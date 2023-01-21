@@ -5,6 +5,7 @@ struct ContentView: View {
   
   var body: some View {
     ZStack {
+      /*
       Swift3DView {
         if tester {
           Triangle(id: "sup")
@@ -26,7 +27,7 @@ struct ContentView: View {
       }
       .frame(width: 400, height: 800)
       .background(.red)
-      
+      */
       VStack {
         Image(systemName: "globe")
           .imageScale(.large)
@@ -36,6 +37,10 @@ struct ContentView: View {
     }
     .onTapGesture {
       tester.toggle()
+    }
+    .onAppear {
+      testTree()
+      // print(self.body)
     }
   }
 }
