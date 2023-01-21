@@ -56,7 +56,7 @@ class MetalView: UIView {
   
   // MARK: - Rendering and Content
   
-  func setContent(_ content: Scene3D) {
+  func setContent(_ content: any Node) {
     scene.setContent(content, library: library)
   }
   

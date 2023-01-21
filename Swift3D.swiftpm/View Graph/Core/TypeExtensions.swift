@@ -7,29 +7,33 @@
 
 import Foundation
 
-// MARK: - Empty
+// MARK: - Never
 
-struct Empty {
-}
-
-extension Empty: Transform3D {
-  var id: String { "" }
-  
-  func build() -> [(String, any Transform3D)] {
-    []
+extension Never: Node {
+  var id: String {
+    fatalError()
   }
+  
+  func desc() -> [String] {
+    fatalError()
+  }
+  
+  var drawCommands: [DrawCommand] {
+    fatalError()
+  }  
 }
 
 // MARK: - Array Print Description
-extension Array where Element == Scene3DElement {
+
+extension Array where Element == any Node {
   var description: String {
+    
     var output = ""
-    self.forEach { (id, drawable) in
-      output.append("\(id): \(type(of: drawable))\n")
+    self.enumerated().forEach() { idx, node in
+      output.append("\(idx): \(node.desc())\n")
     }
     
     return output
   }
 }
-
 

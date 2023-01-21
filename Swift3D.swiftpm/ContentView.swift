@@ -5,29 +5,11 @@ struct ContentView: View {
   
   var body: some View {
     ZStack {
-      /*
       Swift3DView {
         if tester {
-          Triangle(id: "sup")
-        }
-        
-        EmptyDrawable(id: tester ? "one" : "two")
-        Transform3DGroup(id: "hello") {
-          EmptyDrawable2(id: "world")
-          EmptyDrawable(id: "world2")
-        }
-        
-        if tester {
-          EmptyDrawable(id: "tester_is_true")
-          EmptyDrawable(id: "tester_is_true")
-        }
-        else {
-          EmptyDrawable(id: "tester_is_false")
+          TriangleNode(id: "sup")
         }
       }
-      .frame(width: 400, height: 800)
-      .background(.red)
-      */
       VStack {
         Image(systemName: "globe")
           .imageScale(.large)
@@ -39,7 +21,7 @@ struct ContentView: View {
       tester.toggle()
     }
     .onAppear {
-      testTree()
+      // testTree()
       // print(self.body)
     }
   }
