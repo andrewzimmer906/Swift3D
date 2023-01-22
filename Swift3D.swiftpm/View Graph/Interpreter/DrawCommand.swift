@@ -9,51 +9,48 @@ import Foundation
 import Metal
 import simd
 
-class DrawCommand {
+struct DrawCommand {  
+  let command: Command
+  let geometry: Geometry?
+  let transform: Transform  
+  let renderType: RenderType?
+  let storage: Storage
+  
+  var needsRender: Bool {
+    geometry != nil && renderType != nil
+  }
+  
+  func copy(_ command: Command? = nil, 
+            geometry: Geometry? = nil, 
+            transform: Transform? = nil,
+            renderType: RenderType? = nil) -> DrawCommand {
+    DrawCommand(command: command ?? self.command, 
+                geometry: geometry ?? self.geometry, 
+                transform: transform ?? self.transform, 
+                renderType: renderType ?? self.renderType, 
+                storage: storage)    
+  }
+}
+
+// MARK: - Data
+
+extension DrawCommand {
+  enum Command {
+    case draw
+    case placeCamera
+  }
+  
   enum Geometry {
-    case none
     case vertices([Float])
   }
   
-  var geometry = Geometry.none
-  var transform: simd_float4x4 = simd_float4x4(1)
-  var needsRender: Bool {
-    storage.needsRender
+  enum Transform {
+    case model(float4x4)
+    case camera(CameraProjectionSettings, float4x4) // projection, view
   }
   
-  private var storage: Storage = Storage(pipelineState: nil, 
-                                         vertexCount: 0, 
-                                         buffer: nil)
-}
-
-// MARK: - Storage
-
-extension DrawCommand {
-  struct Storage {
-    let pipelineState: MTLRenderPipelineState?
-    let vertexCount: Int
-    let buffer: MTLBuffer?
-    
-    var needsRender: Bool {
-      pipelineState != nil && buffer != nil
-    }
-  }
-  
-  func createStorage(device: MTLDevice, library: MetalShaderLibrary) -> DrawCommand {
-    var buffer: MTLBuffer? = nil
-    var vertexCount = 0
-    switch geometry {
-    case .none:
-      buffer = nil
-    case .vertices(let vertices):
-      let dataSize = vertices.count * MemoryLayout.size(ofValue: vertices[0])
-      buffer = device.makeBuffer(bytes: vertices, length: dataSize, options: [])
-      vertexCount = vertices.count
-    }
-    
-    let pipeline = library.pipeline(for: "basic_vertex", fragment: "basic_fragment")
-    self.storage = Storage(pipelineState: pipeline, vertexCount: vertexCount, buffer: buffer)
-    return self
+  enum RenderType {
+    case triangles(Int)
   }
 }
 
@@ -61,18 +58,31 @@ extension DrawCommand {
 
 extension DrawCommand {
   func render(encoder: MTLRenderCommandEncoder) {
+    // Shaders
     if let ps = storage.pipelineState {
       encoder.setRenderPipelineState(ps)
     }
     
-    if let vb = storage.buffer {
-      encoder.setVertexBuffer(vb, offset: 0, index: 0)  
+    // Vertices
+    if let vb = storage.vertexBuffer {
+      encoder.setVertexBuffer(vb, offset: 0, index: 0)
     }
     
-    encoder.drawPrimitives(type: .triangle, 
-                           vertexStart: 0, 
-                           vertexCount: storage.vertexCount, 
-                           instanceCount: storage.vertexCount / 3)
+    if let modelM = storage.modelMatBuffer {
+      encoder.setVertexBuffer(modelM, offset: 0, index: 1)
+    }
+    
+    // Draw
+    switch renderType {
+    case .none:
+      break
+    case .triangles(let instanceCount):
+      encoder.drawPrimitives(type: .triangle, 
+                             vertexStart: 0, 
+                             vertexCount: instanceCount * 3, 
+                             instanceCount: instanceCount)
+    }
+    
     encoder.endEncoding()
   }
 }

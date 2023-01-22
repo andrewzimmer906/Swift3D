@@ -57,7 +57,9 @@ class MetalView: UIView {
   // MARK: - Rendering and Content
   
   func setContent(_ content: any Node) {
-    scene.setContent(content, library: library)
+    scene.setContent(content, 
+                     library: library,
+                     surfaceAspect: Float(layer.frame.size.width / layer.frame.size.height))
   }
   
   private func render(time: CFTimeInterval) {
@@ -78,6 +80,11 @@ class MetalView: UIView {
     for l in layers {
       l.frame = layer.frame
     }      
+    
+    // Reset content to reset the aspect ration on the projection matrix.
+    scene.setContent(scene.content, 
+                     library: library,
+                     surfaceAspect: Float(layer.frame.size.width / layer.frame.size.height))
   }
 }
 

@@ -1,25 +1,31 @@
 import Foundation
 import UIKit
 import Metal
+import simd
 
 public class MetalRenderer: ObservableObject {
   private let commandQueue: MTLCommandQueue
-
-  private var _metalDevice: MTLDevice?
-  public var metalDevice: MTLDevice? {
-    _metalDevice
-  }
+  let metalDevice: MTLDevice
   
-  // private var pipe: MetalPipeline?
-
-  // private var command: MetalRenderCommand?
-  // private var command2: MetalRenderCommand?
+  private lazy var defaultProjViewBuffer: MTLBuffer? = {
+    let buff = metalDevice.makeBuffer(length: MemoryLayout<ViewProjectionUniform>.size)
+    guard let buff = buff else {
+      fatalError()
+    }
+    
+    let vpUniform = ViewProjectionUniform(projectionMatrix: float4x4.identity, viewMatrix: float4x4.identity)          
+    buff.contents().storeBytes(of: vpUniform, as: ViewProjectionUniform.self)
+    
+    return buff
+  }()
   
   public init(device: MTLDevice) {
     guard let cq = device.makeCommandQueue() else {
       fatalError()        
-    }    
-    commandQueue = cq    
+    }   
+    
+    commandQueue = cq
+    metalDevice = device
   }
   
   func render(layerDrawable: CAMetalDrawable, commands: [DrawCommand]) {
@@ -46,6 +52,11 @@ public class MetalRenderer: ObservableObject {
     renderPassDescriptor.colorAttachments[0].texture = layerDrawable.texture
     renderPassDescriptor.colorAttachments[0].loadAction = .load
     
+    var viewProjBuffer: MTLBuffer? = nil
+    if let cameraCommand = commands.first(where: { $0.command == .placeCamera }) {
+      viewProjBuffer = cameraCommand.storage.viewProjBuffer
+    }
+    
     commands.forEach { command in
       guard command.needsRender else {
         return 
@@ -55,84 +66,17 @@ public class MetalRenderer: ObservableObject {
         fatalError()
       }
       
+      // Set the view / proj buffer if it exists
+      if let viewProjBuffer = viewProjBuffer {
+        encoder.setVertexBuffer(viewProjBuffer, offset: 0, index: 2)
+      } else {
+        encoder.setVertexBuffer(defaultProjViewBuffer, offset: 0, index: 2)
+      }
+      
       command.render(encoder: encoder)
     }
 
     buffer.present(layerDrawable)
     buffer.commit()
   }
-  
-  
-  /*
-  public func build() {
-    _metalDevice = MTLCreateSystemDefaultDevice()
-    commandQueue = _metalDevice?.makeCommandQueue()
-
-    if let device = _metalDevice {
-      let pipe = MetalPipeline(library: device.makeDefaultLibrary()!, device: device)
-      //let pipe2 = MetalPipeline(library: device.makeDefaultLibrary()!, device: device)
-
-
-      command = MetalRenderCommand(device: device, pipeline: pipe,
-                                   vertices: [
-        0.0,  0.75, 0.0,
-        -0.75, -0.75, 0.0,
-        0.75, -0.75, 0.0
-     ])
-
-    command2 = MetalRenderCommand(device: device, pipeline: pipe,
-                                 vertices: [
-      -1.0,  -1.0, 0.0,
-      -0.75, -0.75, 0.0,
-       -1.0, -0.75, 0.0
-   ])
-  }
-
-    ready = true
-    timeline.start(callback: render)
-  }
-
-
-  private func render(time: CFTimeInterval) {
-    guard let layer = layer,
-          let drawable = layer.nextDrawable(),
-          let commandBuffer = commandQueue?.makeCommandBuffer() else {
-      print("error failed to render")
-      return
-    }
-
-    // Pass Descriptors
-    let clearPassDescriptor = MTLRenderPassDescriptor()
-    clearPassDescriptor.colorAttachments[0].texture = drawable.texture
-    clearPassDescriptor.colorAttachments[0].loadAction = .clear
-    clearPassDescriptor.colorAttachments[0].clearColor = MTLClearColor(
-      red: 0.15,
-      green: 0.15,
-      blue: 0.15,
-      alpha: 1.0)
-
-    let renderPassDescriptor = MTLRenderPassDescriptor()
-    renderPassDescriptor.colorAttachments[0].texture = drawable.texture
-    renderPassDescriptor.colorAttachments[0].loadAction = .load
-
-    // Clear Pass
-    let renderEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: clearPassDescriptor)!
-    renderEncoder.endEncoding()
-
-    // Encoder
-    if let command = self.command {
-      let renderEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: renderPassDescriptor)!
-      command.render(encoder: renderEncoder)
-    }
-
-    if let command = self.command2 {
-      let renderEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: renderPassDescriptor)!
-      command.render(encoder: renderEncoder)
-    }
-
-    commandBuffer.present(drawable)
-    commandBuffer.commit()
-    
-    print("render complete")
-  }*/
 }
