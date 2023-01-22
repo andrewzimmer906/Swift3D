@@ -9,16 +9,16 @@ import UIKit
 import SwiftUI
 
 struct Swift3DView: UIViewRepresentable {
-  let content: () -> [any Transform3D]
+  let content: () -> any Node
   
-  init(@SceneBuilder3D _ content: @escaping () -> [any Transform3D]) {
+  init(@SceneBuilder _ content: @escaping () -> any Node) {
     self.content = content
   }
 
   func makeUIView(context: Context) -> UIView {
     // Needs initial frame to not be zero to create MTLDevice
     let view = MetalView(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
-    view.setContent(content().build())
+    view.setContent(content())
     
     return view
   }
@@ -28,7 +28,7 @@ struct Swift3DView: UIViewRepresentable {
     context: Context
   ) {
     if let view = uiView as? MetalView {
-      view.setContent(content().build())
+      view.setContent(content())
     }
   }
 }

@@ -22,7 +22,7 @@ public class MetalRenderer: ObservableObject {
     commandQueue = cq    
   }
   
-  func render(layerDrawable: CAMetalDrawable, commands: [any DrawCommand]) {
+  func render(layerDrawable: CAMetalDrawable, commands: [DrawCommand]) {
     guard let buffer = commandQueue.makeCommandBuffer() else {
       fatalError()
     }
@@ -47,9 +47,14 @@ public class MetalRenderer: ObservableObject {
     renderPassDescriptor.colorAttachments[0].loadAction = .load
     
     commands.forEach { command in
+      guard command.needsRender else {
+        return 
+      }
+      
       guard let encoder = buffer.makeRenderCommandEncoder(descriptor: renderPassDescriptor) else {
         fatalError()
       }
+      
       command.render(encoder: encoder)
     }
 
