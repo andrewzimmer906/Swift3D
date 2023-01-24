@@ -18,10 +18,11 @@ struct TriangleNode: Node {
   }
   
   var drawCommands: [DrawCommand] {
-    [DrawCommand(command: .draw, 
+    [DrawCommand(command: .draw(id), 
                  geometry: .vertices(vertices), 
                  transform: .model(float4x4.identity), 
-                 renderType: .triangles(1), 
+                 renderType: .triangles(1),
+                 animations: nil,
                  storage: DrawCommand.Storage())]
   }
   

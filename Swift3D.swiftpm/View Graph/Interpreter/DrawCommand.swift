@@ -9,35 +9,59 @@ import Foundation
 import Metal
 import simd
 
-struct DrawCommand {  
+struct DrawCommand {
   let command: Command
   let geometry: Geometry?
-  let transform: Transform  
+  let transform: Transform 
   let renderType: RenderType?
+  
+  let animations: [NodeTransition]?
+  
   let storage: Storage
   
   var needsRender: Bool {
     geometry != nil && renderType != nil
   }
   
-  func copy(_ command: Command? = nil, 
-            geometry: Geometry? = nil, 
+  func copy(geometry: Geometry? = nil, 
             transform: Transform? = nil,
-            renderType: RenderType? = nil) -> DrawCommand {
-    DrawCommand(command: command ?? self.command, 
+            renderType: RenderType? = nil,
+            animations: [NodeTransition]? = nil) -> DrawCommand {
+    DrawCommand(command: self.command, 
                 geometry: geometry ?? self.geometry, 
                 transform: transform ?? self.transform, 
                 renderType: renderType ?? self.renderType, 
-                storage: storage)    
+                animations: animations ?? self.animations,
+                storage: storage)
   }
 }
 
 // MARK: - Data
 
 extension DrawCommand {
-  enum Command {
-    case draw
-    case placeCamera
+  enum Command: Equatable {
+    case draw(String)
+    case placeCamera(String)
+    
+    var isCamera: Bool {
+      switch self {
+      case .placeCamera:
+        return true
+      default:
+        return false
+      }
+    }
+    
+    static func ==(lhs: Command, rhs: Command) -> Bool {
+      switch(lhs, rhs) {
+      case (.draw(let lhsId), .draw(let rhsId)):
+        return lhsId == rhsId
+      case (.placeCamera(let lhsId), .placeCamera(let rhsId)):
+        return lhsId == rhsId  
+      default:
+        return false
+      }
+    }
   }
   
   enum Geometry {
@@ -57,6 +81,13 @@ extension DrawCommand {
 // MARK: - Render
 
 extension DrawCommand {
+  /// Updates the values in the command with any animations that are running.
+  func update(time: CFTimeInterval) {
+    if let dirtyTransform = updatedTransform(time: time) {
+      storage.set(dirtyTransform)
+    }
+  }
+  
   func render(encoder: MTLRenderCommandEncoder) {
     // Shaders
     if let ps = storage.pipelineState {

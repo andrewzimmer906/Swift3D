@@ -22,6 +22,8 @@ struct IdentityModifier: NodeModifier {
   }
 }
 
+// MARK: - Node Extension
+
 extension Node {
   func modified(id: String) -> ModifiedNodeContent<Self, IdentityModifier> {
     self.modifier(IdentityModifier(id: id))

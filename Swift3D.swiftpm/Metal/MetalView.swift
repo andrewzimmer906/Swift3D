@@ -67,7 +67,7 @@ class MetalView: UIView {
       fatalError()
     }
     
-    renderer.render(layerDrawable: drawable, commands: scene.commands)
+    renderer.render(time, layerDrawable: drawable, commands: scene.commands)
   }
   
   // MARK: - View Methods

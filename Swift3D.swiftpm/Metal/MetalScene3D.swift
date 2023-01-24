@@ -21,10 +21,14 @@ class MetalScene3D {
     self.content = content
     
     // Generate some draw commands    
-    commands = content.drawCommands.map({ command in
-      command.createStorage(device: device, 
-                            library: library, 
-                            surfaceAspect: surfaceAspect)
+    let nextCommands = content.drawCommands.map({ command in
+      let prevCommand = commands.first { $0.command == command.command }
+
+      return command.createStorage(device: device, 
+                                   library: library, 
+                                   previousDrawCommand: prevCommand,
+                                   surfaceAspect: surfaceAspect)
     })
+    commands = nextCommands
   }
 }
