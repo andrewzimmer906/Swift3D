@@ -22,6 +22,6 @@ struct GroupNode<Content>: Node where Content: Node {
   }
   
   var drawCommands: [DrawCommand] {
-    content.drawCommands
+    content.drawCommands.map { $0.append(id: id) }
   }
 }

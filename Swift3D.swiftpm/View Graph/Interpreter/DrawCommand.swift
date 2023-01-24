@@ -22,16 +22,29 @@ struct DrawCommand {
     geometry != nil && renderType != nil
   }
   
-  func copy(geometry: Geometry? = nil, 
+  func copy(command: Command? = nil,
+            geometry: Geometry? = nil, 
             transform: Transform? = nil,
             renderType: RenderType? = nil,
             animations: [NodeTransition]? = nil) -> DrawCommand {
-    DrawCommand(command: self.command, 
+    DrawCommand(command: command ?? self.command, 
                 geometry: geometry ?? self.geometry, 
                 transform: transform ?? self.transform, 
                 renderType: renderType ?? self.renderType, 
                 animations: animations ?? self.animations,
                 storage: storage)
+  }
+  
+  func append(id: String) -> DrawCommand {
+    var updatedCommand = command
+    switch command {
+    case .draw(let curId):
+      updatedCommand = .draw("\(id).\(curId)")
+    case .placeCamera(let curId):
+      updatedCommand = .placeCamera("\(id).\(curId)")
+    }
+    
+    return self.copy(command: updatedCommand)
   }
 }
 

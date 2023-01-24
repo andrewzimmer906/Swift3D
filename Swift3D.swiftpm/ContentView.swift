@@ -14,24 +14,40 @@ struct ContentView: View {
       }) {
         GroupNode(id: "camera_container") {
           CameraNode(id: "camera")
-            .transform(float4x4.translated(simd_float3(x: 0, y: 0, z: -5)))
+            .transform(float4x4.translated(simd_float3(x: 0, y: 0, z: -7)))
         }
         .transform(float4x4.rotated(angle: isRotated ? Float.pi : 0, axis: simd_float3.up))        
         .transition(.easeOut(1.5))
-                
-        TriangleNode(id: "sup")
-          .transform(float4x4.rotated(angle: rotation, axis: simd_float3.up))
-          .transform(.scaled(simd_float3.one * 0.5))
         
-        TriangleNode(id: "sup2")
-          .transform(.translated(simd_float3.down))
-          .transform(float4x4.rotated(angle: rotation, axis: simd_float3.right))          
-          .transform(.scaled(simd_float3.one * 0.5))
+        GroupNode(id: "tri_boss") {
+          TriangleNode(id: "L1")
+            .transform(.translated(simd_float3.left * 1))
+          TriangleNode(id: "L75")
+            .transform(.translated(simd_float3.left * 0.75))
+          TriangleNode(id: "L5")
+            .transform(.translated(simd_float3.left * 0.5))
+          TriangleNode(id: "L25")
+            .transform(.translated(simd_float3.left * 0.25))
+          
+          TriangleNode(id: "base")
+
+          TriangleNode(id: "R25")
+            .transform(.translated(simd_float3.right * 0.25))
+          TriangleNode(id: "R5")
+            .transform(.translated(simd_float3.right * 0.5))
+          TriangleNode(id: "R75")
+            .transform(.translated(simd_float3.right * 0.75))
+          TriangleNode(id: "R1")
+            .transform(.translated(simd_float3.right * 1))          
+        }
+        .transform(.translated(simd_float3.right * sin(rotation)))
+        .transform(float4x4.rotated(angle: rotation, axis: simd_float3.up))
         
-        TriangleNode(id: "sup4")
+        /*TriangleNode(id: "tri")
           .transform(.translated(simd_float3.up))
           .transform(float4x4.rotated(angle: rotation, axis: simd_float3.forward))          
           .transform(.scaled(simd_float3.one * 0.5))
+         */
       }
       
       VStack {
