@@ -22,7 +22,9 @@ class MetalScene3D {
     
     // Generate some draw commands    
     let nextCommands = content.drawCommands.map({ command in
-      let prevCommand = commands.first { $0.command == command.command }
+      let prevCommands = commands.filter { $0.command == command.command }
+      assert(prevCommands.count <= 1, "Ids must be unique. Please check your Ids.")
+      let prevCommand = prevCommands.first
 
       return command.createStorage(device: device, 
                                    library: library, 

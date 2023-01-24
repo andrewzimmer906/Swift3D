@@ -9,15 +9,29 @@ struct ContentView: View {
   
   var body: some View {
     ZStack {
-      Swift3DView {
-        CameraNode(id: "camera")
-          .transform(float4x4.translated(simd_float3(x: 0, y: 0, z: isRotated ? -10 : -20)))
-          .transition(.easeOut(2))
-        
+      Swift3DView(updateLoop: { delta in 
+        rotation += 1.0 * Float(delta)
+      }) {
+        GroupNode(id: "camera_container") {
+          CameraNode(id: "camera")
+            .transform(float4x4.translated(simd_float3(x: 0, y: 0, z: -5)))
+        }
+        .transform(float4x4.rotated(angle: isRotated ? Float.pi : 0, axis: simd_float3.up))        
+        .transition(.easeOut(1.5))
+                
         TriangleNode(id: "sup")
-          .transform(float4x4.rotated(angle: isRotated ? Float.pi : 0, axis: simd_float3.forward))
-          .transform(float4x4.translated(simd_float3.left * (isRotated ? 2 : 0)))
-          .transition(.easeInOut(1))
+          .transform(float4x4.rotated(angle: rotation, axis: simd_float3.up))
+          .transform(.scaled(simd_float3.one * 0.5))
+        
+        TriangleNode(id: "sup2")
+          .transform(.translated(simd_float3.down))
+          .transform(float4x4.rotated(angle: rotation, axis: simd_float3.right))          
+          .transform(.scaled(simd_float3.one * 0.5))
+        
+        TriangleNode(id: "sup4")
+          .transform(.translated(simd_float3.up))
+          .transform(float4x4.rotated(angle: rotation, axis: simd_float3.forward))          
+          .transform(.scaled(simd_float3.one * 0.5))
       }
       
       VStack {
@@ -28,7 +42,7 @@ struct ContentView: View {
       }
     }
     .onTapGesture {
-      rotation += Float.pi/2
+      //rotation += Float.pi/2
       //tester.toggle()
       isRotated.toggle()
     }

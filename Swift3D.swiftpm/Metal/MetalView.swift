@@ -13,6 +13,8 @@ class MetalView: UIView {
   private let scene: MetalScene3D
   
   private let timelineLoop = TimelineLoop(fps: 60)
+  private var updateLoop: ((_ deltaTime: CFTimeInterval) -> Void)?
+  private var lastUpdateTime: CFTimeInterval = 0
   
   // MARK: Setup / Teardown
   
@@ -56,6 +58,11 @@ class MetalView: UIView {
   
   // MARK: - Rendering and Content
   
+  func setUpdateLoop(_ updateLoop: ((_ deltaTime: CFTimeInterval) -> Void)?) {
+    self.lastUpdateTime = CACurrentMediaTime()
+    self.updateLoop = updateLoop
+  }
+  
   func setContent(_ content: any Node) {
     scene.setContent(content, 
                      library: library,
@@ -66,6 +73,11 @@ class MetalView: UIView {
     guard let drawable = metalLayer?.nextDrawable() else {
       fatalError()
     }
+    
+    let curTime = CACurrentMediaTime()
+    let delta = curTime - lastUpdateTime
+    updateLoop?(delta)
+    lastUpdateTime = curTime
     
     renderer.render(time, layerDrawable: drawable, commands: scene.commands)
   }

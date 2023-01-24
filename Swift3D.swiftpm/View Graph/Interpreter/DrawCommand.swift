@@ -14,7 +14,6 @@ struct DrawCommand {
   let geometry: Geometry?
   let transform: Transform 
   let renderType: RenderType?
-  
   let animations: [NodeTransition]?
   
   let storage: Storage
@@ -36,54 +35,12 @@ struct DrawCommand {
   }
 }
 
-// MARK: - Data
-
-extension DrawCommand {
-  enum Command: Equatable {
-    case draw(String)
-    case placeCamera(String)
-    
-    var isCamera: Bool {
-      switch self {
-      case .placeCamera:
-        return true
-      default:
-        return false
-      }
-    }
-    
-    static func ==(lhs: Command, rhs: Command) -> Bool {
-      switch(lhs, rhs) {
-      case (.draw(let lhsId), .draw(let rhsId)):
-        return lhsId == rhsId
-      case (.placeCamera(let lhsId), .placeCamera(let rhsId)):
-        return lhsId == rhsId  
-      default:
-        return false
-      }
-    }
-  }
-  
-  enum Geometry {
-    case vertices([Float])
-  }
-  
-  enum Transform {
-    case model(float4x4)
-    case camera(CameraProjectionSettings, float4x4) // projection, view
-  }
-  
-  enum RenderType {
-    case triangles(Int)
-  }
-}
-
-// MARK: - Render
+// MARK: - Update / Render
 
 extension DrawCommand {
   /// Updates the values in the command with any animations that are running.
   func update(time: CFTimeInterval) {
-    if let dirtyTransform = updatedTransform(time: time) {
+    if let dirtyTransform = presentedTransform(time: time) {
       storage.set(dirtyTransform)
     }
   }
@@ -115,5 +72,13 @@ extension DrawCommand {
     }
     
     encoder.endEncoding()
+  }
+}
+
+// MARK: - Transitions
+extension DrawCommand {
+  /// Updates the draw command to have the correct values for its current time with transitions in mind.
+  func presentedDrawCommand(time: CFTimeInterval) -> DrawCommand {
+    return self.copy(transform: presentedTransform(time: time))
   }
 }

@@ -9,15 +9,19 @@ import UIKit
 import SwiftUI
 
 struct Swift3DView: UIViewRepresentable {
+  let updateLoop: ((_ deltaTime: CFTimeInterval) -> Void)?
   let content: () -> any Node
   
-  init(@SceneBuilder _ content: @escaping () -> any Node) {
+  init(updateLoop: ((_ deltaTime: CFTimeInterval) -> Void)? = nil,
+       @SceneBuilder _ content: @escaping () -> any Node) {
+    self.updateLoop = updateLoop
     self.content = content
   }
 
   func makeUIView(context: Context) -> UIView {
     // Needs initial frame to not be zero to create MTLDevice
     let view = MetalView(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
+    view.setUpdateLoop(updateLoop)
     view.setContent(content())
     
     return view
