@@ -19,7 +19,7 @@ struct TriangleNode: Node {
   
   var drawCommands: [DrawCommand] {
     [DrawCommand(command: .draw(id), 
-                 geometry: .vertices(vertices), 
+                 geometry: Vertices(vertices: vertices),
                  transform: .model(float4x4.identity), 
                  renderType: .triangles(1),
                  animations: nil,
@@ -28,5 +28,5 @@ struct TriangleNode: Node {
   
   func desc() -> [String] {
     ["\(String(describing:type(of: self))).\(id)"]  
-  }  
+  }
 }

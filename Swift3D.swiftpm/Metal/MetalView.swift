@@ -15,6 +15,7 @@ class MetalView: UIView {
   private let timelineLoop = TimelineLoop(fps: 60)
   private var updateLoop: ((_ deltaTime: CFTimeInterval) -> Void)?
   private var lastUpdateTime: CFTimeInterval = 0
+  private var preferredTimeBetweenUpdates: CFTimeInterval = 0
   
   // MARK: Setup / Teardown
   
@@ -58,9 +59,10 @@ class MetalView: UIView {
   
   // MARK: - Rendering and Content
   
-  func setUpdateLoop(_ updateLoop: ((_ deltaTime: CFTimeInterval) -> Void)?) {
+  func setUpdateLoop(_ updateLoop: ((_ deltaTime: CFTimeInterval) -> Void)?, preferredFps: Int) {
     self.lastUpdateTime = CACurrentMediaTime()
     self.updateLoop = updateLoop
+    self.preferredTimeBetweenUpdates = 1.0 / Double(preferredFps)    
   }
   
   func setContent(_ content: any Node) {
@@ -76,8 +78,10 @@ class MetalView: UIView {
     
     let curTime = CACurrentMediaTime()
     let delta = curTime - lastUpdateTime
-    updateLoop?(delta)
-    lastUpdateTime = curTime
+    if delta >= preferredTimeBetweenUpdates {
+      updateLoop?(delta)
+      lastUpdateTime = curTime
+    }
     
     renderer.render(time, layerDrawable: drawable, commands: scene.commands)
   }

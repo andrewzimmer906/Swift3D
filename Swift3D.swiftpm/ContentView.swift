@@ -40,14 +40,7 @@ struct ContentView: View {
           TriangleNode(id: "R1")
             .transform(.translated(simd_float3.right * 1))          
         }
-        .transform(.translated(simd_float3.right * sin(rotation)))
         .transform(float4x4.rotated(angle: rotation, axis: simd_float3.up))
-        
-        /*TriangleNode(id: "tri")
-          .transform(.translated(simd_float3.up))
-          .transform(float4x4.rotated(angle: rotation, axis: simd_float3.forward))          
-          .transform(.scaled(simd_float3.one * 0.5))
-         */
       }
       
       VStack {

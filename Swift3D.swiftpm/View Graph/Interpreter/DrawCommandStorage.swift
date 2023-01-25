@@ -115,25 +115,23 @@ extension DrawCommand.Storage {
     }
   }
 
-  private func make(_ geometry: DrawCommand.Geometry,
-                      previousGeometry: DrawCommand.Geometry?,
-                      previousStorage: DrawCommand.Storage?) {    
+  private func make<A, B>(_ geometry: A,
+                      previousGeometry: B?,
+                          previousStorage: DrawCommand.Storage?) where A: DrawCommand_Geometry, B: DrawCommand_Geometry {    
     guard let device = device else {
       fatalError()
     }
     
-    let usePrevious = (geometry == previousGeometry)    
-    switch geometry {
-    case .vertices(let vertices):
+    if let previousGeometry = previousGeometry as? A {
+      let usePrevious = (geometry == previousGeometry)
+      
       if usePrevious {
-        // This could potentially cache an old model. :D
         self.vertexBuffer = previousStorage?.vertexBuffer
-      }
-      else {
-        let dataSize = vertices.count * MemoryLayout<Float>.size
-        self.vertexBuffer = device.makeBuffer(bytes: vertices, length: dataSize)      
+        return 
       }
     }
+    
+    self.vertexBuffer = geometry.createBuffer(device: device)
   }
 }
 

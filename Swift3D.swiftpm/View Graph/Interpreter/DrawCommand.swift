@@ -9,9 +9,13 @@ import Foundation
 import Metal
 import simd
 
-struct DrawCommand {
+protocol DrawCommandP {
+  associatedtype Geo: DrawCommand_Geometry
+}
+
+struct DrawCommand: Draw {
   let command: Command
-  let geometry: Geometry?
+  let geometry: Geo?
   let transform: Transform 
   let renderType: RenderType?
   let animations: [NodeTransition]?
@@ -23,7 +27,7 @@ struct DrawCommand {
   }
   
   func copy(command: Command? = nil,
-            geometry: Geometry? = nil, 
+            geometry: (any DrawCommand.Geometry)? = nil, 
             transform: Transform? = nil,
             renderType: RenderType? = nil,
             animations: [NodeTransition]? = nil) -> DrawCommand {
