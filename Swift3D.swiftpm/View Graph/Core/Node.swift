@@ -10,5 +10,5 @@ import Foundation
 protocol Node {  
   var id: String { get }  
   func desc() -> [String]
-  var drawCommands: [DrawCommand] { get }
+  var drawCommands: [any MetalDrawable] { get }
 }

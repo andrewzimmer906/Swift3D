@@ -14,7 +14,7 @@ extension DrawCommand {
   class Storage {
     // Storing two levels back of draw commands allows us to
     // do a little additional optimization and handle animations.
-    private(set) var previousDrawCommand: DrawCommand?
+    private(set) var previousDrawCommand: (any MetalDrawable)?
     private(set) var surfaceAspect: Float?
     
     private(set) var device: MTLDevice?
@@ -24,40 +24,74 @@ extension DrawCommand {
     private(set) var modelMatBuffer: MTLBuffer?
     private(set) var viewProjBuffer: MTLBuffer?
   }
-  
-  func createStorage(device: MTLDevice, 
+}
+
+/*
+extension DrawableCommand {
+  func createStorage<C0>(device: MTLDevice, 
                      library: MetalShaderLibrary, 
-                     previousDrawCommand: DrawCommand?,
-                     surfaceAspect: Float) -> DrawCommand {
-    storage.build(self, 
+                     previousDrawCommand: C0?,
+                    surfaceAspect: Float) -> Self where C0: DrawableCommand {
+    
+    storage.build(self,
                   previousDrawCommand: previousDrawCommand?.presentedDrawCommand(time: CACurrentMediaTime()), 
                   device: device, 
                   library: library,
                   surfaceAspect: surfaceAspect)
     
+      /*
+    
+    storage.device = device
+    storage.surfaceAspect = surfaceAspect
+    storage.previousDrawCommand = previousDrawCommand
+    
+    // Geometry
+    storage.make(command.geometry,
+                 previousGeometry: previousDrawCommand?.geometry, 
+                 previousStorage: previousDrawCommand?.storage)
+    // set(command.geometry)  // does nothing, we have to set in build.
+    
+    // Transform
+    storage.make(command.transform, 
+         previousTransform: previousDrawCommand?.transform, 
+         previousStorage: previousDrawCommand?.storage)
+    storage.set(command.presentedTransform(time: CACurrentMediaTime()) ?? command.transform)
+    
+    // TODO: Real shader selection!
+    storage.pipelineState = library.pipeline(for: "basic_vertex", fragment: "basic_fragment")
+    
+    // Clear out old data and release MTLBuffers that are no longer in use.
+    storage.previousDrawCommand?.storage.clear()
+    */
+    /*
+    storage.build(self, 
+                  previousDrawCommand: previousDrawCommand?.presentedDrawCommand(time: CACurrentMediaTime()), 
+                  device: device, 
+                  library: library,
+                  surfaceAspect: surfaceAspect)*/
+    
     return self
   }
-}
+}*/
 
 // MARK: - Build
 
 extension DrawCommand.Storage {
-  func build(_ command: DrawCommand, 
-             previousDrawCommand: DrawCommand?,
-             device: MTLDevice, 
-             library: MetalShaderLibrary, 
-             surfaceAspect: Float) {
+  func build<C0>(_ command: C0, 
+                     previousDrawCommand: (any MetalDrawable)?,
+                     device: MTLDevice, 
+                     library: MetalShaderLibrary, 
+                     surfaceAspect: Float) where C0: MetalDrawable {
     
     self.device = device
     self.surfaceAspect = surfaceAspect
-    self.previousDrawCommand = previousDrawCommand    
+    self.previousDrawCommand = previousDrawCommand
     
     // Geometry
     if let geometry = command.geometry {
-      make(geometry, 
+      make(geometry,
            previousGeometry: previousDrawCommand?.geometry, 
            previousStorage: previousDrawCommand?.storage)
-      set(geometry)  // does nothing, we have to set in build.
     }
     
     // Transform
@@ -96,7 +130,7 @@ extension DrawCommand.Storage {
       fatalError()
     }
     
-    let usePrevious = (transform == previousTransform)    
+    let usePrevious = (transform == previousTransform)
     switch transform {
     case .model(_):
       if usePrevious {
@@ -104,7 +138,7 @@ extension DrawCommand.Storage {
       }
       else {
         self.modelMatBuffer = device.makeBuffer(length: float4x4.length)  
-      }     
+      }
       
     case .camera(_, _):
       if usePrevious {
@@ -115,9 +149,9 @@ extension DrawCommand.Storage {
     }
   }
 
-  private func make<A, B>(_ geometry: A,
-                      previousGeometry: B?,
-                          previousStorage: DrawCommand.Storage?) where A: DrawCommand_Geometry, B: DrawCommand_Geometry {    
+  private func make<A>(_ geometry: A,
+                      previousGeometry: (any DrawCommand_Geometry)?,
+                          previousStorage: DrawCommand.Storage?) where A: DrawCommand_Geometry {    
     guard let device = device else {
       fatalError()
     }

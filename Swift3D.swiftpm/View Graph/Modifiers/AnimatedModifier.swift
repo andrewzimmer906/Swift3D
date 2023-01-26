@@ -54,11 +54,11 @@ struct TransitionModifier: NodeModifier {
     content.desc()
   }
   
-  func drawCommands(content: any Node) -> [DrawCommand] {
+  func drawCommands(content: any Node) -> [any MetalDrawable] {
     return content.drawCommands.map { command in
       var anims: [NodeTransition] = command.animations ?? []
-      anims.append(animation)
-      return command.copy(animations: anims)
+      anims.append(animation)      
+      return command.withUpdated(animations: anims)
     }
   }
 }

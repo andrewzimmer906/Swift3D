@@ -14,7 +14,7 @@ func makeCode(@SceneBuilder _ content: () -> any Node) -> any Node {
 }
 
 func testTree() {
-  let yes = true
+  // let yes = true
   let no = false
 
   let tree = makeCode { 

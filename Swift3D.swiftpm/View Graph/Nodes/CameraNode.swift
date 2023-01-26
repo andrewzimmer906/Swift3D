@@ -21,13 +21,11 @@ struct CameraNode: Node {
     ["\(String(describing:type(of: self))).\(id)"]  
   }
   
-  var drawCommands: [DrawCommand] {
-    [DrawCommand(command: .placeCamera(id), 
-                 geometry: .none, 
-                 transform: .camera(CameraProjectionSettings(fov:1.0472, zNear: 0.1, zFar: 100),
-                                    float4x4.identity),
-                 renderType: .none,
-                 animations: nil,
-                 storage: DrawCommand.Storage())]
+  var drawCommands: [any MetalDrawable] {
+    [PlaceCamera(id: id, 
+                renderType: nil, 
+                animations: nil, 
+                transform: .camera(CameraProjectionSettings(fov:1.0472, zNear: 0.1, zFar: 100), float4x4.identity),
+                storage: DrawCommand.Storage())]
   }
 }

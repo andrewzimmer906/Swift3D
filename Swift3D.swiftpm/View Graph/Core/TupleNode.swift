@@ -48,7 +48,7 @@ struct TupleNode<T>: Node {
     fatalError()
   }
   
-  var drawCommands: [DrawCommand] {
+  var drawCommands: [any MetalDrawable] {
     if let val = value as? (any Node, any Node) {
       return val.0.drawCommands + val.1.drawCommands
     }

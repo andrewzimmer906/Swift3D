@@ -18,7 +18,7 @@ struct EmptyNode: Node {
     []  
   }
   
-  var drawCommands: [DrawCommand] {
+  var drawCommands: [any MetalDrawable] {
     []
   }
 }

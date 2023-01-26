@@ -17,7 +17,7 @@ struct IdentityModifier: NodeModifier {
     }
   }
   
-  func drawCommands(content: any Node) -> [DrawCommand] {
+  func drawCommands(content: any Node) -> [any MetalDrawable] {
     return content.drawCommands
   }
 }

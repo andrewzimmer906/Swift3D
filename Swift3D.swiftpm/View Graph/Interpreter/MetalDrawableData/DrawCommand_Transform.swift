@@ -29,9 +29,9 @@ extension DrawCommand.Transform: Equatable {
 }
 
 // MARK: - Transitions
-extension DrawCommand {
+extension MetalDrawable {
   /// Gets visible transform accounting for transitions
-  func presentedTransform(time: CFTimeInterval) -> Transform? {
+  func presentedTransform(time: CFTimeInterval) -> DrawCommand.Transform? {
     guard let animation = animations?.first(where: { $0.attribute == .all }),
           let prevTransform = storage.previousDrawCommand?.transform else {
       return nil

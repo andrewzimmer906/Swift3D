@@ -15,13 +15,13 @@ struct TransformModifier: NodeModifier {
     content.desc()
   }
   
-  func drawCommands(content: any Node) -> [DrawCommand] {
+  func drawCommands(content: any Node) -> [any MetalDrawable] {
     return content.drawCommands.map { command in
       switch command.transform {
       case .model(let modelMat):
-        return command.copy(transform: .model(modelMat * transform))
+        return command.withUpdated(transform: .model(modelMat * transform))
       case .camera(let projMat, let viewMat): 
-        return command.copy(transform: .camera(projMat, viewMat * transform))
+        return command.withUpdated(transform: .camera(projMat, viewMat * transform))
       }
     }
   }

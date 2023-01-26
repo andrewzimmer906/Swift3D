@@ -8,18 +8,15 @@
 import Foundation
 import Metal
 
-extension DrawCommand {
-  typealias Geometry = DrawCommand_Geometry
-}
-
-
 protocol DrawCommand_Geometry: Equatable {
   func createBuffer(device: MTLDevice) -> MTLBuffer? 
 }
 
 // MARK: - Raw Floats
 
-struct Vertices: DrawCommand_Geometry {
+// MARK: - Raw Floats
+
+struct RawVertices: DrawCommand_Geometry {
   let vertices: [Float]
   
   func createBuffer(device: MTLDevice) -> MTLBuffer? {
@@ -28,13 +25,15 @@ struct Vertices: DrawCommand_Geometry {
   }
   
   static func == (lhs: Self, rhs: any DrawCommand_Geometry) -> Bool {
-    if let rhs = rhs as? Vertices {
+    if let rhs = rhs as? RawVertices {
       return lhs.vertices.count == rhs.vertices.count 
     }
     
     return false
   }
 }
+
+
 
 
 /*
@@ -56,7 +55,8 @@ extension DrawCommand.Geometry: Equatable {
 // MARK: - Storage
 
 extension DrawCommand.Storage {
-  func set(_ geometry: any DrawCommand.Geometry) {
+  
+  /*func set(_ geometry: any DrawCommand.Geometry) {
     /*
     switch geometry {
     case .vertices(let vertices):
@@ -64,7 +64,7 @@ extension DrawCommand.Storage {
      // Throws fatalError so we set in storage.build instead.
     }
      */
-  }
+  }*/
 }
 
 

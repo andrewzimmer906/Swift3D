@@ -19,14 +19,14 @@ extension ModifiedNodeContent: Node where Content: Node, Modifier: NodeModifier 
     modifier.desc(content: content)
   }
   
-  var drawCommands: [DrawCommand] {
+  var drawCommands: [any MetalDrawable] {
     modifier.drawCommands(content: content)
   }
 }
 
 protocol NodeModifier {
   func desc(content: any Node) -> [String]
-  func drawCommands(content: any Node) -> [DrawCommand]
+  func drawCommands(content: any Node) -> [any MetalDrawable]
 }
 
 // MARK: - Node Extension

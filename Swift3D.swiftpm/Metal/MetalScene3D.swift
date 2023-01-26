@@ -11,7 +11,7 @@ import Metal
 class MetalScene3D {
   private let device: MTLDevice
   private(set) var content: any Node = EmptyNode()
-  private(set) var commands: [DrawCommand] = []
+  private(set) var commands: [any MetalDrawable] = []
   
   init(device: MTLDevice) {
     self.device = device
@@ -22,15 +22,16 @@ class MetalScene3D {
     
     // Generate some draw commands    
     let nextCommands = content.drawCommands.map({ command in
-      let prevCommands = commands.filter { $0.command == command.command }
+      let prevCommands = commands.filter { $0.id == command.id }
       assert(prevCommands.count <= 1, "Ids must be unique. Please check your Ids.")
       let prevCommand = prevCommands.first
-
+            
       return command.createStorage(device: device, 
                                    library: library, 
                                    previousDrawCommand: prevCommand,
                                    surfaceAspect: surfaceAspect)
     })
+    
     commands = nextCommands
   }
 }

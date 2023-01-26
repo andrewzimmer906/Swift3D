@@ -21,7 +21,9 @@ struct GroupNode<Content>: Node where Content: Node {
     content.desc().map { "\(id).\($0)" }
   }
   
-  var drawCommands: [DrawCommand] {
-    content.drawCommands.map { $0.append(id: id) }
+  var drawCommands: [any MetalDrawable] {
+    content.drawCommands.map { 
+      $0.withUpdated(id: "\(id).\($0.id)")       
+    }
   }
 }

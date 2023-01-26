@@ -18,7 +18,7 @@ extension Never: Node {
     fatalError()
   }
   
-  var drawCommands: [DrawCommand] {
+  var drawCommands: [any MetalDrawable] {
     fatalError()
   }  
 }

@@ -30,7 +30,7 @@ struct ConditionalNode<TrueContent, FalseContent>: Node where TrueContent: Node,
     }
   }
   
-  var drawCommands: [DrawCommand] {
+  var drawCommands: [any MetalDrawable] {
     switch storage {
     case .trueContent(let c):
       return c.drawCommands
