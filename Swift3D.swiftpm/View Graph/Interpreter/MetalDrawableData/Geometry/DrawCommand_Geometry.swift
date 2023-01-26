@@ -11,13 +11,13 @@ import Metal
 
 // MARK: - Geometry
 
-protocol DrawCommand_Geometry {
+protocol MetalDrawable_Geometry {
   func createBuffer(device: MTLDevice) -> MTLBuffer?
-  func isEqualTo(_ other: DrawCommand_Geometry) -> Bool
+  func isEqualTo(_ other: MetalDrawable_Geometry) -> Bool
 }
 
-extension DrawCommand_Geometry where Self: Equatable {
-  func isEqualTo(_ other: DrawCommand_Geometry) -> Bool {
+extension MetalDrawable_Geometry where Self: Equatable {
+  func isEqualTo(_ other: MetalDrawable_Geometry) -> Bool {
       guard let geo = other as? Self else { return false }
       return self == geo
   }
@@ -25,7 +25,7 @@ extension DrawCommand_Geometry where Self: Equatable {
 
 // MARK: - Raw Floats
 
-struct RawVertices: DrawCommand_Geometry, Equatable {
+struct RawVertices: MetalDrawable_Geometry, Equatable {
   let vertices: [Float]
   
   func createBuffer(device: MTLDevice) -> MTLBuffer? {
@@ -33,7 +33,7 @@ struct RawVertices: DrawCommand_Geometry, Equatable {
     return device.makeBuffer(bytes: vertices, length: dataSize)
   }
   
-  static func == (lhs: Self, rhs: any DrawCommand_Geometry) -> Bool {
+  static func == (lhs: Self, rhs: any MetalDrawable_Geometry) -> Bool {
     if let rhs = rhs as? RawVertices {
       return lhs.vertices.count == rhs.vertices.count 
     }

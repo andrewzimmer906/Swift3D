@@ -8,7 +8,7 @@
 import Foundation
 import Metal
 
-extension Never: DrawCommand_Geometry {
+extension Never: MetalDrawable_Geometry {
   func createBuffer(device: MTLDevice) -> MTLBuffer? {
     fatalError()
   }

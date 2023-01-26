@@ -28,13 +28,13 @@ protocol MetalDrawable_Storage {
 // MARK: - Metal Drawable
 
 protocol MetalDrawable {
-  associatedtype Geometry: DrawCommand_Geometry
+  associatedtype Geometry: MetalDrawable_Geometry
   associatedtype Storage: MetalDrawable_Storage
   
   var id: String { get }
   var transform: float4x4 { get }
   var geometry: Geometry? { get }  
-  var renderType: DrawCommand.RenderType? { get }  
+  var renderType: MetalDrawableData.RenderType? { get }  
   var animations: [NodeTransition]? { get }
   
   var storage: Storage { get }

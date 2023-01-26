@@ -14,7 +14,7 @@ import simd
 
 struct PlaceCamera: MetalDrawable {
   let id: String  
-  let renderType: DrawCommand.RenderType?
+  let renderType: MetalDrawableData.RenderType?
   let animations: [NodeTransition]?
   let transform: float4x4
   let cameraProjectionSettings: CameraProjectionSettings

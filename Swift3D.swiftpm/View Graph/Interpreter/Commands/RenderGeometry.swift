@@ -16,7 +16,7 @@ struct RenderGeometry: MetalDrawable {
   let id: String
   let transform: float4x4
   let geometry: RawVertices?  
-  let renderType: DrawCommand.RenderType?
+  let renderType: MetalDrawableData.RenderType?
   let animations: [NodeTransition]?
   let storage: RenderGeometry.Storage
 
