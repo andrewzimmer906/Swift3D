@@ -10,12 +10,12 @@ import Metal
 
 // MARK: - NodeRenderCommand
 
-struct RenderGeometry<Geometry>: MetalDrawable where Geometry: DrawCommand_Geometry {
+struct RenderGeometry: MetalDrawable {
   let id: String  
   let renderType: DrawCommand.RenderType?
   let animations: [NodeTransition]?
   let transform: DrawCommand.Transform
-  let geometry: Geometry?
+  let geometry: RawVertices?
   
   let storage: DrawCommand.Storage
 }

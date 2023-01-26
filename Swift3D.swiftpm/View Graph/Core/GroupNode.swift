@@ -17,8 +17,8 @@ struct GroupNode<Content>: Node where Content: Node {
     self.content = content()
   }
   
-  func desc() -> [String] {
-    content.desc().map { "\(id).\($0)" }
+  var printedTree: [String] {
+    content.printedTree.map { "\(id).\($0)" }
   }
   
   var drawCommands: [any MetalDrawable] {

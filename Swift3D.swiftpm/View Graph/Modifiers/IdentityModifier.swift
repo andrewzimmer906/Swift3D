@@ -11,8 +11,8 @@ import Foundation
 struct IdentityModifier: NodeModifier {
   let id: String
   
-  func desc(content: any Node) -> [String] {
-    content.desc().map {
+  func printedTree(content: any Node) -> [String] {
+    content.printedTree.map {
       "\(id).\($0)"
     }
   }

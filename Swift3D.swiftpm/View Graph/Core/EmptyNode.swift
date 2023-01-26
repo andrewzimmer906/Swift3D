@@ -14,7 +14,7 @@ struct EmptyNode: Node {
     self
   }
   
-  func desc() -> [String] {
+  var printedTree: [String] {
     []  
   }
   

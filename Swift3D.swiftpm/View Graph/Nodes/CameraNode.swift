@@ -17,10 +17,6 @@ struct CameraProjectionSettings {
 struct CameraNode: Node {
   let id: String
   
-  func desc() -> [String] {
-    ["\(String(describing:type(of: self))).\(id)"]  
-  }
-  
   var drawCommands: [any MetalDrawable] {
     [PlaceCamera(id: id, 
                 renderType: nil, 

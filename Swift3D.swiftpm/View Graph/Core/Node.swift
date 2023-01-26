@@ -7,8 +7,14 @@
 
 import Foundation
 
-protocol Node {  
+protocol Node {
   var id: String { get }  
-  func desc() -> [String]
+  var printedTree: [String] { get }
   var drawCommands: [any MetalDrawable] { get }
+}
+
+extension Node {
+  var printedTree: [String] {    
+    ["\(id):\(String(describing:type(of: self)))"]
+  }
 }

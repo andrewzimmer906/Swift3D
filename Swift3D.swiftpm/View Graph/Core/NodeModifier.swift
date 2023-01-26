@@ -15,8 +15,8 @@ struct ModifiedNodeContent<Content, Modifier> {
 extension ModifiedNodeContent: Node where Content: Node, Modifier: NodeModifier {
   var id: String { "" }
   
-  func desc() -> [String] {
-    modifier.desc(content: content)
+  var printedTree: [String] {
+    modifier.printedTree(content: content)
   }
   
   var drawCommands: [any MetalDrawable] {
@@ -25,7 +25,7 @@ extension ModifiedNodeContent: Node where Content: Node, Modifier: NodeModifier 
 }
 
 protocol NodeModifier {
-  func desc(content: any Node) -> [String]
+  func printedTree(content: any Node) -> [String]
   func drawCommands(content: any Node) -> [any MetalDrawable]
 }
 

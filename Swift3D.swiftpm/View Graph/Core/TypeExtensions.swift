@@ -14,7 +14,7 @@ extension Never: Node {
     fatalError()
   }
   
-  func desc() -> [String] {
+  var printedTree: [String] {
     fatalError()
   }
   
@@ -30,7 +30,7 @@ extension Array where Element == any Node {
     
     var output = ""
     self.enumerated().forEach() { idx, node in
-      output.append("\(idx): \(node.desc())\n")
+      output.append("\(idx): \(node.printedTree)\n")
     }
     
     return output

@@ -21,12 +21,12 @@ struct ConditionalNode<TrueContent, FalseContent>: Node where TrueContent: Node,
     self.storage = storage
   }
   
-  func desc() -> [String] {
+  var printedTree: [String] {
     switch storage {
     case .trueContent(let c):
-      return c.desc()
+      return c.printedTree
     case .falseContent(let c):
-      return c.desc()
+      return c.printedTree
     }
   }
   

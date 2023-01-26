@@ -11,8 +11,8 @@ import simd
 struct TransformModifier: NodeModifier {
   let transform: float4x4
   
-  func desc(content: any Node) -> [String] {
-    content.desc()
+  func printedTree(content: any Node) -> [String] {
+    content.printedTree
   }
   
   func drawCommands(content: any Node) -> [any MetalDrawable] {

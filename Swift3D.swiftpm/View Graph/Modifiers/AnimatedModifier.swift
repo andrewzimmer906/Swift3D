@@ -50,8 +50,8 @@ extension NodeTransition {
 struct TransitionModifier: NodeModifier {
   let animation: NodeTransition
   
-  func desc(content: any Node) -> [String] {
-    content.desc()
+  func printedTree(content: any Node) -> [String] {
+    content.printedTree
   }
   
   func drawCommands(content: any Node) -> [any MetalDrawable] {

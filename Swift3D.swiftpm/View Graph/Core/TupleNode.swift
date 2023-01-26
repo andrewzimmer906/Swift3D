@@ -16,33 +16,33 @@ struct TupleNode<T>: Node {
     self
   }
   
-  func desc() -> [String] {
+  var printedTree: [String] {
     if let val = value as? (any Node, any Node) {
-      return val.0.desc() + val.1.desc()
+      return val.0.printedTree + val.1.printedTree
     }
     else if let val = value as? (any Node, any Node, any Node) {
-      return val.0.desc() + val.1.desc() + val.2.desc()
+      return val.0.printedTree + val.1.printedTree + val.2.printedTree
     }
     else if let val = value as? (any Node, any Node, any Node, any Node) {
-      return val.0.desc() + val.1.desc() + val.2.desc() + val.3.desc()
+      return val.0.printedTree + val.1.printedTree + val.2.printedTree + val.3.printedTree
     }
     else if let val = value as? (any Node, any Node, any Node, any Node, any Node) {
-      return val.0.desc() + val.1.desc() + val.2.desc() + val.3.desc() + val.4.desc()
+      return val.0.printedTree + val.1.printedTree + val.2.printedTree + val.3.printedTree + val.4.printedTree
     }
     else if let val = value as? (any Node, any Node, any Node, any Node, any Node, any Node) {
-      return val.0.desc() + val.1.desc() + val.2.desc() + val.3.desc() + val.4.desc() + val.5.desc()
+      return val.0.printedTree + val.1.printedTree + val.2.printedTree + val.3.printedTree + val.4.printedTree + val.5.printedTree
     }
     else if let val = value as? (any Node, any Node, any Node, any Node, any Node, any Node, any Node) {
-      return val.0.desc() + val.1.desc() + val.2.desc() + val.3.desc() + val.4.desc() + val.5.desc() + val.6.desc()
+      return val.0.printedTree + val.1.printedTree + val.2.printedTree + val.3.printedTree + val.4.printedTree + val.5.printedTree + val.6.printedTree
     }
     else if let val = value as? (any Node, any Node, any Node, any Node, any Node, any Node, any Node, any Node) {
-      return val.0.desc() + val.1.desc() + val.2.desc() + val.3.desc() + val.4.desc() + val.5.desc() + val.6.desc() + val.7.desc()
+      return val.0.printedTree + val.1.printedTree + val.2.printedTree + val.3.printedTree + val.4.printedTree + val.5.printedTree + val.6.printedTree + val.7.printedTree
     }
     else if let val = value as? (any Node, any Node, any Node, any Node, any Node, any Node, any Node, any Node, any Node) {
-      return val.0.desc() + val.1.desc() + val.2.desc() + val.3.desc() + val.4.desc() + val.5.desc() + val.6.desc() + val.7.desc() + val.8.desc()
+      return val.0.printedTree + val.1.printedTree + val.2.printedTree + val.3.printedTree + val.4.printedTree + val.5.printedTree + val.6.printedTree + val.7.printedTree + val.8.printedTree
     }
     else if let val = value as? (any Node, any Node, any Node, any Node, any Node, any Node, any Node, any Node, any Node, any Node) {
-      return val.0.desc() + val.1.desc() + val.2.desc() + val.3.desc() + val.4.desc() + val.5.desc() + val.6.desc() + val.7.desc() + val.8.desc() + val.9.desc()
+      return val.0.printedTree + val.1.printedTree + val.2.printedTree + val.3.printedTree + val.4.printedTree + val.5.printedTree + val.6.printedTree + val.7.printedTree + val.8.printedTree + val.9.printedTree
     }
     
     fatalError()

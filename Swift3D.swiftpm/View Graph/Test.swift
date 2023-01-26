@@ -29,7 +29,7 @@ func testTree() {
   print("\n")
   print(tree)
   print("\n")
-  print(tree.desc().reduce("", { partialResult, str in
+  print(tree.printedTree.reduce("", { partialResult, str in
     partialResult + "\n" + str
   }))
 }
