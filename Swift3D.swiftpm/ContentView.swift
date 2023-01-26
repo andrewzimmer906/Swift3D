@@ -9,9 +9,9 @@ struct ContentView: View {
   
   var body: some View {
     ZStack {
-      Swift3DView(/*updateLoop: { delta in 
-        //rotation += 1.0 * Float(delta)
-      }*/) {
+      Swift3DView(updateLoop: { delta in 
+        rotation += 1.0 * Float(delta)
+      }) {
         GroupNode(id: "camera_container") {
           CameraNode(id: "camera")
             .transform(float4x4.translated(simd_float3(x: 0, y: 0, z: isRotated ? -7 : -14)))

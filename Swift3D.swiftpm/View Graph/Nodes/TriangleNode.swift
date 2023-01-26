@@ -18,6 +18,11 @@ struct TriangleNode: Node {
   }
   
   var drawCommands: [any MetalDrawable] { 
-    [RenderGeometry(id: id, renderType: .triangles(1), animations: nil, transform: .model(float4x4.identity), geometry: RawVertices(vertices: vertices), storage: DrawCommand.Storage())]
+    [RenderGeometry(id: id, 
+                    transform: float4x4.identity, 
+                    geometry: RawVertices(vertices: vertices), 
+                    renderType: .triangles(1),
+                    animations: nil,
+                    storage: RenderGeometry.Storage())]
   }
 }

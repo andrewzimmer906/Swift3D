@@ -9,12 +9,6 @@ import Foundation
 import Metal
 import simd
 
-// Library Uniform Requirements
-struct ViewProjectionUniform {
-  let projectionMatrix: float4x4
-  let viewMatrix: float4x4
-}
-
 class MetalShaderLibrary {
   // TODO: Limit the size of this fella.
   private var pipelines: [String: MTLRenderPipelineState] = [:]

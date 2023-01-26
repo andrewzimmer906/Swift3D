@@ -6,12 +6,15 @@
 //
 
 import Foundation
+import UIKit
 import Metal
+
+typealias CommandAndPrevious = (any MetalDrawable, (any MetalDrawable)?)
 
 class MetalScene3D {
   private let device: MTLDevice
   private(set) var content: any Node = EmptyNode()
-  private(set) var commands: [any MetalDrawable] = []
+  private(set) var commands: [CommandAndPrevious] = []
   
   init(device: MTLDevice) {
     self.device = device
@@ -22,14 +25,15 @@ class MetalScene3D {
     
     // Generate some draw commands    
     let nextCommands = content.drawCommands.map({ command in
-      let prevCommands = commands.filter { $0.id == command.id }
+      let prevCommands = commands.filter { $0.0.id == command.id }
       assert(prevCommands.count <= 1, "Ids must be unique. Please check your Ids.")
-      let prevCommand = prevCommands.first
-            
-      return command.createStorage(device: device, 
-                                   library: library, 
-                                   previousDrawCommand: prevCommand,
-                                   surfaceAspect: surfaceAspect)
+      let prevTuple = prevCommands.first
+      let prevCommand = prevTuple?.0.presentedDrawCommand(time: CACurrentMediaTime(), previous: prevTuple?.1)
+      
+      command.storage
+        .build(command, previous: prevCommand, device: device, library: library, surfaceAspect: surfaceAspect)
+      
+      return (command, prevCommand)
     })
     
     commands = nextCommands

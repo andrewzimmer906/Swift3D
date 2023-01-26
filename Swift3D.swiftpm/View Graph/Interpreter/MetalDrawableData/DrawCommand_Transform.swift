@@ -30,8 +30,14 @@ extension DrawCommand.Transform: Equatable {
 
 // MARK: - Transitions
 extension MetalDrawable {
+  
+  
+  
   /// Gets visible transform accounting for transitions
-  func presentedTransform(time: CFTimeInterval) -> DrawCommand.Transform? {
+  func presentedTransform(time: CFTimeInterval) -> float4x4? {    
+    return self.transform
+    //TODO: Fix
+    /*
     guard let animation = animations?.first(where: { $0.attribute == .all }),
           let prevTransform = storage.previousDrawCommand?.transform else {
       return nil
@@ -51,27 +57,6 @@ extension MetalDrawable {
       return .camera(interpolatedSettings, interpolatedView)      
     default:
       return nil
-    }
-  }
-}
-
-// MARK: - Storage
-
-extension DrawCommand.Storage {
-  func set(_ transform: DrawCommand.Transform) {
-    guard let surfaceAspect = surfaceAspect else {
-      return
-    }
-    
-    switch transform {
-    case .model(let modelM):
-      self.modelMatBuffer?.contents().storeBytes(of: modelM, as: float4x4.self)
-    case .camera(let camSettings, let viewM):
-      let projM = float4x4.makePerspective(fovyRadians: camSettings.fov, 
-                                           surfaceAspect, camSettings.zNear, 
-                                           camSettings.zFar)
-      let vpUniform = ViewProjectionUniform(projectionMatrix: projM, viewMatrix: viewM)      
-      self.viewProjBuffer?.contents().storeBytes(of: vpUniform, as: ViewProjectionUniform.self)
-    }
+    }*/
   }
 }

@@ -21,7 +21,8 @@ struct CameraNode: Node {
     [PlaceCamera(id: id, 
                 renderType: nil, 
                 animations: nil, 
-                transform: .camera(CameraProjectionSettings(fov:1.0472, zNear: 0.1, zFar: 100), float4x4.identity),
-                storage: DrawCommand.Storage())]
+                transform: float4x4.identity,
+                cameraProjectionSettings: CameraProjectionSettings(fov:1.0472, zNear: 0.1, zFar: 100),
+                storage: PlaceCamera.Storage())]
   }
 }

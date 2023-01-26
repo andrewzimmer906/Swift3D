@@ -10,6 +10,7 @@ import UIKit
 import Metal
 import simd
 
+/*
 extension DrawCommand {  
   class Storage {
     // Storing two levels back of draw commands allows us to
@@ -24,7 +25,7 @@ extension DrawCommand {
     private(set) var modelMatBuffer: MTLBuffer?
     private(set) var viewProjBuffer: MTLBuffer?
   }
-}
+}*/
 
 /*
 extension DrawableCommand {
@@ -75,7 +76,7 @@ extension DrawableCommand {
 }*/
 
 // MARK: - Build
-
+/*
 extension DrawCommand.Storage {
   func build<C0>(_ command: C0, 
                      previousDrawCommand: (any MetalDrawable)?,
@@ -168,4 +169,5 @@ extension DrawCommand.Storage {
     self.vertexBuffer = geometry.createBuffer(device: device)
   }
 }
+ */
 

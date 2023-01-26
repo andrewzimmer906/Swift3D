@@ -15,14 +15,9 @@ struct TransformModifier: NodeModifier {
     content.printedTree
   }
   
-  func drawCommands(content: any Node) -> [any MetalDrawable] {
+  func drawCommands(content: any Node) -> [any MetalDrawable] {    
     return content.drawCommands.map { command in
-      switch command.transform {
-      case .model(let modelMat):
-        return command.withUpdated(transform: .model(modelMat * transform))
-      case .camera(let projMat, let viewMat): 
-        return command.withUpdated(transform: .camera(projMat, viewMat * transform))
-      }
+      command.withUpdated(transform: command.transform * transform)
     }
   }
 }

@@ -8,7 +8,21 @@
 import Foundation
 import simd
 
-extension float4x4 {  
+protocol Lerpable {
+  static func lerp(_ from: Self, _ to: Self, _ percent: Float) -> Self
+}
+
+extension Float: Lerpable {
+  var saturated: Float {
+    max(0, min(1, self))
+  }
+  
+  static func lerp(_ from: Float, _ to: Float, _ percent: Float) -> Float {
+    return from + (to - from) * percent
+  }
+}
+
+extension float4x4: Lerpable  {  
   static func lerp(_ from: Self, _ to: Self, _ percent: Float) -> Self {
     let fromT = from.translation
     let fromR = from.rotation
@@ -28,13 +42,13 @@ extension float4x4 {
   }
 }
 
-extension simd_float3 {
+extension simd_float3: Lerpable  {
   static func lerp(_ from: Self, _ to: Self, _ percent: Float) -> Self {    
     return from + (to - from) * percent
   }
 }
 
-extension SIMD4<Float> {
+extension SIMD4<Float>: Lerpable  {
   static func lerp(_ from: Self, _ to: Self, _ percent: Float) -> Self {
     return from + (to - from) * percent
   }

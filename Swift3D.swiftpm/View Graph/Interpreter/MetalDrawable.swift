@@ -14,64 +14,76 @@ import simd
 enum MetalDrawableData {}
 struct DrawCommand {}
 
+// MARK: - Data Sources / Storage
+protocol MetalDrawable_Storage {
+  func build(_ command: (any MetalDrawable),
+               previous: (any MetalDrawable)?,
+               device: MTLDevice, 
+               library: MetalShaderLibrary, 
+               surfaceAspect: Float)
+  
+  func set<Value>(_ value: Value)
+}
+
 // MARK: - Metal Drawable
 
 protocol MetalDrawable {
   associatedtype Geometry: DrawCommand_Geometry
-
+  associatedtype Storage: MetalDrawable_Storage
+  
   var id: String { get }
-  var transform: DrawCommand.Transform { get }
+  var transform: float4x4 { get }
   var geometry: Geometry? { get }  
   var renderType: DrawCommand.RenderType? { get }  
   var animations: [NodeTransition]? { get }
   
-  var storage: DrawCommand.Storage { get }  
+  var storage: Storage { get }
   var needsRender: Bool { get }
 
   func withUpdated(id: String) -> Self
-  func withUpdated(transform: DrawCommand.Transform) -> Self  
+  func withUpdated(transform: float4x4) -> Self  
   func withUpdated(animations: [NodeTransition]) -> Self
   
-  func update(time: CFTimeInterval)
+  func update(time: CFTimeInterval, previous: (any MetalDrawable)?)
   func render(encoder: MTLRenderCommandEncoder)
-  func presentedDrawCommand(time: CFTimeInterval) -> any MetalDrawable
-
-  func createStorage(device: MTLDevice, 
-                     library: MetalShaderLibrary, 
-                     previousDrawCommand: (any MetalDrawable)?,
-                     surfaceAspect: Float) -> Self
+  func presentedDrawCommand(time: CFTimeInterval, previous: (any MetalDrawable)?) -> any MetalDrawable
 }
 
 extension MetalDrawable {
-  /// Updates the values in the command with any animations that are running.  
-  func update(time: CFTimeInterval) {    
-    if let dirtyTransform = presentedTransform(time: time) {
-      storage.set(dirtyTransform)
-    }
-  }
-  
   /// Does this command need a render encoder?
   var needsRender: Bool {
     renderType != nil && geometry != nil
   }
   
-  /// State of command at a given time with any transitions applied.
-  func presentedDrawCommand(time: CFTimeInterval) -> any MetalDrawable {
-    return self.withUpdated(transform: presentedTransform(time: time) ?? transform)
+  /// Updates the values in the command with any animations that are running.  
+  func update(time: CFTimeInterval, previous: (any MetalDrawable)?) {    
+    if let dirtyTransform = attribute(at: time, cur: self.transform, prev: previous?.transform) {
+      storage.set(dirtyTransform)
+    }
   }
   
-  /// Creates the GPU storage for the commands data in preperation for rendering.
-  /// NOTE: This may require some memory so should only be called as needed, not before every pass.
-  func createStorage(device: MTLDevice, 
-                     library: MetalShaderLibrary, 
-                     previousDrawCommand: (any MetalDrawable)?,
-                         surfaceAspect: Float) -> Self {
-    self.storage.build(self, 
-                       previousDrawCommand: previousDrawCommand?.presentedDrawCommand(time: CACurrentMediaTime()), 
-                       device: device, 
-                       library: library, 
-                       surfaceAspect: surfaceAspect)
+  /// State of command at a given time with any transitions applied, should be used to keep transitions accurate during redraws
+  func presentedDrawCommand(time: CFTimeInterval, previous: (any MetalDrawable)?) -> any MetalDrawable {    
+    var toReturn = self
+    if let dirtyTransform = attribute(at: time, cur: self.transform, prev: previous?.transform) {
+      toReturn = self.withUpdated(transform: dirtyTransform)
+    }    
+    return toReturn
+  }
+}
+
+// MARK: - Animated Attributes
+extension MetalDrawable {
+  func attribute<T: Lerpable>(at time: CFTimeInterval,
+                         cur: T, 
+                         prev: T?, 
+                         attributes: [NodeTransition.Attribute] = [.all]) -> T? {    
+    guard let animation = animations?.first(where: { attributes.contains($0.attribute) }),
+          let prev = prev else {            
+      return nil
+    }
     
-    return self
+    let percent = animation.interpolate(time: time)
+    return T.lerp(prev, cur, percent)
   }
 }

@@ -8,15 +8,24 @@
 import Foundation
 import Metal
 
-protocol DrawCommand_Geometry: Equatable {
-  func createBuffer(device: MTLDevice) -> MTLBuffer? 
+
+// MARK: - Geometry
+
+protocol DrawCommand_Geometry {
+  func createBuffer(device: MTLDevice) -> MTLBuffer?
+  func isEqualTo(_ other: DrawCommand_Geometry) -> Bool
+}
+
+extension DrawCommand_Geometry where Self: Equatable {
+  func isEqualTo(_ other: DrawCommand_Geometry) -> Bool {
+      guard let geo = other as? Self else { return false }
+      return self == geo
+  }
 }
 
 // MARK: - Raw Floats
 
-// MARK: - Raw Floats
-
-struct RawVertices: DrawCommand_Geometry {
+struct RawVertices: DrawCommand_Geometry, Equatable {
   let vertices: [Float]
   
   func createBuffer(device: MTLDevice) -> MTLBuffer? {
@@ -32,39 +41,4 @@ struct RawVertices: DrawCommand_Geometry {
     return false
   }
 }
-
-
-
-
-/*
-extension DrawCommand {
-  enum Geometry {
-    case vertices([Float])
-  }
-}
-
-extension DrawCommand.Geometry: Equatable {
-  static func ==(lhs: Self, rhs: Self) -> Bool {
-    switch (lhs, rhs) {
-    case (.vertices(let a), .vertices(let b)):
-      return a.count == b.count
-    }
-  }
-}*/
-
-// MARK: - Storage
-
-extension DrawCommand.Storage {
-  
-  /*func set(_ geometry: any DrawCommand.Geometry) {
-    /*
-    switch geometry {
-    case .vertices(let vertices):
-      //self.vertexBuffer?.contents().storeBytes(of: vertices, as: [Float].self)
-     // Throws fatalError so we set in storage.build instead.
-    }
-     */
-  }*/
-}
-
 

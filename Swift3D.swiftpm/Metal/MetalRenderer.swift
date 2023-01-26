@@ -30,7 +30,7 @@ public class MetalRenderer: ObservableObject {
   
   func render(_ time: CFTimeInterval, 
               layerDrawable: CAMetalDrawable, 
-              commands: [any MetalDrawable]) {
+              commands: [CommandAndPrevious]) {
     guard let buffer = commandQueue.makeCommandBuffer() else {
       fatalError()
     }
@@ -54,15 +54,16 @@ public class MetalRenderer: ObservableObject {
     renderPassDescriptor.colorAttachments[0].texture = layerDrawable.texture
     renderPassDescriptor.colorAttachments[0].loadAction = .load
     
-    var viewProjBuffer: MTLBuffer? = nil
-    if let cameraCommand = commands.first(where: { $0 is PlaceCamera }) {      
+    // TODO: FIX
+    var viewProjBuffer: MTLBuffer? = nil    
+    if let cameraCommand = commands.first(where: { $0.0 is PlaceCamera })?.0 as? PlaceCamera {  
       viewProjBuffer = cameraCommand.storage.viewProjBuffer
     }
     
     commands.forEach { command in
-      command.update(time: time)
+      command.0.update(time: time, previous: command.1)
       
-      guard command.needsRender else {
+      guard command.0.needsRender else {
         return 
       }
       
@@ -77,7 +78,7 @@ public class MetalRenderer: ObservableObject {
         encoder.setVertexBuffer(defaultProjViewBuffer, offset: 0, index: 2)
       }
       
-      command.render(encoder: encoder)
+      command.0.render(encoder: encoder)
     }
 
     buffer.present(layerDrawable)
