@@ -7,6 +7,7 @@ import MetalKit
 class MetalView: UIView {
   private let device: MTLDevice
   private var metalLayer: CAMetalLayer?
+  private var metalDepthTexture: MTLTexture?
   
   private let renderer: MetalRenderer
   private let library: MetalShaderLibrary
@@ -72,7 +73,8 @@ class MetalView: UIView {
   }
   
   private func render(time: CFTimeInterval) {
-    guard let drawable = metalLayer?.nextDrawable() else {
+    guard let drawable = metalLayer?.nextDrawable(),
+          let depth = metalDepthTexture else {
       fatalError()
     }
     
@@ -83,7 +85,7 @@ class MetalView: UIView {
       lastUpdateTime = curTime
     }
     
-    renderer.render(time, layerDrawable: drawable, commands: scene.commands)
+    renderer.render(time, layerDrawable: drawable, depthTexture: depth, commands: scene.commands)
   }
   
   // MARK: - View Methods
@@ -101,6 +103,16 @@ class MetalView: UIView {
     scene.setContent(scene.content, 
                      library: library,
                      surfaceAspect: Float(layer.frame.size.width / layer.frame.size.height))
+    
+    
+    // Remake our depth texture to size.
+    let desc = MTLTextureDescriptor.texture2DDescriptor(
+        pixelFormat: .depth32Float_stencil8,
+        width: Int(layer.frame.size.width), height: Int(layer.frame.size.height), 
+        mipmapped: false)
+    desc.storageMode = .private
+    desc.usage = .renderTarget    
+    self.metalDepthTexture = device.makeTexture(descriptor: desc)
   }
 }
 

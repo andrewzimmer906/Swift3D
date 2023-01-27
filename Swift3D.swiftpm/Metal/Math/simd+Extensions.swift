@@ -87,17 +87,8 @@ extension float4x4 {
       .init(x: x, y: y, z: z)
   }
   
-  var rotation: simd_quatf {
-    /*let sc = self.scale    
-    let rotMat = simd_float3x3(columns: (
-      simd_float3(x: self.columns.0.x / sc.x, y: self.columns.0.y / sc.x, z: self.columns.0.z / sc.x), 
-      simd_float3(x: self.columns.1.x / sc.y, y: self.columns.1.y / sc.y, z: self.columns.1.z / sc.y), 
-      simd_float3(x: self.columns.2.x / sc.z, y: self.columns.2.y / sc.z, z: self.columns.2.z / sc.z)) 
-    )*/
-    
+  var rotation: simd_quatf {    
     return simd_quatf(self)
-    
-    //return simd_quatf(rotMat)
   }
   
   var translation: simd_float3 {

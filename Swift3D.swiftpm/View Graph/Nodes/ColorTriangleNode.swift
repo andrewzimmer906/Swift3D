@@ -10,20 +10,15 @@ import simd
 
 struct ColorTriangleNode: Node {
   let id: String
-  // let color: Color
-  
-  private var vertices: [ColoredVertices.Vertex] {
-    [.init(pos: simd_float3(x: 0, y: 1, z: 0), col: simd_float4(1,0,0,1)),
-     .init(pos: simd_float3(x: -1, y: -1, z: 0), col: simd_float4(0,1,0,1)),
-     .init(pos: simd_float3(x: 1, y: -1, z: 0), col: simd_float4(0,0,1,1))]
-  }
   
   var drawCommands: [any MetalDrawable] { 
     [RenderGeometry(id: id, 
                     transform: float4x4.identity, 
-                    geometry: ColoredVertices(vertices: vertices), 
-                    renderType: .triangles(1),
+                    geometry: Triangle.get() as ColoredVertices, 
+                    shaderPipeline: .standard("basic_col_vertex", "basic_col_fragment"),
+                    renderType: .triangles,
                     animations: nil,
-                    storage: RenderGeometry.Storage())]
+                    storage: RenderGeometry.Storage(),
+                    cullBackfaces: false)]
   }
 }

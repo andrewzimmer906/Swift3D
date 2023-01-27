@@ -13,13 +13,13 @@ import simd
 // MARK: - NodeRenderCommand
 
 struct PlaceCamera: MetalDrawable {
-  let id: String  
-  let renderType: MetalDrawableData.RenderType?
+  let id: String
+  let transform: float4x4 
+  let cameraProjectionSettings: CameraProjectionSettings  
   let animations: [NodeTransition]?
-  let transform: float4x4
-  let cameraProjectionSettings: CameraProjectionSettings
+  
   let storage: PlaceCamera.Storage  
-  var geometry: Never? { nil }
+  
   
   func withUpdated(transform: float4x4) -> Self {
     withUpdated(id: nil, animations: nil, transform: transform)
@@ -36,11 +36,10 @@ struct PlaceCamera: MetalDrawable {
   private func withUpdated(id: String?, 
                            animations: [NodeTransition]?,
                            transform: float4x4?) -> Self {
-    .init(id: id ?? self.id, 
-          renderType: renderType, 
-          animations: animations ?? self.animations, 
-          transform: transform ?? self.transform,  
-          cameraProjectionSettings: self.cameraProjectionSettings,
+    .init(id: id ?? self.id,
+          transform: transform ?? self.transform,
+          cameraProjectionSettings: self.cameraProjectionSettings, 
+          animations: animations ?? self.animations,         
           storage: storage)
   }
 }
@@ -55,7 +54,8 @@ extension PlaceCamera {
     }
   }
   
-  func render(encoder: MTLRenderCommandEncoder) {
+  var needsRender: Bool { false }
+  func render(encoder: MTLRenderCommandEncoder, depthStencil: MTLDepthStencilState?) {
     fatalError()
   }
 }

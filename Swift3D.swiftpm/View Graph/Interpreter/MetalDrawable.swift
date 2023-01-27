@@ -28,13 +28,10 @@ protocol MetalDrawable_Storage {
 // MARK: - Metal Drawable
 
 protocol MetalDrawable {
-  associatedtype Geometry: MetalDrawable_Geometry
   associatedtype Storage: MetalDrawable_Storage
   
   var id: String { get }
   var transform: float4x4 { get }
-  var geometry: Geometry? { get }  
-  var renderType: MetalDrawableData.RenderType? { get }  
   var animations: [NodeTransition]? { get }
   
   var storage: Storage { get }
@@ -45,16 +42,11 @@ protocol MetalDrawable {
   func withUpdated(animations: [NodeTransition]) -> Self
   
   func update(time: CFTimeInterval, previous: (any MetalDrawable)?)
-  func render(encoder: MTLRenderCommandEncoder)
+  func render(encoder: MTLRenderCommandEncoder, depthStencil: MTLDepthStencilState?)
   func presentedDrawCommand(time: CFTimeInterval, previous: (any MetalDrawable)?) -> any MetalDrawable
 }
 
 extension MetalDrawable {
-  /// Does this command need a render encoder?
-  var needsRender: Bool {
-    renderType != nil && geometry != nil
-  }
-  
   /// Updates the values in the command with any animations that are running.  
   func update(time: CFTimeInterval, previous: (any MetalDrawable)?) {    
     if let dirtyTransform = attribute(at: time, cur: self.transform, prev: previous?.transform) {

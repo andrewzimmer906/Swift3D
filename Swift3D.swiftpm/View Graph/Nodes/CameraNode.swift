@@ -19,10 +19,9 @@ struct CameraNode: Node {
   
   var drawCommands: [any MetalDrawable] {
     [PlaceCamera(id: id, 
-                renderType: nil, 
-                animations: nil, 
-                transform: float4x4.identity,
-                cameraProjectionSettings: CameraProjectionSettings(fov:1.0472, zNear: 0.1, zFar: 100),
-                storage: PlaceCamera.Storage())]
+                 transform: float4x4.identity, 
+                 cameraProjectionSettings: CameraProjectionSettings(fov:1.0472, zNear: 0.1, zFar: 100),
+                 animations: nil,
+                 storage: PlaceCamera.Storage())]
   }
 }

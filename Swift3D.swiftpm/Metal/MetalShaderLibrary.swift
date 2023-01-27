@@ -38,6 +38,7 @@ class MetalShaderLibrary {
     pipelineStateDescriptor.vertexFunction = vertexProgram
     pipelineStateDescriptor.fragmentFunction = fragmentProgram
     pipelineStateDescriptor.colorAttachments[0].pixelFormat = .bgra8Unorm
+    pipelineStateDescriptor.depthAttachmentPixelFormat = .depth32Float_stencil8
     
     do {
       let pipelineState = try device.makeRenderPipelineState(descriptor: pipelineStateDescriptor)

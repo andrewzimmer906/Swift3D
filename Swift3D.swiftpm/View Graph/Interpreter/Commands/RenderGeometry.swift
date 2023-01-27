@@ -15,17 +15,19 @@ import simd
 struct RenderGeometry<Geometry: MetalDrawable_Geometry>: MetalDrawable {  
   let id: String
   let transform: float4x4
-  let geometry: Geometry?
-  let renderType: MetalDrawableData.RenderType?
+  let geometry: Geometry
+  let shaderPipeline: MetalDrawableData.ShaderPipeline?
+  let renderType: MetalDrawableData.RenderType?  
   let animations: [NodeTransition]?
   let storage: RenderGeometry.Storage
+  let cullBackfaces: Bool
 
-  func withUpdated(transform: float4x4) -> Self {
-    withUpdated(id: nil, animations: nil, transform: transform)
-  }
-  
   func withUpdated(id: String) -> Self {
     withUpdated(id: id, animations: nil, transform: nil)
+  }
+  
+  func withUpdated(transform: float4x4) -> Self {
+    withUpdated(id: nil, animations: nil, transform: transform)
   }
   
   func withUpdated(animations: [NodeTransition]) -> Self {
@@ -37,17 +39,26 @@ struct RenderGeometry<Geometry: MetalDrawable_Geometry>: MetalDrawable {
                            transform: float4x4?) -> Self {
     .init(id: id ?? self.id, 
           transform: transform ?? self.transform, 
-          geometry: self.geometry, 
+          geometry: self.geometry,
+          shaderPipeline: self.shaderPipeline,
           renderType: self.renderType, 
           animations: animations ?? self.animations, 
-          storage: self.storage)
+          storage: self.storage,
+          cullBackfaces: cullBackfaces)
   }
 }
 
 // MARK: - Render
 
-extension RenderGeometry {
-  func render(encoder: MTLRenderCommandEncoder) {
+extension RenderGeometry {  
+  var needsRender: Bool { true }
+  
+  func render(encoder: MTLRenderCommandEncoder, depthStencil: MTLDepthStencilState?) {
+    // Depth and Stencil
+    encoder.setDepthStencilState(depthStencil)
+    encoder.setFrontFacing(.clockwise)
+    encoder.setCullMode(cullBackfaces ? .back : .none)
+    
     // Shaders
     if let ps = storage.pipelineState {
       encoder.setRenderPipelineState(ps)
@@ -66,12 +77,22 @@ extension RenderGeometry {
     switch renderType {
     case .none:
       break
-    case .triangles(let instanceCount):
-      encoder.drawPrimitives(type: .triangle, 
-                             vertexStart: 0, 
-                             vertexCount: instanceCount * 3, 
-                             instanceCount: instanceCount)
-    }
+    case .triangles:
+      if let indexBuffer = storage.indexBuffer {
+        encoder.drawIndexedPrimitives(type: .triangle, 
+                                      indexCount: self.geometry.numPoints, 
+                                      indexType: .uint16, 
+                                      indexBuffer: indexBuffer, 
+                                      indexBufferOffset: 0, 
+                                      instanceCount: self.geometry.numPoints / 3)
+      }
+      else {
+        encoder.drawPrimitives(type: .triangle, 
+                               vertexStart: 0, 
+                               vertexCount: self.geometry.numPoints, 
+                               instanceCount: self.geometry.numPoints / 3)
+      }
+    }  
     
     encoder.endEncoding()
   }
@@ -84,6 +105,7 @@ extension RenderGeometry {
     private(set) var device: MTLDevice?
     private(set) var pipelineState: MTLRenderPipelineState?
     private(set) var vertexBuffer: MTLBuffer?
+    private(set) var indexBuffer: MTLBuffer?
     private(set) var modelMatBuffer: MTLBuffer?
   }
 }
@@ -100,22 +122,31 @@ extension RenderGeometry.Storage {
                device: MTLDevice, 
                library: MetalShaderLibrary, 
                surfaceAspect: Float) {
+    guard let command = command as? RenderGeometry else {
+      fatalError()
+    }
+    let previous = previous as? RenderGeometry
+    
     self.device = device
     
     // Re-use previous buffers if they are the right size / data.
     if let prevStorage = previous?.storage as? RenderGeometry.Storage {
-      if let command_geo = command.geometry,
-         let prev_geo = previous?.geometry,
-         command_geo.isEqualTo(prev_geo) {
-        self.vertexBuffer = prevStorage.vertexBuffer
-      }
+      if let prev_geo = previous?.geometry,
+         command.geometry.isEqualTo(prev_geo) {
+          self.vertexBuffer = prevStorage.vertexBuffer
+          self.indexBuffer = prevStorage.indexBuffer
+        }
       
       self.modelMatBuffer = prevStorage.modelMatBuffer
     }
     
     // Make new buffers where needed.
     if self.vertexBuffer == nil {
-      self.vertexBuffer = command.geometry?.createBuffer(device: device)
+      self.vertexBuffer = command.geometry.createBuffer(device: device)
+    }
+    
+    if self.indexBuffer == nil {
+      self.indexBuffer = command.geometry.createIndexBuffer(device: device)
     }
     
     if self.modelMatBuffer == nil {
@@ -126,7 +157,15 @@ extension RenderGeometry.Storage {
     let updatedTransform = command.attribute(at: CACurrentMediaTime(), cur: command.transform, prev: previous?.transform)    
     set(updatedTransform ?? command.transform)
 
-    self.pipelineState = library.pipeline(for: "basic_col_vertex", fragment: "basic_col_fragment") 
+    // Set up our shader pipeline.
+    if let shaderPipe = command.shaderPipeline {
+      switch shaderPipe {
+      case .standard(let vert, let frag):
+        self.pipelineState = library.pipeline(for: vert, fragment: frag)  
+      } 
+    } else {
+      self.pipelineState = library.pipeline(for: "basic_vertex", fragment: "basic_fragment")
+    }
   }
 }
 

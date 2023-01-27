@@ -18,12 +18,6 @@ func testTree() {
   let no = false
 
   let tree = makeCode { 
-    if no {
-      TriangleNode(id: "yeah")
-    }
-    
-    TriangleNode(id: "world").modifier(IdentityModifier(id: "hey"))
-    TriangleNode(id: "fifty2").modified(id: "modification")
   }
   
   print("\n")
