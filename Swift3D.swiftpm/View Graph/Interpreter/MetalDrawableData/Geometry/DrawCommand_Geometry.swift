@@ -7,6 +7,7 @@
 
 import Foundation
 import Metal
+import simd
 
 
 // MARK: - Geometry
@@ -32,12 +33,27 @@ struct RawVertices: MetalDrawable_Geometry, Equatable {
     let dataSize = vertices.count * MemoryLayout<Float>.size
     return device.makeBuffer(bytes: vertices, length: dataSize)
   }
+}
+
+// MARK: - Float and Color
+
+struct ColoredVertices: MetalDrawable_Geometry {
+  struct Vertex {
+    let pos: simd_float3
+    let col: simd_float4
+  }
   
-  static func == (lhs: Self, rhs: any MetalDrawable_Geometry) -> Bool {
-    if let rhs = rhs as? RawVertices {
-      return lhs.vertices.count == rhs.vertices.count 
+  let vertices: [Vertex]
+  
+  func createBuffer(device: MTLDevice) -> MTLBuffer? {
+    let dataSize = vertices.count * MemoryLayout<Vertex>.size
+    return device.makeBuffer(bytes: vertices, length: dataSize)
+  }
+  
+  func isEqualTo(_ other: MetalDrawable_Geometry) -> Bool {
+    if let cast = other as? ColoredVertices {
+      return vertices.count == cast.vertices.count
     }
-    
     return false
   }
 }

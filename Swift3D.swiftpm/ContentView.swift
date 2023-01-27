@@ -14,31 +14,36 @@ struct ContentView: View {
       }) {
         GroupNode(id: "camera_container") {
           CameraNode(id: "camera")
-            .transform(float4x4.translated(simd_float3(x: 0, y: 0, z: isRotated ? -7 : -14)))
+            .transform(float4x4.translated(simd_float3(x: 0, y: 0, z: -5)))
+             //.transform(float4x4.translated(simd_float3(x: 0, y: 0, z: isRotated ? -7 : -14)))
         }
         .transform(float4x4.rotated(angle: isRotated ? Float.pi : 0, axis: simd_float3.up))        
         .transition(.easeOut(1.5))
         
+        /*ColorTriangleNode(id: "Tri")
+          .transform(.rotated(angle: rotation, axis: .up))
+        */
+        
         GroupNode(id: "tri_boss") {
-          TriangleNode(id: "L1")
+          ColorTriangleNode(id: "L1")
             .transform(.translated(simd_float3.left * 1))
-          TriangleNode(id: "L75")
+          ColorTriangleNode(id: "L75")
             .transform(.translated(simd_float3.left * 0.75))
-          TriangleNode(id: "L5")
+          ColorTriangleNode(id: "L5")
             .transform(.translated(simd_float3.left * 0.5))
-          TriangleNode(id: "L25")
+          ColorTriangleNode(id: "L25")
             .transform(.translated(simd_float3.left * 0.25))
           
-          TriangleNode(id: "base")
+          ColorTriangleNode(id: "base")
 
-          TriangleNode(id: "R25")
+          ColorTriangleNode(id: "R25")
             .transform(.translated(simd_float3.right * 0.25))
-          TriangleNode(id: "R5")
+          ColorTriangleNode(id: "R5")
             .transform(.translated(simd_float3.right * 0.5))
-          TriangleNode(id: "R75")
+          ColorTriangleNode(id: "R75")
             .transform(.translated(simd_float3.right * 0.75))
-          TriangleNode(id: "R1")
-            .transform(.translated(simd_float3.right * 1))          
+          ColorTriangleNode(id: "R1")
+            .transform(.translated(simd_float3.right * 1))     
         }
         .transform(float4x4.rotated(angle: rotation, axis: simd_float3.up))
       }

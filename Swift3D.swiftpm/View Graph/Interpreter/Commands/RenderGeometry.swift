@@ -12,10 +12,10 @@ import simd
 
 // MARK: - NodeRenderCommand
 
-struct RenderGeometry: MetalDrawable {  
+struct RenderGeometry<Geometry: MetalDrawable_Geometry>: MetalDrawable {  
   let id: String
   let transform: float4x4
-  let geometry: RawVertices?  
+  let geometry: Geometry?
   let renderType: MetalDrawableData.RenderType?
   let animations: [NodeTransition]?
   let storage: RenderGeometry.Storage
@@ -126,7 +126,7 @@ extension RenderGeometry.Storage {
     let updatedTransform = command.attribute(at: CACurrentMediaTime(), cur: command.transform, prev: previous?.transform)    
     set(updatedTransform ?? command.transform)
 
-    self.pipelineState = library.pipeline(for: "basic_vertex", fragment: "basic_fragment") 
+    self.pipelineState = library.pipeline(for: "basic_col_vertex", fragment: "basic_col_fragment") 
   }
 }
 
