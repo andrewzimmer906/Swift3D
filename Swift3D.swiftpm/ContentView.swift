@@ -21,6 +21,26 @@ struct ContentView: View {
       }) {
         camera
         
+        //axis(id: "axis")
+        //CubeNode(id: "hello")
+        OctaNode(id: "hello", divisions: 2)
+          .colored(color: .mint)
+          .transform(.translated(.up * 0.5))
+          .transform(.rotated(angle: rotation, axis: .up))
+        
+        CubeNode(id: "hello2")
+          .colored(color: .mint)
+          //.transform(.translated(.down))
+          .transform(.rotated(angle: -rotation, axis: .up))
+        
+        TriangleNode(id: "hello3")
+          .colored(color: .mint)
+          .transform(.translated(.down * 0.5))
+          .transform(.rotated(angle: rotation, axis: .up))
+        
+        //TriangleNode(id: "1")
+//          .transform(.rotated(angle: (isRotated ? -1 : 1) * .pi/6, axis: .up))
+        
         //ColorTriangleNode(id: "1")
           //.transform(.translated(.forward * 5))
         
@@ -28,7 +48,22 @@ struct ContentView: View {
           .transform(.translated(.up))
           .transform(.rotated(angle: rotation, axis: .up))
          */
-        cubeConglomerate
+        /*
+        GroupNode(id: "xx") {
+          cubeConglomerate(id: "1")
+            .transform(.translated(.right))
+          cubeConglomerate(id: "2")
+            .transform(.translated(.left))
+          cubeConglomerate(id: "3")
+            .transform(.translated(.up))
+          cubeConglomerate(id: "4")
+            .transform(.translated(.down))
+          cubeConglomerate(id: "5")
+            .transform(.translated(.forward))
+          cubeConglomerate(id: "6")
+            .transform(.translated(.back))
+        }                  
+        cubeConglomerate(id: "10")*/
         
         /*ColorTriangleNode(id: "2")
           .transform(float4x4.rotated(angle: rotation, axis: simd_float3.up))
@@ -52,12 +87,12 @@ struct ContentView: View {
          */
       }
        
-      VStack {
+      /*VStack {
         Image(systemName: "globe")
           .imageScale(.large)
           .foregroundColor(.accentColor)
         Text(tester ? "Hello, world!" : "Goodbye, world!")
-      }
+      }*/
     }
     .onTapGesture {
       //rotation += Float.pi/2
@@ -87,6 +122,7 @@ struct ContentView: View {
       case .normal:
         CameraNode(id: "camera")
           .transform(float4x4.translated(simd_float3(x: 0, y: 0, z: -10)))
+          //.transform(.rotated(angle: -.pi, axis: .up))
       case .above:
         CameraNode(id: "camera")            
           .transform(.rotated(angle: -.pi/4, axis: .right))
@@ -100,8 +136,27 @@ struct ContentView: View {
     .transition(.easeOut(1.5))
   }
   
-  private var cubeConglomerate: some Node {
-    GroupNode(id: "cube_giant") { 
+  private func axis(id: String) -> some Node {
+    GroupNode(id: id) {
+      CubeNode(id: "X")
+        .colored(color: .red)
+        .transform(.translated(.right))
+        .transform(.scaled(simd_float3(x: 2, y: 0.15, z: 0.15)))
+      
+      CubeNode(id: "Y")
+        .colored(color: .green)
+        .transform(.translated(.up))
+        .transform(.scaled(simd_float3(x: 0.15, y: 2, z: 0.15)))
+      
+      CubeNode(id: "Z")
+        .colored(color: .blue)
+        .transform(.translated(.forward))
+        .transform(.scaled(simd_float3(x: 0.15, y: 0.15, z: 2)))
+    }
+  }
+  
+  private func cubeConglomerate(id: String) -> some Node {
+    GroupNode(id: id) { 
       CubeNode(id: "0")
         .transform(.scaled(.one * 0.5))
       
@@ -152,6 +207,6 @@ struct ContentView: View {
         .transform(.translated(.forward))
         .transform(.translated(.up))
         .transform(.scaled(.one * 0.5))
-    }.transform(.rotated(angle: rotation, axis: .up))
+    }.transform(.rotated(angle: -rotation, axis: .up))
   }
 }

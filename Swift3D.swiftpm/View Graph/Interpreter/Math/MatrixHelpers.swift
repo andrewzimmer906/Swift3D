@@ -25,10 +25,10 @@ extension simd_float3 {
     simd_float3(x: -1, y: 0, z: 0)
   }
   static var forward: simd_float3 {
-    simd_float3(x: 0, y: 0, z: 1)
+    simd_float3(x: 0, y: 0, z: -1)
   }
   static var back: simd_float3 {
-    simd_float3(x: 0, y: 0, z: -1)
+    simd_float3(x: 0, y: 0, z: 1)
   }
 }
 
@@ -59,9 +59,24 @@ extension float4x4 {
   static func TRS(trans: simd_float3, rot: simd_quatf, scale: simd_float3) -> float4x4 {
     return translated(trans) * simd_float4x4(rot) * scaled(scale)
   }
-
+  
   static func makePerspective(fovyRadians: Float, _ aspect: Float, _ nearZ: Float, _ farZ: Float) -> float4x4 {
-    return unsafeBitCast(GLKMatrix4MakePerspective(fovyRadians, aspect, nearZ, farZ), to: float4x4.self)
+    let ys = 1 / tanf(fovyRadians * 0.5)
+    let xs = ys / aspect
+    let zs = farZ / (nearZ - farZ)
+    return float4x4(columns: (.init(x:xs, y:0, z:0, w:0),
+                              .init(x:0, y:ys, z:0, w:0),
+                              .init(x:0, y:0, z:zs, w:-1),
+                              .init(x:0, y:0, z:zs * nearZ, w:0)))
+    /*return Mat4([
+      Vec4(xs,  0, 0,   0),
+      Vec4( 0, ys, 0,   0),
+      Vec4( 0,  0, zs, -1),
+      Vec4( 0,  0, zs * nearZ, 0)
+    ])
+    */
+    
+    // return unsafeBitCast(GLKMatrix4MakePerspective(fovyRadians, aspect, nearZ, farZ), to: float4x4.self)
   }
 
   static func makeFrustum(left: Float, _ right: Float, _ bottom: Float, _ top: Float, _ nearZ: Float, _ farZ: Float) -> float4x4 {

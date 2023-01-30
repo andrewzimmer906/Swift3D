@@ -3,10 +3,34 @@ import UIKit
 import Metal
 import simd
 
+// MARK: - Uniforms
+
+struct LightsUniform {  
+  let light1: simd_float4
+  let light1Col: simd_float4
+  
+  let light2: simd_float4
+  let light2Col: simd_float4
+};
+
+// MARK: - Renderer
+
 public class MetalRenderer: ObservableObject {
   private let commandQueue: MTLCommandQueue
   let metalDevice: MTLDevice
   let depthStencilState: MTLDepthStencilState?
+  
+  private lazy var defaultLighting: MTLBuffer? = {
+    let buff = metalDevice.makeBuffer(length: MemoryLayout<LightsUniform>.size)
+    guard let buff = buff else {
+      fatalError()
+    }
+    
+    let lightsUniform = LightsUniform(light1: simd_float4(x:0, y: 0, z: 0, w: 1), light1Col: .one * 0.35, 
+                                      light2: simd_float4(x:0, y: 0.5, z: 1, w: 2), light2Col: .one * 0.85)    
+    buff.contents().storeBytes(of: lightsUniform, as: LightsUniform.self)
+    return buff
+  }()
   
   private lazy var defaultProjViewBuffer: MTLBuffer? = {
     let buff = metalDevice.makeBuffer(length: MemoryLayout<ViewProjectionUniform>.size)
@@ -14,9 +38,10 @@ public class MetalRenderer: ObservableObject {
       fatalError()
     }
     
-    let vpUniform = ViewProjectionUniform(projectionMatrix: float4x4.identity, viewMatrix: float4x4.identity)          
-    buff.contents().storeBytes(of: vpUniform, as: ViewProjectionUniform.self)
+    let vpUniform = ViewProjectionUniform(projectionMatrix: float4x4.identity, 
+                                          viewMatrix: float4x4.identity)
     
+    buff.contents().storeBytes(of: vpUniform, as: ViewProjectionUniform.self)
     return buff
   }()
   
@@ -52,9 +77,9 @@ public class MetalRenderer: ObservableObject {
     clearPassDescriptor.depthAttachment.storeAction = .store
     
     clearPassDescriptor.colorAttachments[0].clearColor = MTLClearColor(
-      red: 0.45,
-      green: 0.45,
-      blue: 0.45,
+      red: 1,
+      green: 1,
+      blue: 1,
       alpha: 1.0)
     
     let renderEncoder = buffer.makeRenderCommandEncoder(descriptor: clearPassDescriptor)!
@@ -90,6 +115,8 @@ public class MetalRenderer: ObservableObject {
       } else {
         encoder.setVertexBuffer(defaultProjViewBuffer, offset: 0, index: 2)
       }
+      
+      encoder.setVertexBuffer(defaultLighting, offset: 0, index: 3)
       
       command.0.render(encoder: encoder, depthStencil: depthStencilState)
     }

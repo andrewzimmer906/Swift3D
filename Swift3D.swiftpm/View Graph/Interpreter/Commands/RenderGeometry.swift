@@ -10,9 +10,13 @@ import UIKit
 import Metal
 import simd
 
+protocol WithPipeline {
+  func withUpdated(pipelineData: MetalDrawable_CustomShaderData) -> Self
+}
+
 // MARK: - NodeRenderCommand
 
-struct RenderGeometry<Geometry: MetalDrawable_Geometry>: MetalDrawable {  
+struct RenderGeometry<Geometry: MetalDrawable_Geometry>: MetalDrawable, WithPipeline {  
   let id: String
   let transform: float4x4
   let geometry: Geometry
@@ -23,24 +27,30 @@ struct RenderGeometry<Geometry: MetalDrawable_Geometry>: MetalDrawable {
   let cullBackfaces: Bool
 
   func withUpdated(id: String) -> Self {
-    withUpdated(id: id, animations: nil, transform: nil)
+    withUpdated(id: id, animations: nil, transform: nil, shaderPipeline: nil)
   }
   
   func withUpdated(transform: float4x4) -> Self {
-    withUpdated(id: nil, animations: nil, transform: transform)
+    withUpdated(id: nil, animations: nil, transform: transform, shaderPipeline: nil)
   }
   
   func withUpdated(animations: [NodeTransition]) -> Self {
-    withUpdated(id: nil, animations: animations, transform: nil)
+    withUpdated(id: nil, animations: animations, transform: nil, shaderPipeline: nil)
+  }
+  
+  func withUpdated(pipelineData: MetalDrawable_CustomShaderData) -> Self {
+    let pipeline = self.shaderPipeline?.withCustomData(pipelineData)
+    return withUpdated(id: nil, animations: nil, transform: nil, shaderPipeline: pipeline)
   }
   
   private func withUpdated(id: String?, 
                            animations: [NodeTransition]?,
-                           transform: float4x4?) -> Self {
+                           transform: float4x4?,
+                           shaderPipeline: MetalDrawableData.ShaderPipeline?) -> Self {
     .init(id: id ?? self.id, 
           transform: transform ?? self.transform, 
           geometry: self.geometry,
-          shaderPipeline: self.shaderPipeline,
+          shaderPipeline: shaderPipeline ?? self.shaderPipeline,
           renderType: self.renderType, 
           animations: animations ?? self.animations, 
           storage: self.storage,
@@ -51,6 +61,19 @@ struct RenderGeometry<Geometry: MetalDrawable_Geometry>: MetalDrawable {
 // MARK: - Render
 
 extension RenderGeometry {  
+  func update(time: CFTimeInterval, previous: (any MetalDrawable)?) {
+    if let dirtyTransform = attribute(at: time, cur: self.transform, prev: previous?.transform) {
+      storage.set(dirtyTransform)
+    }
+    
+    switch self.shaderPipeline {
+    case .custom(_, _, let data):
+        storage.set(data)
+    default:
+      break
+    }
+  }
+  
   var needsRender: Bool { true }
   
   func render(encoder: MTLRenderCommandEncoder, depthStencil: MTLDepthStencilState?) {
@@ -71,6 +94,10 @@ extension RenderGeometry {
     
     if let modelM = storage.modelMatBuffer {
       encoder.setVertexBuffer(modelM, offset: 0, index: 1)
+    }
+    
+    if let customV = storage.customValues {
+      encoder.setVertexBuffer(customV, offset: 0, index: 4)
     }
     
     // Draw
@@ -107,6 +134,8 @@ extension RenderGeometry {
     private(set) var vertexBuffer: MTLBuffer?
     private(set) var indexBuffer: MTLBuffer?
     private(set) var modelMatBuffer: MTLBuffer?
+    
+    private(set) var customValues: MTLBuffer?
   }
 }
 
@@ -114,6 +143,10 @@ extension RenderGeometry.Storage {
   func set<Value>(_ value: Value) {
     if let t = value as? float4x4 {
       self.modelMatBuffer?.contents().storeBytes(of: t, as: float4x4.self)
+    }
+    
+    if let t = value as? MetalDrawable_CustomShaderData {
+      t.set(self.customValues)
     }
   }
   
@@ -136,6 +169,15 @@ extension RenderGeometry.Storage {
           self.vertexBuffer = prevStorage.vertexBuffer
           self.indexBuffer = prevStorage.indexBuffer
         }
+      
+      switch (command.shaderPipeline, previous?.shaderPipeline) {
+      case (.custom(_, _, let dataA), .custom(_ , _, let dataB)):
+        if dataA.sameType(dataB) {
+          self.customValues = prevStorage.customValues
+        }
+      default:
+        break
+      }
       
       self.modelMatBuffer = prevStorage.modelMatBuffer
     }
@@ -161,8 +203,13 @@ extension RenderGeometry.Storage {
     if let shaderPipe = command.shaderPipeline {
       switch shaderPipe {
       case .standard(let vert, let frag):
-        self.pipelineState = library.pipeline(for: vert, fragment: frag)  
-      } 
+        self.pipelineState = library.pipeline(for: vert, fragment: frag)
+      case .custom(let vert, let frag, let data):
+        self.pipelineState = library.pipeline(for: vert, fragment: frag)
+        if self.customValues == nil {          
+          self.customValues = data.createBuffer(device: device)          
+        }
+      }
     } else {
       self.pipelineState = library.pipeline(for: "basic_vertex", fragment: "basic_fragment")
     }

@@ -8,14 +8,14 @@
 import Foundation
 import simd
 
-struct CubeNode: Node {
+struct CubeNode: Node, AcceptsColored {
   let id: String
   
-  var drawCommands: [any MetalDrawable] { 
+  var drawCommands: [any MetalDrawable] {
     [RenderGeometry(id: id, 
                     transform: float4x4.identity, 
                     geometry: Cube.get() as StandardGeometry, 
-                    shaderPipeline: .standard("simple_lit_vertex", "simple_lit_fragment"),
+                    shaderPipeline: .custom("simple_lit_vertex", "simple_lit_fragment", ColorUniform(color: .one)),
                     renderType: .triangles,
                     animations: nil,
                     storage: RenderGeometry.Storage(),
