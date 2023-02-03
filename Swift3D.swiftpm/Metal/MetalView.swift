@@ -17,6 +17,8 @@ class MetalView: UIView {
   private var updateLoop: ((_ deltaTime: CFTimeInterval) -> Void)?
   private var lastUpdateTime: CFTimeInterval = 0
   private var preferredTimeBetweenUpdates: CFTimeInterval = 0
+
+  private var content: (() -> any Node)?
   
   // MARK: Setup / Teardown
   
@@ -65,12 +67,20 @@ class MetalView: UIView {
     self.updateLoop = updateLoop
     self.preferredTimeBetweenUpdates = 1.0 / Double(preferredFps)    
   }
-  
+
+  func setContent(_ content: @escaping () -> any Node) {
+    self.content = content
+    scene.setContent(content(),
+                     library: library,
+                     surfaceAspect: Float(layer.frame.size.width / layer.frame.size.height))
+  }
+
+  /*
   func setContent(_ content: any Node) {
     scene.setContent(content, 
                      library: library,
                      surfaceAspect: Float(layer.frame.size.width / layer.frame.size.height))
-  }
+  }*/
   
   private func render(time: CFTimeInterval) {
     guard let drawable = metalLayer?.nextDrawable(),
@@ -83,8 +93,14 @@ class MetalView: UIView {
     if delta >= preferredTimeBetweenUpdates {
       updateLoop?(delta)
       lastUpdateTime = curTime
+
+      if let content = self.content {
+        scene.setContent(content(),
+                         library: library,
+                         surfaceAspect: Float(layer.frame.size.width / layer.frame.size.height))
+      }
     }
-    
+
     renderer.render(time, layerDrawable: drawable, depthTexture: depth, commands: scene.commands)
   }
   
@@ -100,7 +116,7 @@ class MetalView: UIView {
     }      
     
     // Reset content to reset the aspect ration on the projection matrix.
-    scene.setContent(scene.content, 
+    scene.setContent(scene.content,
                      library: library,
                      surfaceAspect: Float(layer.frame.size.width / layer.frame.size.height))
     

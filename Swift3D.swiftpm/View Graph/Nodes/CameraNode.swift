@@ -21,7 +21,12 @@ struct CameraNode: Node {
     [PlaceCamera(id: id, 
                  transform: float4x4.identity, 
                  cameraProjectionSettings: CameraProjectionSettings(fov:1.0472, zNear: 0.1, zFar: 100),
+                 shaderPipeline: nil,
                  animations: nil,
                  storage: PlaceCamera.Storage())]
+  }
+
+  func skybox(_ texture: some MetalDrawable_Texture, scaledBy: simd_float2 = .one) -> ModifiedNodeContent<Self, ShaderModifier> {
+    self.modifier(ShaderModifier(shader: .skybox(texture, scaledBy: scaledBy)))
   }
 }

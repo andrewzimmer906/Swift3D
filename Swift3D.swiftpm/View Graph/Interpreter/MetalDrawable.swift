@@ -38,7 +38,7 @@ protocol MetalDrawable {
   var needsRender: Bool { get }
 
   func withUpdated(id: String) -> Self
-  func withUpdated(transform: float4x4) -> Self  
+  func withUpdated(transform: float4x4) -> Self
   func withUpdated(animations: [NodeTransition]) -> Self
   
   func update(time: CFTimeInterval, previous: (any MetalDrawable)?)

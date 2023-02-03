@@ -8,7 +8,7 @@
 import Foundation
 import simd
 
-struct OctaNode: Node, AcceptsColored {
+struct OctaNode: Node, AcceptsShader {
   let id: String
   let divisions: Int
   
@@ -21,7 +21,7 @@ struct OctaNode: Node, AcceptsColored {
     [RenderGeometry(id: id, 
                     transform: float4x4.identity, 
                     geometry: Octahedron.get(divisions: divisions) as StandardGeometry,
-                    shaderPipeline: .custom("simple_lit_vertex", "simple_lit_fragment", ColorUniform(color: .one)),
+                    shaderPipeline: UnlitShader(.with(.red)),
                     renderType: .triangles,
                     animations: nil,
                     storage: RenderGeometry.Storage(),

@@ -25,7 +25,7 @@ struct Swift3DView: UIViewRepresentable {
     // Needs initial frame to not be zero to create MTLDevice
     let view = MetalView(frame: CGRect(x: 0, y: 0, width: 100, height: 100))    
     view.setUpdateLoop(updateLoop, preferredFps: preferredFps)
-    view.setContent(content())
+    view.setContent(content)
     
     return view
   }
@@ -35,7 +35,7 @@ struct Swift3DView: UIViewRepresentable {
     context: Context
   ) {
     if let view = uiView as? MetalView {
-      view.setContent(content())
+      view.setContent(content)
     }
   }
 }

@@ -21,3 +21,12 @@ extension Never: MetalDrawable_Geometry {
     fatalError()
   }
 }
+
+extension Never: MetalDrawable_Shader {
+  func setupEncoder(encoder: MTLRenderCommandEncoder) {
+    fatalError()
+  }
+  func build(device: MTLDevice, library: MetalShaderLibrary, previous: (any MetalDrawable_Shader)?) {
+    fatalError()
+  }
+}

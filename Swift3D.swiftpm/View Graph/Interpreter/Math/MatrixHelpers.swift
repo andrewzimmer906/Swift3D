@@ -9,6 +9,12 @@ import Foundation
 import simd
 import GLKit
 
+extension simd_quatf {
+  static var identity: Self {
+    simd_quatf(ix: 0, iy: 0, iz: 0, r: 1)
+  }
+}
+
 // MARK: - simd_float3
 
 extension simd_float3 {
@@ -60,6 +66,27 @@ extension float4x4 {
     return translated(trans) * simd_float4x4(rot) * scaled(scale)
   }
   
+  static func lookAt(eye: simd_float3, look: simd_float3, up: simd_float3) -> float4x4 {
+    let vLook = normalize(look)
+    let vSide = cross(vLook, normalize(up))
+    let vUp = cross(vSide, vLook)
+    
+    var m = float4x4(columns: (
+      simd_float4(vSide, 0),
+      simd_float4(vUp, 0),
+      simd_float4(-vLook, 0),
+      simd_float4(0,0,0,1)
+    ))
+    m = m.transpose
+    
+    let eyeInv = -(m * simd_float4(eye, 0))
+    m[3][0] = eyeInv.x
+    m[3][1] = eyeInv.y
+    m[3][2] = eyeInv.z
+    
+    return m
+  }
+  
   static func makePerspective(fovyRadians: Float, _ aspect: Float, _ nearZ: Float, _ farZ: Float) -> float4x4 {
     let ys = 1 / tanf(fovyRadians * 0.5)
     let xs = ys / aspect
@@ -85,10 +112,6 @@ extension float4x4 {
 
   static func makeOrtho(left: Float, _ right: Float, _ bottom: Float, _ top: Float, _ nearZ: Float, _ farZ: Float) -> float4x4 {
     return unsafeBitCast(GLKMatrix4MakeOrtho(left, right, bottom, top, nearZ, farZ), to: float4x4.self)
-  }
-
-  static func makeLookAt(eyeX: Float, _ eyeY: Float, _ eyeZ: Float, _ centerX: Float, _ centerY: Float, _ centerZ: Float, _ upX: Float, _ upY: Float, _ upZ: Float) -> float4x4 {
-    return unsafeBitCast(GLKMatrix4MakeLookAt(eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ), to: float4x4.self)
   }
 
   // MARK: - Instance

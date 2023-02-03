@@ -36,17 +36,38 @@ extension Octahedron where Geometry == StandardGeometry {
       normalize($0)
     }
   }
-  
+
   private static func uvs(for positions: [simd_float3]) -> [simd_float2] {
-    positions.map {
-      var x = atan2($0.x, $0.z) / (-2.0 * .pi)
+    var uvs = [simd_float2](repeating: .zero, count: positions.count)
+    var previousX: Float = 1
+    for i in 0..<positions.count {
+      let v = positions[i];
+      if v.x == previousX {
+        uvs[i - 1].x = 1
+      }
+      previousX = v.x;
+
+      var x = atan2(v.x, -v.z) / (-2 * .pi)
       if x < 0 {
         x += 1
       }
-      let y = asin($0.y) / .pi + 0.5
-      
-      return simd_float2(x: x, y: y)
+      let y = asin(v.y) / .pi + 0.5
+      uvs[i] = simd_float2(x: x, y: y)
     }
+
+    uvs[positions.count - 4].x = 0.125
+    uvs[0].x = 0.125
+
+    uvs[positions.count - 3].x = 0.375
+    uvs[1].x = 0.375
+
+    uvs[positions.count - 2].x = 0.625
+    uvs[2].x = 0.625
+
+    uvs[positions.count - 1].x = 0.875
+    uvs[3].x = 0.875
+
+    return uvs
   }
   
   // MARK: - Create

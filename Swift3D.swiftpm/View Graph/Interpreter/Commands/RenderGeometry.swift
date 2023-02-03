@@ -10,17 +10,17 @@ import UIKit
 import Metal
 import simd
 
-protocol WithPipeline {
-  func withUpdated(pipelineData: MetalDrawable_CustomShaderData) -> Self
+protocol HasShaderPipeline {
+  func withUpdated<Shader: MetalDrawable_Shader>(shaderPipeline: Shader) -> any MetalDrawable
 }
 
 // MARK: - NodeRenderCommand
 
-struct RenderGeometry<Geometry: MetalDrawable_Geometry>: MetalDrawable, WithPipeline {  
+struct RenderGeometry<Geometry: MetalDrawable_Geometry>: MetalDrawable, HasShaderPipeline {
   let id: String
   let transform: float4x4
   let geometry: Geometry
-  let shaderPipeline: MetalDrawableData.ShaderPipeline?
+  let shaderPipeline: any MetalDrawable_Shader
   let renderType: MetalDrawableData.RenderType?  
   let animations: [NodeTransition]?
   let storage: RenderGeometry.Storage
@@ -38,54 +38,35 @@ struct RenderGeometry<Geometry: MetalDrawable_Geometry>: MetalDrawable, WithPipe
     withUpdated(id: nil, animations: animations, transform: nil, shaderPipeline: nil)
   }
   
-  func withUpdated(pipelineData: MetalDrawable_CustomShaderData) -> Self {
-    let pipeline = self.shaderPipeline?.withCustomData(pipelineData)
-    return withUpdated(id: nil, animations: nil, transform: nil, shaderPipeline: pipeline)
+  func withUpdated<Shader: MetalDrawable_Shader>(shaderPipeline: Shader) -> any MetalDrawable {
+    withUpdated(id: nil, animations: nil, transform: nil, shaderPipeline: shaderPipeline)
   }
   
-  private func withUpdated(id: String?, 
+  private func withUpdated(id: String?,
                            animations: [NodeTransition]?,
-                           transform: float4x4?,
-                           shaderPipeline: MetalDrawableData.ShaderPipeline?) -> Self {
-    .init(id: id ?? self.id, 
-          transform: transform ?? self.transform, 
-          geometry: self.geometry,
-          shaderPipeline: shaderPipeline ?? self.shaderPipeline,
-          renderType: self.renderType, 
-          animations: animations ?? self.animations, 
-          storage: self.storage,
-          cullBackfaces: cullBackfaces)
+                           transform: float4x4?, 
+                           shaderPipeline: (any MetalDrawable_Shader)?) -> Self {
+      RenderGeometry.init(id: id ?? self.id, 
+                          transform: transform ?? self.transform, 
+                        geometry: self.geometry,
+                          shaderPipeline: shaderPipeline ?? self.shaderPipeline,
+                        renderType: self.renderType, 
+                        animations: animations ?? self.animations, 
+                        storage: self.storage,
+                        cullBackfaces: cullBackfaces)
   }
 }
 
 // MARK: - Render
 
-extension RenderGeometry {  
-  func update(time: CFTimeInterval, previous: (any MetalDrawable)?) {
-    if let dirtyTransform = attribute(at: time, cur: self.transform, prev: previous?.transform) {
-      storage.set(dirtyTransform)
-    }
-    
-    switch self.shaderPipeline {
-    case .custom(_, _, let data):
-        storage.set(data)
-    default:
-      break
-    }
-  }
-  
+extension RenderGeometry {    
   var needsRender: Bool { true }
   
   func render(encoder: MTLRenderCommandEncoder, depthStencil: MTLDepthStencilState?) {
     // Depth and Stencil
     encoder.setDepthStencilState(depthStencil)
     encoder.setFrontFacing(.clockwise)
-    encoder.setCullMode(cullBackfaces ? .back : .none)
-    
-    // Shaders
-    if let ps = storage.pipelineState {
-      encoder.setRenderPipelineState(ps)
-    }
+    encoder.setCullMode(cullBackfaces ? .back : .none)    
     
     // Vertices
     if let vb = storage.vertexBuffer {
@@ -96,9 +77,8 @@ extension RenderGeometry {
       encoder.setVertexBuffer(modelM, offset: 0, index: 1)
     }
     
-    if let customV = storage.customValues {
-      encoder.setVertexBuffer(customV, offset: 0, index: 4)
-    }
+    // Shaders and Uniforms
+    self.shaderPipeline.setupEncoder(encoder: encoder)
     
     // Draw
     switch renderType {
@@ -130,12 +110,9 @@ extension RenderGeometry {
 extension RenderGeometry {
   class Storage: MetalDrawable_Storage {    
     private(set) var device: MTLDevice?
-    private(set) var pipelineState: MTLRenderPipelineState?
     private(set) var vertexBuffer: MTLBuffer?
     private(set) var indexBuffer: MTLBuffer?
     private(set) var modelMatBuffer: MTLBuffer?
-    
-    private(set) var customValues: MTLBuffer?
   }
 }
 
@@ -143,10 +120,6 @@ extension RenderGeometry.Storage {
   func set<Value>(_ value: Value) {
     if let t = value as? float4x4 {
       self.modelMatBuffer?.contents().storeBytes(of: t, as: float4x4.self)
-    }
-    
-    if let t = value as? MetalDrawable_CustomShaderData {
-      t.set(self.customValues)
     }
   }
   
@@ -157,9 +130,9 @@ extension RenderGeometry.Storage {
                surfaceAspect: Float) {
     guard let command = command as? RenderGeometry else {
       fatalError()
-    }
-    let previous = previous as? RenderGeometry
+    } 
     
+    let previous = previous as? RenderGeometry    
     self.device = device
     
     // Re-use previous buffers if they are the right size / data.
@@ -170,17 +143,13 @@ extension RenderGeometry.Storage {
           self.indexBuffer = prevStorage.indexBuffer
         }
       
-      switch (command.shaderPipeline, previous?.shaderPipeline) {
-      case (.custom(_, _, let dataA), .custom(_ , _, let dataB)):
-        if dataA.sameType(dataB) {
-          self.customValues = prevStorage.customValues
-        }
-      default:
-        break
-      }
-      
       self.modelMatBuffer = prevStorage.modelMatBuffer
     }
+    
+    // set up our shader pipeline
+    command.shaderPipeline.build(device: device,
+                                 library: library,
+                                 previous: previous?.shaderPipeline)
     
     // Make new buffers where needed.
     if self.vertexBuffer == nil {
@@ -196,23 +165,8 @@ extension RenderGeometry.Storage {
     }
     
     // Use the latest transform according to what our transitions will calculate
-    let updatedTransform = command.attribute(at: CACurrentMediaTime(), cur: command.transform, prev: previous?.transform)    
-    set(updatedTransform ?? command.transform)
-
-    // Set up our shader pipeline.
-    if let shaderPipe = command.shaderPipeline {
-      switch shaderPipe {
-      case .standard(let vert, let frag):
-        self.pipelineState = library.pipeline(for: vert, fragment: frag)
-      case .custom(let vert, let frag, let data):
-        self.pipelineState = library.pipeline(for: vert, fragment: frag)
-        if self.customValues == nil {          
-          self.customValues = data.createBuffer(device: device)          
-        }
-      }
-    } else {
-      self.pipelineState = library.pipeline(for: "basic_vertex", fragment: "basic_fragment")
-    }
+    self.set(command.transform)
+    command.update(time: CACurrentMediaTime(), previous: previous)
   }
 }
 

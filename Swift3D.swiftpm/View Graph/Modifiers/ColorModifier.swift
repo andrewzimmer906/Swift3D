@@ -17,25 +17,13 @@ struct ColorModifier: NodeModifier {
   }
   
   func drawCommands(content: any Node) -> [any MetalDrawable] {
-    let data = data    
+    let simdColor = color.components   
     return content.drawCommands.map {
-      if let cmd = $0 as? WithPipeline {
-        return cmd.withUpdated(pipelineData: data) as! any MetalDrawable
+      if let light = $0 as? PlaceLight {
+        return light.withUpdated(color: simdColor)
       }
       return $0
     }
-  }
-  
-  private var data: ColorUniform {
-    let converted = UIColor(color)
-    var red: CGFloat = 0
-    var green: CGFloat = 0
-    var blue: CGFloat = 0
-    var alpha: CGFloat = 0
-
-    converted.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
-    let col = simd_float4(x: Float(red), y: Float(green), z: Float(blue), w: Float(alpha))
-    return ColorUniform(color: col)
   }
 }
 
@@ -46,9 +34,5 @@ protocol AcceptsColored { }
 extension Node where Self: AcceptsColored {
   func colored(color: Color) -> ModifiedNodeContent<Self, ColorModifier> {
     self.modifier(ColorModifier(color: color))
-  }
-  
-  func modified(id: String) -> ModifiedNodeContent<Self, IdentityModifier> {
-    self.modifier(IdentityModifier(id: id))
   }
 }

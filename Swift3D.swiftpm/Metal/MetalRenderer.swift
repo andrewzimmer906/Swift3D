@@ -3,16 +3,6 @@ import UIKit
 import Metal
 import simd
 
-// MARK: - Uniforms
-
-struct LightsUniform {  
-  let light1: simd_float4
-  let light1Col: simd_float4
-  
-  let light2: simd_float4
-  let light2Col: simd_float4
-};
-
 // MARK: - Renderer
 
 public class MetalRenderer: ObservableObject {
@@ -27,7 +17,7 @@ public class MetalRenderer: ObservableObject {
     }
     
     let lightsUniform = LightsUniform(light1: simd_float4(x:0, y: 0, z: 0, w: 1), light1Col: .one * 0.35, 
-                                      light2: simd_float4(x:0, y: 0.5, z: 1, w: 2), light2Col: .one * 0.85)    
+                                      light2: simd_float4(x:0, y: 0, z: 0, w: 0), light2Col: .zero)
     buff.contents().storeBytes(of: lightsUniform, as: LightsUniform.self)
     return buff
   }()
@@ -98,6 +88,20 @@ public class MetalRenderer: ObservableObject {
       viewProjBuffer = cameraCommand.storage.viewProjBuffer
     }
     
+    var lightsBuffer: MTLBuffer?
+    let lightCommands = commands.filter({ $0.0 is PlaceLight })
+    if !lightCommands.isEmpty {      
+      let storage = lightCommands.first?.0.storage as? PlaceLight.Storage
+      let presentedCommands = lightCommands.map { (cur, prev) in
+        cur.presentedDrawCommand(time: time, previous: prev)
+      }
+      storage?.set(presentedCommands)
+      lightsBuffer = storage?.lightsUniform
+    }
+    else {
+      lightsBuffer = defaultLighting
+    }
+    
     commands.forEach { command in
       command.0.update(time: time, previous: command.1)
       
@@ -116,7 +120,7 @@ public class MetalRenderer: ObservableObject {
         encoder.setVertexBuffer(defaultProjViewBuffer, offset: 0, index: 2)
       }
       
-      encoder.setVertexBuffer(defaultLighting, offset: 0, index: 3)
+      encoder.setVertexBuffer(lightsBuffer, offset: 0, index: 3)
       
       command.0.render(encoder: encoder, depthStencil: depthStencilState)
     }
