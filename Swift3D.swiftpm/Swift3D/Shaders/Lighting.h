@@ -26,6 +26,6 @@ struct MaterialProperties {
 
 // Methods -----------
 
-float3 calculateLighting(Lights lights, MaterialProperties material, float3 normal, float4 vPos);
+float3 calculateLighting(Lights lights, MaterialProperties material, float3 normal, float3 normalV, float4 vPos);
 
 #endif /* Header_h */

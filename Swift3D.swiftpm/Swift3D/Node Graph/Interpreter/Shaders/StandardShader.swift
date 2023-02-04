@@ -14,8 +14,8 @@ import simd
 extension MetalDrawable_Shader where Self == StandardShader {
   static func standard(albedo: MetalDrawable_Texture,
                        albedoScaling: simd_float2 = .one,
-                       specPow: Float = 1,
-                       rimPow: Float = 0) -> StandardShader {
+                       specPow: Float = 2,
+                       rimPow: Float = 2) -> StandardShader {
     
     return .init(albedo: albedo,
                  uniform: StandardUniform(

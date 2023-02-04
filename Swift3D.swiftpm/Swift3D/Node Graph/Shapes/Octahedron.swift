@@ -16,7 +16,9 @@ struct Octahedron<Geometry: MetalDrawable_Geometry> {
 
 // Grabbed Math from :
 // https://web.archive.org/web/20171218054621/http://www.binpress.com/tutorial/creating-an-octahedron-sphere/162
-extension Octahedron where Geometry == StandardGeometry {  
+extension Octahedron where Geometry == StandardGeometry {
+
+  // TODO: Add some caching for this LARGE object.
   static func get(divisions: Int) -> Geometry {
     let data = create(for: divisions)
     let normalizedPos = data.0.map { normalize($0) }

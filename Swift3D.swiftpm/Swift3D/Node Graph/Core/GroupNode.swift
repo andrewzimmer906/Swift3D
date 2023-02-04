@@ -16,6 +16,10 @@ struct GroupNode<Content>: Node where Content: Node {
     self.id = id
     self.content = content()
   }
+
+  var body: some Node {
+    self.content
+  }
   
   var printedTree: [String] {
     content.printedTree.map { "\(id).\($0)" }

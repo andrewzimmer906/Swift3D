@@ -25,6 +25,7 @@ struct PlaceCamera: MetalDrawable, HasShaderPipeline {
   let cameraProjectionSettings: CameraProjectionSettings
   let shaderPipeline: (any MetalDrawable_Shader)?
   let animations: [NodeTransition]?
+  //private var geometry: StandardGeometry { Octahedron.get(divisions: 3) }
   private var geometry: StandardGeometry { Cube.get() }
 
   let storage: PlaceCamera.Storage
@@ -66,11 +67,14 @@ extension PlaceCamera {
   func update(time: CFTimeInterval, previous: (any MetalDrawable)?) {
     if let dirtyTransform = attribute(at: time, cur: self.transform, prev: previous?.transform) {
       storage.set((dirtyTransform, self.cameraProjectionSettings))
-
-      let skyboxTranslation = dirtyTransform.translation
-      let skyboxTransform = float4x4.TRS(trans: skyboxTranslation, rot: simd_quatf.identity, scale: simd_float3.one * (self.cameraProjectionSettings.zFar - 1))
-      storage.set(skyboxTransform)
+      storage.set(skyboxPlacement(dirtyTransform))
     }
+  }
+
+  private func skyboxPlacement(_ viewTransform: float4x4) -> float4x4 {
+    let skyboxTranslation = viewTransform.translation
+    let skyboxTransform = float4x4.TRS(trans: skyboxTranslation, rot: simd_quatf.identity, scale: simd_float3.one * (min(self.cameraProjectionSettings.zFar * 0.9, self.cameraProjectionSettings.zFar - 10)))
+    return skyboxTransform
   }
   
   var needsRender: Bool { shaderPipeline != nil }
@@ -135,7 +139,7 @@ extension PlaceCamera.Storage {
                                            self.surfaceAspect ?? 1, 
                                            camSettings.zNear, 
                                            camSettings.zFar)
-      let vpUniform = ViewProjectionUniform(projectionMatrix: projM, viewMatrix: viewM)      
+      let vpUniform = ViewProjectionUniform(projectionMatrix: projM, viewMatrix: viewM)
       self.viewProjBuffer?.contents().storeBytes(of: vpUniform, as: ViewProjectionUniform.self)
     } else if let transform = value as? float4x4 {
       self.skyboxTransform?.contents().storeBytes(of: transform, as: float4x4.self)
@@ -183,5 +187,6 @@ extension PlaceCamera.Storage {
     // Use the latest transform according to what our transitions will calculate
     let updatedTransform = command.attribute(at: CACurrentMediaTime(), cur: command.transform, prev: previous?.transform)
     self.set((updatedTransform ?? command.transform, command.cameraProjectionSettings))
+    self.set(command.skyboxPlacement(updatedTransform ?? command.transform))
   }
 }

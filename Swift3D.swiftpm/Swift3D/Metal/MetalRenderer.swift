@@ -90,7 +90,7 @@ public class MetalRenderer: ObservableObject {
     
     var lightsBuffer: MTLBuffer?
     let lightCommands = commands.filter({ $0.0 is PlaceLight })
-    if !lightCommands.isEmpty {      
+    if !lightCommands.isEmpty {
       let storage = lightCommands.first?.0.storage as? PlaceLight.Storage
       let presentedCommands = lightCommands.map { (cur, prev) in
         cur.presentedDrawCommand(time: time, previous: prev)
@@ -121,7 +121,6 @@ public class MetalRenderer: ObservableObject {
       }
       
       encoder.setVertexBuffer(lightsBuffer, offset: 0, index: 3)
-      
       command.0.render(encoder: encoder, depthStencil: depthStencilState)
     }
 

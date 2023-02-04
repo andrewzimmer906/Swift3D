@@ -14,24 +14,29 @@ struct ContentView: View {
   @State var camPos: CameraPos = .normal  
   @State var tester: Bool = true
   @State var isRotated: Bool = true
+
+  let cameraController = TouchCameraController()
   
   var body: some View {
     ZStack {
       Swift3DView(updateLoop: { delta in
         rotation += 1.0 * Float(delta)
-
+        cameraController.update(delta: delta)
       }) {
-        CameraController()
-        
-        camera
+        TouchCamera(controller: cameraController,
+                    skybox: UIImage(named: "greyChecker"),
+                    scaledBy: .one * 2)
         lights
 
         OctaNode(id: "newid", divisions: 2)
-          .shaded(.standard(albedo: UIImage(named: "purpleChecker")))
-          .transform(.translated(.up * sin(rotation) * 3))
-          .transform(.rotated(angle: rotation, axis: .up))
+          .shaded(.standard(albedo: UIImage(named: "greyChecker"), specPow: 6))
+          .transform(.translated(.right * 0.5))
 
+        CubeNode(id: "cube1")
+          .shaded(.standard(albedo: UIImage(named: "orangeChecker")))
+          .transform(.translated(.left * 0.5))
 
+/*
         CubeNode(id: "hello")
           .shaded(.standard(albedo: UIImage(named: "orangeChecker"),
                             albedoScaling: .one * 4,
@@ -43,47 +48,23 @@ struct ContentView: View {
           .shaded(.standard(albedo: UIImage(named: "orangeChecker"), rimPow: 1))
           .transform(.translated(.down * 0.5))
           .transform(.rotated(angle: rotation, axis: .up))
-          .transform(.scaled(.one * 2))
+          .transform(.scaled(.one * 2))*/
       }
     }
+
     .onTapGesture {
-      //rotation += Float.pi/2
-      //tester.toggle()
-      if let updatedPos = CameraPos(rawValue: camPos.rawValue + 1) {
-       camPos = updatedPos 
-      }
-      else {
-        camPos = .normal
-      }
+      cameraController.touchTapped()
       isRotated.toggle()
     }
-    .onAppear {
-      withAnimation(.default.repeatForever(autoreverses: true)) {
-        isRotated.toggle()
+    .gesture(DragGesture(minimumDistance: 0)
+      .onChanged { gesture in
+        cameraController.touchMoved(startLocation: gesture.startLocation,
+                                    curLocation: gesture.location)
       }
-    }
-  }
-  
-  private var camera: some Node {
-    GroupNode(id: "camera_container") {
-      switch camPos {
-      case .normal:
-        CameraNode(id: "camera")
-          .skybox(UIImage(named: "darkDiamond"), scaledBy: .one * 8)
-          .transform(float4x4.translated(simd_float3(x: 0, y: 0, z: -10)))
-      case .above:
-        CameraNode(id: "camera")
-          .skybox(UIImage(named: "darkDiamond"), scaledBy: .one * 8)
-          .transform(.rotated(angle: -.pi/4, axis: .right))
-          .transform(float4x4.translated(simd_float3(x: 0, y: 5, z: -5)))
-      case .under:
-        CameraNode(id: "camera")
-          .skybox(UIImage(named: "darkDiamond"), scaledBy: .one * 8)
-          .transform(.rotated(angle: .pi/4, axis: .right))
-          .transform(float4x4.translated(simd_float3(x: 0, y: -5, z: -5)))
-      }
-    }
-    .transition(.easeOut(1.5))
+      .onEnded({ gesture in
+        cameraController.touchEnded(predictedEndLocation: gesture.predictedEndLocation)
+      })
+    )
   }
   
   private var lights: some Node {

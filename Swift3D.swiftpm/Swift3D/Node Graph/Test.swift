@@ -13,11 +13,15 @@ func makeCode(@SceneBuilder _ content: () -> any Node) -> any Node {
   content()
 }
 
-func testTree() {
+func testBuilder() {
   // let yes = true
-  let no = false
+  // let no = false
 
-  let tree = makeCode { 
+  let tree = makeCode {
+    GroupNode(id: "one") {
+      TriangleNode(id: "tri1")
+    }
+    TriangleNode(id: "tris")
   }
   
   print("\n")
