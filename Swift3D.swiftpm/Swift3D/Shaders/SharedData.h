@@ -15,12 +15,9 @@ struct Uniforms {
 struct ViewProjectionUniform {
   float4x4 projectionMatrix;
   float4x4 viewMatrix;
-  float4x4 clipToViewMatrix;
 };
 
-struct CustomShaderUniform {
-  float4 textureColor;
-};
+
 
 // Normal, UV, Vertex
 struct VertexIn {

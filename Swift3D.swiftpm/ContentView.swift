@@ -23,13 +23,12 @@ struct ContentView: View {
         rotation += 1.0 * Float(delta)
         cameraController.update(delta: delta)
       }) {
-        TouchCamera(controller: cameraController,
-                    skybox: CubeMap(image: "skyGridGreen"),
-                    scaledBy: .one)
+        TouchCamera(controller: cameraController)
         lights
 
         OctaNode(id: "newid", divisions: 2)
-          .shaded(.standard(albedo: UIImage(named: "greyChecker"), specPow: 6))
+          //.shaded(.standard(albedo: UIImage(named: "greyChecker"), specPow: 6))
+          .shaded(.unlit(.yellow))
           .transform(.translated(.right * 0.5))
 
         CubeNode(id: "cube1")

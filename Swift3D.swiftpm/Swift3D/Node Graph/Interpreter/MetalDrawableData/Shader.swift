@@ -14,7 +14,7 @@ import UIKit
 
 protocol MetalDrawable_Shader {
   func setupEncoder(encoder: MTLRenderCommandEncoder)
-  func build(device: MTLDevice, library: MetalShaderLibrary, previous: (any MetalDrawable_Shader)?)
+  func build(device: MTLDevice, library: MetalShaderLibrary)
 }
 
 // MARK: - Textures

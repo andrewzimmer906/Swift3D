@@ -14,16 +14,7 @@ import simd
 
 extension MetalDrawable_Shader where Self == UnlitShader {
   static func unlit(_ color: Color) -> UnlitShader {
-    return UnlitShader(.with(color))
-  }
-}
-
-// MARK: - Uniforms
-
-struct ColorUniform {
-  let color: simd_float4
-  static func with(_ color: Color) -> ColorUniform {
-    return ColorUniform(color: color.components)
+    return UnlitShader(color)
   }
 }
 
@@ -31,41 +22,31 @@ struct ColorUniform {
 
 struct UnlitShader: MetalDrawable_Shader {
   let functions: (String, String) = ("unlit_vertex", "unlit_fragment")
-  let colorUniform: ColorUniform
+  let color: Color
   let storage: Storage
   
-  init(_ uniforms: ColorUniform, storage: Storage = Storage()) {
-    self.colorUniform = uniforms
+  init(_ color: Color, storage: Storage = Storage()) {
+    self.color = color
     self.storage = storage
   }
   
-  func build(device: MTLDevice, library: MetalShaderLibrary, previous: (any MetalDrawable_Shader)?) {
-    let previous = previous as? UnlitShader
-    
-    self.storage.uniformsBuffer = previous?.storage.uniformsBuffer
-    if self.storage.uniformsBuffer == nil {        
-      storage.uniformsBuffer = device.makeBuffer(length: MemoryLayout<ColorUniform>.size)
-      storage.uniformsBuffer?.contents().storeBytes(of: self.colorUniform, as: ColorUniform.self)
-    }
-    
+  func build(device: MTLDevice, library: MetalShaderLibrary) {
+    self.storage.color = self.color.components
     self.storage.pipeline = library.pipeline(for: functions.0, fragment: functions.1)
   }
   
   func setupEncoder(encoder: MTLRenderCommandEncoder) {
-    if let uniform = storage.uniformsBuffer {
-      encoder.setVertexBuffer(uniform, offset: 0, index: 4)
-    }
-    
     if let ps = storage.pipeline { 
       encoder.setRenderPipelineState(ps)
     }
+    encoder.setFragmentBytes(&storage.color, length: MemoryLayout<SIMD4<Float>>.size, index: 0)
   }
 }
 
 
 extension UnlitShader {
   class Storage {
-    fileprivate var uniformsBuffer: MTLBuffer?
     fileprivate var pipeline: MTLRenderPipelineState?
+    var color: simd_float4 = .zero
   }
 }

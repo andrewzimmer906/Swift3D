@@ -121,26 +121,21 @@ class TouchCameraController {
 
 // MARK: - Node
 
-struct TouchCamera<Skybox: MetalDrawable_Texture>: Node {
+struct TouchCamera<Skybox: MetalDrawable_Shader>: Node {
   var id: String { "Camera Controller" }
 
   let controller: TouchCameraController
   let skybox: Skybox
-  let scaledBy: simd_float2
 
   init(controller: TouchCameraController,
-       skybox: Skybox = Color(hex: 0xefefef),
-       scaledBy: simd_float2 = .one) {
+       skybox: Skybox = .skybox()) {
     self.controller = controller
     self.skybox = skybox
-    self.scaledBy = scaledBy
   }
-
-
 
   var body: some Node {
     CameraNode(id: "Main Camera")
-      .skybox(skybox, scaledBy: scaledBy)
+      .skybox(skybox)
       .transform(controller.transform)
       .transition(.easeInOut(0.3))
   }

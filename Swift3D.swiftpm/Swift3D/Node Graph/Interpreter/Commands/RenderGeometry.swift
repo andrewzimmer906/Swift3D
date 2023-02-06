@@ -148,8 +148,7 @@ extension RenderGeometry.Storage {
     
     // set up our shader pipeline
     command.shaderPipeline.build(device: device,
-                                 library: library,
-                                 previous: previous?.shaderPipeline)
+                                 library: library)
     
     // Make new buffers where needed.
     if self.vertexBuffer == nil {

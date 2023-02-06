@@ -34,13 +34,7 @@ struct CameraNode: Node {
                  storage: PlaceCamera.Storage())]
   }
 
-  func skybox(_ texture: any MetalDrawable_Texture, scaledBy: simd_float2 = .one) -> ModifiedNodeContent<Self, ShaderModifier> {
-    if let cube = texture as? CubeMap {
-      return self.modifier(ShaderModifier(shader: .skybox(cube, scaledBy: scaledBy)))
-    } else if let color = texture as? Color {
-      return self.modifier(ShaderModifier(shader: .unlit(color)))
-    } else {
-      fatalError("Please use a CubeMap for your camera skybox.")
-    }
+  func skybox(_ shader: any MetalDrawable_Shader) -> ModifiedNodeContent<Self, ShaderModifier> {
+    return self.modifier(ShaderModifier(shader: shader))
   }
 }

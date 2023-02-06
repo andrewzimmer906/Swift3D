@@ -21,7 +21,7 @@ struct OctaNode: Node, AcceptsShader {
     [RenderGeometry(id: id, 
                     transform: float4x4.identity, 
                     geometry: Octahedron.get(divisions: divisions) as StandardGeometry,
-                    shaderPipeline: UnlitShader(.with(.red)),
+                    shaderPipeline: UnlitShader(.red),
                     renderType: .triangles,
                     animations: nil,
                     storage: RenderGeometry.Storage(),

@@ -11,8 +11,6 @@ struct VertexOut {
   float4 viewPos;
   float4 normal;
   float4 normalV;
-  Lights lights;
-  MaterialProperties material;
 };
 
 // --
@@ -20,9 +18,6 @@ struct VertexOut {
 vertex VertexOut standard_vertex(const device VertexIn* vertex_array [[ buffer(0) ]],
                            const device Uniforms& uniforms [[ buffer(1) ]],
                            const device ViewProjectionUniform& vpUniforms [[ buffer(2) ]],
-                           const device Lights& lights [[ buffer(3) ]],
-                           const device MaterialProperties& material [[ buffer(4) ]],
-                                   
                            unsigned int vid [[ vertex_id ]]) {
   VertexIn in = vertex_array[vid];
   VertexOut out;
@@ -36,18 +31,17 @@ vertex VertexOut standard_vertex(const device VertexIn* vertex_array [[ buffer(0
   out.viewPos = mv_matrix * float4(in.position, 1.0);
   out.normal = normalize((m_matrix * float4(in.normal, 0.0)));
   out.normalV = normalize((mv_matrix * float4(in.normal, 0.0)));
-  
-  out.material = material;
-  out.lights = lights;
+
   out.uv = in.uv;
 
   return out;
 }
 
 fragment float4 standard_fragment(VertexOut in [[stage_in]],
-                                  texture2d<float> albedo [[ texture(0) ]]) {
-  const float4 color = albedo.sample(textureSampler, in.uv * in.material.albedoTextureScaling.xy);
-  float3 lighting = calculateLighting(in.lights, in.material, in.normal.xyz, in.normalV.xyz, in.viewPos);
-  //lighting = in.viewPos.xyz * 0.5 + 0.5;
+                                  texture2d<float> albedo [[ texture(0) ]],
+                                  constant MaterialProperties &material [[ buffer(0) ]],
+                                  constant Lights &lights [[ buffer(1) ]]) {
+  const float4 color = albedo.sample(textureSampler, in.uv * material.albedoTextureScaling.xy);
+  float3 lighting = calculateLighting(lights, material, in.normal.xyz, in.normalV.xyz, in.viewPos);
   return float4((lighting * color.xyz).xyz, 1.0);
 }

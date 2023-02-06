@@ -12,7 +12,7 @@ import simd
 
 // MARK: - Uniforms
 
-struct LightsUniform {  
+struct Lights {
   let light1: simd_float4
   let light1Col: simd_float4
   
@@ -100,8 +100,8 @@ extension PlaceLight.Storage {
         values1 = lights[1].uniformValues        
       }
       
-      let uniform = LightsUniform(light1: values0.0, light1Col: values0.1, light2: values1.0, light2Col: values1.1)
-      self.lightsUniform?.contents().storeBytes(of: uniform, as: LightsUniform.self)
+      let uniform = Lights(light1: values0.0, light1Col: values0.1, light2: values1.0, light2Col: values1.1)
+      self.lightsUniform?.contents().storeBytes(of: uniform, as: Lights.self)
     }
   }
   
@@ -112,7 +112,7 @@ extension PlaceLight.Storage {
                surfaceAspect: Float) {
     self.device = device    
     if lightsUniform == nil {
-      self.lightsUniform = device.makeBuffer(length: MemoryLayout<LightsUniform>.size)
+      self.lightsUniform = device.makeBuffer(length: MemoryLayout<Lights>.size)
     }
   }
 }

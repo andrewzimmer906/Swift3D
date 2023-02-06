@@ -11,14 +11,14 @@ public class MetalRenderer: ObservableObject {
   let depthStencilState: MTLDepthStencilState?
   
   private lazy var defaultLighting: MTLBuffer? = {
-    let buff = metalDevice.makeBuffer(length: MemoryLayout<LightsUniform>.size)
+    let buff = metalDevice.makeBuffer(length: MemoryLayout<Lights>.size)
     guard let buff = buff else {
       fatalError()
     }
     
-    let lightsUniform = LightsUniform(light1: simd_float4(x:0, y: 0, z: 0, w: 1), light1Col: .one * 0.35, 
+    let lightsUniform = Lights(light1: simd_float4(x:0, y: 0, z: 0, w: 1), light1Col: .one * 0.35, 
                                       light2: simd_float4(x:0, y: 0, z: 0, w: 0), light2Col: .zero)
-    buff.contents().storeBytes(of: lightsUniform, as: LightsUniform.self)
+    buff.contents().storeBytes(of: lightsUniform, as: Lights.self)
     return buff
   }()
   
@@ -29,8 +29,7 @@ public class MetalRenderer: ObservableObject {
     }
     
     let vpUniform = ViewProjectionUniform(projectionMatrix: float4x4.identity, 
-                                          viewMatrix: float4x4.identity,
-                                          clipToViewMatrix: .identity)
+                                          viewMatrix: float4x4.identity)
     
     buff.contents().storeBytes(of: vpUniform, as: ViewProjectionUniform.self)
     return buff
@@ -120,8 +119,8 @@ public class MetalRenderer: ObservableObject {
       } else {
         encoder.setVertexBuffer(defaultProjViewBuffer, offset: 0, index: 2)
       }
-      
-      encoder.setVertexBuffer(lightsBuffer, offset: 0, index: 3)
+        
+      encoder.setFragmentBuffer(lightsBuffer, offset: 0, index: 1)
       command.0.render(encoder: encoder, depthStencil: depthStencilState)
     }
 

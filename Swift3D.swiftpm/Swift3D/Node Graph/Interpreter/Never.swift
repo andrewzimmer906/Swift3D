@@ -26,7 +26,7 @@ extension Never: MetalDrawable_Shader {
   func setupEncoder(encoder: MTLRenderCommandEncoder) {
     fatalError()
   }
-  func build(device: MTLDevice, library: MetalShaderLibrary, previous: (any MetalDrawable_Shader)?) {
+  func build(device: MTLDevice, library: MetalShaderLibrary) {
     fatalError()
   }
 }

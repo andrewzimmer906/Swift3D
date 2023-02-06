@@ -18,7 +18,7 @@ extension MetalDrawable_Shader where Self == StandardShader {
                        rimPow: Float = 2) -> StandardShader {
     
     return .init(albedo: albedo,
-                 uniform: StandardUniform(
+                 material: MaterialSettings(
                   lightingSettings: simd_float4(specPow, rimPow, 0, 0),
                   albedoTextureScaling: simd_float4(x: albedoScaling.x, y: albedoScaling.y, z: 0, w: 0)),
                  storage: StandardShader.Storage())
@@ -27,7 +27,7 @@ extension MetalDrawable_Shader where Self == StandardShader {
 
 // MARK: - Uniforms
 
-fileprivate struct StandardUniform {
+fileprivate struct MaterialSettings {
   let lightingSettings: simd_float4
   let albedoTextureScaling: simd_float4;
 }
@@ -37,18 +37,12 @@ fileprivate struct StandardUniform {
 struct StandardShader: MetalDrawable_Shader {
   let functions: (String, String) = ("standard_vertex", "standard_fragment")
   let albedo: MetalDrawable_Texture
-  fileprivate let uniform: StandardUniform
+  fileprivate let material: MaterialSettings
 
   let storage: Storage
   
-  func build(device: MTLDevice, library: MetalShaderLibrary, previous: (any MetalDrawable_Shader)?) {
-    let previous = previous as? StandardShader
-    
-    self.storage.uniformsBuffer = previous?.storage.uniformsBuffer
-    if self.storage.uniformsBuffer == nil {
-      storage.uniformsBuffer = device.makeBuffer(length: MemoryLayout<StandardUniform>.size)
-      storage.uniformsBuffer?.contents().storeBytes(of: self.uniform, as: StandardUniform.self)
-    }
+  func build(device: MTLDevice, library: MetalShaderLibrary) {
+    self.storage.material = self.material
 
     // We store and use library directly because it does a lot of the reuse and caching of
     // shaders & textures for us.
@@ -56,16 +50,14 @@ struct StandardShader: MetalDrawable_Shader {
   }
   
   func setupEncoder(encoder: MTLRenderCommandEncoder) {
-    guard let uniformBuffer = storage.uniformsBuffer,
-          let library = storage.library else {
+    guard let library = storage.library else {
       return
     }
 
-    // Uniforms
-    encoder.setVertexBuffer(uniformBuffer, offset: 0, index: 4)
-
     // Albedo
     encoder.setFragmentTexture(albedo.mtlTexture(library), index: 0)
+    encoder.setFragmentBytes(&storage.material, length: MemoryLayout<MaterialSettings>.size, index: 0)
+    // encoder.setFragmentBytes(&storage.material, length: MemoryLayout<MaterialSettings>.size, index: 1)
 
     // Shaders
     encoder.setRenderPipelineState(library.pipeline(for: functions.0, fragment: functions.1))
@@ -74,7 +66,7 @@ struct StandardShader: MetalDrawable_Shader {
 
 extension StandardShader {
   class Storage {
-    fileprivate var uniformsBuffer: MTLBuffer?
+    fileprivate var material: MaterialSettings = .init(lightingSettings: .zero, albedoTextureScaling: .zero)
     fileprivate var library: MetalShaderLibrary?
   }
 }

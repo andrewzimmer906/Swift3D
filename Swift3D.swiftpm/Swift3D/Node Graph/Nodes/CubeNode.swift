@@ -15,7 +15,7 @@ struct CubeNode: Node, AcceptsShader {
     [RenderGeometry(id: id, 
                     transform: float4x4.identity, 
                     geometry: Cube.get() as StandardGeometry, 
-                    shaderPipeline: UnlitShader(.with(.white)),
+                    shaderPipeline: UnlitShader(.white),
                     renderType: .triangles,
                     animations: nil,
                     storage: RenderGeometry.Storage(),

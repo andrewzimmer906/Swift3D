@@ -15,7 +15,7 @@ struct TriangleNode: Node, AcceptsShader {
     [RenderGeometry(id: id, 
                     transform: float4x4.identity, 
                     geometry: Triangle.get() as StandardGeometry,                    
-                    shaderPipeline: UnlitShader(.with(.red)),
+                    shaderPipeline: UnlitShader(.red),
                     renderType: .triangles,
                     animations: nil,
                     storage: RenderGeometry.Storage(),
