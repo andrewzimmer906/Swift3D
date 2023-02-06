@@ -47,4 +47,20 @@ extension Optional<UIImage>: MetalDrawable_Texture {
   }
 }
 
+struct CubeMap: MetalDrawable_Texture {
+  let image: String
+
+  func mtlTexture(_ library: MetalShaderLibrary) -> MTLTexture? {
+    guard let img = UIImage(named: image) else {
+      fatalError()
+    }
+
+    return library.cubeTexture(image: img)
+  }
+
+  static func cube(_ image: String) -> Self {
+    return Self(image: image)
+  }
+}
+
 

@@ -29,7 +29,8 @@ public class MetalRenderer: ObservableObject {
     }
     
     let vpUniform = ViewProjectionUniform(projectionMatrix: float4x4.identity, 
-                                          viewMatrix: float4x4.identity)
+                                          viewMatrix: float4x4.identity,
+                                          clipToViewMatrix: .identity)
     
     buff.contents().storeBytes(of: vpUniform, as: ViewProjectionUniform.self)
     return buff

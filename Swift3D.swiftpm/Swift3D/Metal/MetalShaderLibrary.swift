@@ -7,6 +7,7 @@
 
 import Foundation
 import Metal
+import MetalKit
 import UIKit
 import simd
 
@@ -15,6 +16,7 @@ class MetalShaderLibrary {
   private var pipelines: [String: MTLRenderPipelineState] = [:]
   private var colorTextures: [simd_float4: MTLTexture] = [:]
   private var imageTextures: [CGImage: MTLTexture] = [:]
+  private var cubeTextures: [UIImage: MTLTexture] = [:]
 
   let device: MTLDevice
   let library: MTLLibrary
@@ -71,24 +73,34 @@ class MetalShaderLibrary {
     imageTextures[image] = texture
     return texture    
   }
+
+  func cubeTexture(image: UIImage) -> MTLTexture {
+    if let tex = cubeTextures[image] {
+      return tex
+    }
+
+    let texture = Self.cubeTexture(device, image: image)
+    cubeTextures[image] = texture
+    return texture
+  }
 }
 
 // MARK: - MTLTextureLoads
 
 extension MetalShaderLibrary {
-  static func texture(_ device: MTLDevice, from image: CGImage, flip: Bool = false) -> MTLTexture {    
+  static func texture(_ device: MTLDevice, from image: CGImage, flip: Bool = false) -> MTLTexture {
     let bytesPerPixel = 4
     let bitsPerComponent = 8
     let colorSpace = CGColorSpaceCreateDeviceRGB()
     
     let rowBytes = image.width * bytesPerPixel
     
-    let context = CGContext(data: nil, 
-                            width: image.width, 
-                            height: image.height, 
-                            bitsPerComponent: bitsPerComponent, 
-                            bytesPerRow: rowBytes, 
-                            space: colorSpace, 
+    let context = CGContext(data: nil,
+                            width: image.width,
+                            height: image.height,
+                            bitsPerComponent: bitsPerComponent,
+                            bytesPerRow: rowBytes,
+                            space: colorSpace,
                             bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)
     guard let context = context else {
       fatalError()
@@ -104,9 +116,9 @@ extension MetalShaderLibrary {
     context.draw(image, in: CGRect(x: 0, y: 0, width: image.width, height: image.height))
     
     let descriptor = MTLTextureDescriptor.texture2DDescriptor(
-      pixelFormat: MTLPixelFormat.rgba8Unorm, 
-      width: image.width, 
-      height: image.height, 
+      pixelFormat: MTLPixelFormat.rgba8Unorm,
+      width: image.width,
+      height: image.height,
       mipmapped: false)
     
     guard let texture = device.makeTexture(descriptor: descriptor),
@@ -114,10 +126,10 @@ extension MetalShaderLibrary {
       fatalError()
     }
     
-    let region = MTLRegionMake2D(0, 0, image.height, image.height)    
+    let region = MTLRegionMake2D(0, 0, image.height, image.height)
     texture.replace(region: region, mipmapLevel: 0, withBytes: pixelData, bytesPerRow: rowBytes)
     
-    return texture    
+    return texture
   }
   
   static func texture(_ device: MTLDevice, from color: simd_float4) -> MTLTexture {
@@ -149,5 +161,26 @@ extension MetalShaderLibrary {
     }
     
     return texture
+  }
+
+  // I went ahead and used metalkit here. I was initially doing things without the kit, but
+  // I've already got plenty texture loading code in here after all.
+  static func cubeTexture(_ device: MTLDevice, image: UIImage) -> MTLTexture  {
+    let loader = MTKTextureLoader(device: device)
+    let cubeTextureOptions: [MTKTextureLoader.Option : Any] = [
+      .textureUsage : MTLTextureUsage.shaderRead.rawValue,
+      .textureStorageMode : MTLStorageMode.private.rawValue,
+      .generateMipmaps : true,
+      .cubeLayout : MTKTextureLoader.CubeLayout.vertical,
+    ]
+
+    let data = image.pngData()!
+    do {
+      let texture = try loader.newTexture(data: data, options: cubeTextureOptions)
+      return texture
+    } catch {
+      print("error:\(error)")
+      fatalError()
+    }
   }
 }

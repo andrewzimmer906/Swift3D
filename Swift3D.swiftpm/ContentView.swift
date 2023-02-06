@@ -24,8 +24,8 @@ struct ContentView: View {
         cameraController.update(delta: delta)
       }) {
         TouchCamera(controller: cameraController,
-                    skybox: UIImage(named: "greyChecker"),
-                    scaledBy: .one * 2)
+                    skybox: CubeMap(image: "skyGridGreen"),
+                    scaledBy: .one)
         lights
 
         OctaNode(id: "newid", divisions: 2)
@@ -35,20 +35,6 @@ struct ContentView: View {
         CubeNode(id: "cube1")
           .shaded(.standard(albedo: UIImage(named: "orangeChecker")))
           .transform(.translated(.left * 0.5))
-
-/*
-        CubeNode(id: "hello")
-          .shaded(.standard(albedo: UIImage(named: "orangeChecker"),
-                            albedoScaling: .one * 4,
-                            rimPow: 1))
-          .transform(.translated(.up))
-          .transform(.rotated(angle: -rotation, axis: .up))
-        
-        OctaNode(id: "hello2", divisions: 0)
-          .shaded(.standard(albedo: UIImage(named: "orangeChecker"), rimPow: 1))
-          .transform(.translated(.down * 0.5))
-          .transform(.rotated(angle: rotation, axis: .up))
-          .transform(.scaled(.one * 2))*/
       }
     }
 

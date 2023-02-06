@@ -15,6 +15,7 @@ import simd
 struct ViewProjectionUniform {
   let projectionMatrix: float4x4
   let viewMatrix: float4x4
+  let clipToViewMatrix: float4x4
 }
 
 // MARK: - Command
@@ -67,14 +68,7 @@ extension PlaceCamera {
   func update(time: CFTimeInterval, previous: (any MetalDrawable)?) {
     if let dirtyTransform = attribute(at: time, cur: self.transform, prev: previous?.transform) {
       storage.set((dirtyTransform, self.cameraProjectionSettings))
-      storage.set(skyboxPlacement(dirtyTransform))
     }
-  }
-
-  private func skyboxPlacement(_ viewTransform: float4x4) -> float4x4 {
-    let skyboxTranslation = viewTransform.translation
-    let skyboxTransform = float4x4.TRS(trans: skyboxTranslation, rot: simd_quatf.identity, scale: simd_float3.one * (min(self.cameraProjectionSettings.zFar * 0.9, self.cameraProjectionSettings.zFar - 10)))
-    return skyboxTransform
   }
   
   var needsRender: Bool { shaderPipeline != nil }
@@ -85,9 +79,19 @@ extension PlaceCamera {
       fatalError()
     }
 
-    encoder.setDepthStencilState(depthStencil)
+    // encoder.setDepthStencilState(depthStencil)
     encoder.setFrontFacing(.counterClockwise)
     encoder.setCullMode(.none)
+
+    // Shaders and Uniforms
+    shaderPipeline.setupEncoder(encoder: encoder)
+    encoder.setFragmentBytes(&storage.skyboxInverseView, length: MemoryLayout<float4x4>.size, index: 0)
+    encoder.setFragmentSamplerState(storage.samplerState, index: 0)
+
+    encoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 3)
+
+    
+    /*
 
     // Vertices
     if let vb = storage.skyboxVertices {
@@ -111,7 +115,7 @@ extension PlaceCamera {
                                     indexBufferOffset: 0,
                                     instanceCount: self.geometry.numPoints / 3)
     }
-
+*/
     encoder.endEncoding()
   }
 }
@@ -125,7 +129,9 @@ extension PlaceCamera {
 
     private(set) var skyboxVertices: MTLBuffer?
     private(set) var skyboxIndices: MTLBuffer?
-    private(set) var skyboxTransform: MTLBuffer?
+    var skyboxTransform: MTLBuffer?
+    var skyboxInverseView: float4x4 = .identity
+    var samplerState: MTLSamplerState?
   }
 }
 
@@ -134,15 +140,19 @@ extension PlaceCamera.Storage {
     if let tuple = value as? (float4x4, CameraProjectionSettings) {
       let viewM = tuple.0
       let camSettings = tuple.1
-      
-      let projM = float4x4.makePerspective(fovyRadians: camSettings.fov, 
-                                           self.surfaceAspect ?? 1, 
-                                           camSettings.zNear, 
-                                           camSettings.zFar)
-      let vpUniform = ViewProjectionUniform(projectionMatrix: projM, viewMatrix: viewM)
+
+      let projM = camSettings.matrix(aspect: self.surfaceAspect ?? 1)
+
+      var viewDirectionMatrix = viewM
+      viewDirectionMatrix.columns.3 = SIMD4<Float>(0, 0, 0, 1)
+      let clipToViewDirectionTransform = (projM * viewDirectionMatrix).inverse
+
+
+      let vpUniform = ViewProjectionUniform(projectionMatrix: projM, viewMatrix: viewM, clipToViewMatrix: clipToViewDirectionTransform)
       self.viewProjBuffer?.contents().storeBytes(of: vpUniform, as: ViewProjectionUniform.self)
-    } else if let transform = value as? float4x4 {
-      self.skyboxTransform?.contents().storeBytes(of: transform, as: float4x4.self)
+
+      self.skyboxInverseView = clipToViewDirectionTransform
+      // self.skyboxTransform?.contents().storeBytes(of: clipToViewDirectionTransform, as: float4x4.self)
     }
   }
   
@@ -179,6 +189,16 @@ extension PlaceCamera.Storage {
       self.skyboxVertices = command.geometry.createBuffer(device: device)
       self.skyboxIndices = command.geometry.createIndexBuffer(device: device)
     }
+
+    let samplerDescriptor = MTLSamplerDescriptor()
+    samplerDescriptor.normalizedCoordinates = true
+    samplerDescriptor.magFilter = .linear
+    samplerDescriptor.minFilter = .linear
+    samplerDescriptor.mipFilter = .linear
+    samplerDescriptor.sAddressMode = .repeat
+    samplerDescriptor.tAddressMode = .repeat
+    samplerState = device.makeSamplerState(descriptor: samplerDescriptor)!
+
     
     if self.skyboxTransform == nil {
       self.skyboxTransform = device.makeBuffer(length: MemoryLayout<float4x4>.size)
@@ -187,6 +207,6 @@ extension PlaceCamera.Storage {
     // Use the latest transform according to what our transitions will calculate
     let updatedTransform = command.attribute(at: CACurrentMediaTime(), cur: command.transform, prev: previous?.transform)
     self.set((updatedTransform ?? command.transform, command.cameraProjectionSettings))
-    self.set(command.skyboxPlacement(updatedTransform ?? command.transform))
+    // self.set(command.skyboxPlacement(updatedTransform ?? command.transform))
   }
 }

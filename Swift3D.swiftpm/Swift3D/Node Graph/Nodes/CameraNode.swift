@@ -6,12 +6,20 @@
 //
 
 import Foundation
+import SwiftUI
 import simd
 
 struct CameraProjectionSettings {
   let fov: Float
   let zNear: Float
   let zFar: Float
+
+  func matrix(aspect: Float) -> float4x4 {
+    float4x4.makePerspective(fovyRadians: fov,
+                             aspect,
+                             zNear,
+                             zFar)
+  }
 }
 
 struct CameraNode: Node {
@@ -26,7 +34,13 @@ struct CameraNode: Node {
                  storage: PlaceCamera.Storage())]
   }
 
-  func skybox(_ texture: some MetalDrawable_Texture, scaledBy: simd_float2 = .one) -> ModifiedNodeContent<Self, ShaderModifier> {
-    self.modifier(ShaderModifier(shader: .skybox(texture, scaledBy: scaledBy)))
+  func skybox(_ texture: any MetalDrawable_Texture, scaledBy: simd_float2 = .one) -> ModifiedNodeContent<Self, ShaderModifier> {
+    if let cube = texture as? CubeMap {
+      return self.modifier(ShaderModifier(shader: .skybox(cube, scaledBy: scaledBy)))
+    } else if let color = texture as? Color {
+      return self.modifier(ShaderModifier(shader: .unlit(color)))
+    } else {
+      fatalError("Please use a CubeMap for your camera skybox.")
+    }
   }
 }

@@ -11,8 +11,8 @@ import simd
 
 // MARK: - Init Helper
 
-extension MetalDrawable_Shader where Self == StandardShader {
-  static func skybox(_ texture: MetalDrawable_Texture, scaledBy: simd_float2) -> SkyboxShader {
+extension MetalDrawable_Shader where Self == SkyboxShader {
+  static func skybox(_ texture: CubeMap, scaledBy: simd_float2) -> SkyboxShader {
     return .init(texture: texture,
                  uniform: SkyboxUniform(textureScaling: simd_float4(x: scaledBy.x, y: scaledBy.y, z: 0, w: 0)),
                  storage: SkyboxShader.Storage())
@@ -29,7 +29,7 @@ fileprivate struct SkyboxUniform {
 
 struct SkyboxShader: MetalDrawable_Shader {
   let functions: (String, String) = ("skybox_vertex", "skybox_fragment")
-  let texture: MetalDrawable_Texture
+  let texture: CubeMap
   fileprivate let uniform: SkyboxUniform
   let storage: Storage
 
@@ -56,13 +56,13 @@ struct SkyboxShader: MetalDrawable_Shader {
     }
 
     // Uniforms
-    encoder.setVertexBuffer(uniformBuffer, offset: 0, index: 4)
+    // encoder.setVertexBuffer(uniformBuffer, offset: 0, index: 4)
 
     // Texture
     encoder.setFragmentTexture(texture.mtlTexture(library), index: 0)
 
     // Shaders
-    encoder.setRenderPipelineState(library.pipeline(for: functions.0, fragment: functions.1))
+    encoder.setRenderPipelineState(library.pipeline(for: functions.0, fragment: functions.1))    
   }
 }
 
