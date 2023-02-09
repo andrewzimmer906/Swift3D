@@ -29,7 +29,7 @@ float3 calculateLight(float type, float3 light, float3 col, float3 normal, float
     float specFactor = pow(saturate(dot(reflection, eye)), material.properties.x) * diffuseFactor;
     float rimFactor = pow(saturate(1.0 - dot(eye, normalV)), material.properties.y) * diffuseFactor;
 
-    return float3(specFactor);
+    // return float3(specFactor);
     return (diffuseFactor + specFactor + rimFactor) * col;
   }
   

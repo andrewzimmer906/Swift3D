@@ -66,7 +66,7 @@ extension RenderGeometry {
   func render(encoder: MTLRenderCommandEncoder, depthStencil: MTLDepthStencilState?) {
     // Depth and Stencil
     encoder.setDepthStencilState(depthStencil)
-    encoder.setFrontFacing(.clockwise)
+    encoder.setFrontFacing(.counterClockwise)
     encoder.setCullMode(cullBackfaces ? .back : .none)    
     
     // Vertices
@@ -147,7 +147,8 @@ extension RenderGeometry.Storage {
     }
 
     command.shaderPipeline.build(device: device,
-                                 library: shaderLibrary)
+                                 library: shaderLibrary,
+                                 descriptor: vertexDescriptor)
 
     // Save Model Transform
     if self.modelMatBuffer == nil {

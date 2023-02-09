@@ -9,7 +9,7 @@ import Foundation
 import Metal
 import MetalKit
 
-protocol MetalDrawable_Geometry {
+public protocol MetalDrawable_Geometry {
   var cacheKey: String { get }
   func get(device: MTLDevice, allocator: MTKMeshBufferAllocator) throws -> MTKMesh
 }
@@ -23,12 +23,12 @@ struct Vertex {
 
   static var descriptor: MDLVertexDescriptor {
     let mdlVertexDescriptor = MDLVertexDescriptor()
-
-    mdlVertexDescriptor.attributes.add(MDLVertexAttribute(name: MDLVertexAttributePosition, format: .float3, offset: 0, bufferIndex: 0))
-    mdlVertexDescriptor.attributes.add(MDLVertexAttribute(name: MDLVertexAttributeNormal, format: .float3, offset: 12, bufferIndex: 0))
-    mdlVertexDescriptor.attributes.add(MDLVertexAttribute(name: MDLVertexAttributeTextureCoordinate, format: .float2, offset: 24, bufferIndex: 0))
-
-    mdlVertexDescriptor.layouts.add(MDLVertexBufferLayout(stride: 32))
+    mdlVertexDescriptor.attributes = [
+      MDLVertexAttribute(name: MDLVertexAttributePosition, format: .float3, offset: 0, bufferIndex: 0),
+      MDLVertexAttribute(name: MDLVertexAttributeNormal, format: .float3, offset: 12, bufferIndex: 0),
+      MDLVertexAttribute(name: MDLVertexAttributeTextureCoordinate, format: .float2, offset: 24, bufferIndex: 0)
+    ]
+    mdlVertexDescriptor.layouts = [MDLVertexBufferLayout(stride: 32)]
 
     return mdlVertexDescriptor
   }

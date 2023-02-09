@@ -10,21 +10,21 @@ import Metal
 import MetalKit
 
 extension Never: MetalDrawable_Geometry {
-  var cacheKey: String { fatalError() }
-  func get(device: MTLDevice, allocator: MTKMeshBufferAllocator) throws -> MTKMesh {
+  public var cacheKey: String { fatalError() }
+  public func get(device: MTLDevice, allocator: MTKMeshBufferAllocator) throws -> MTKMesh {
     fatalError()
   }
-  func get(mesh: MTKMesh?) -> MTLVertexDescriptor? {
+  public func get(mesh: MTKMesh?) -> MTLVertexDescriptor? {
     fatalError()
   }
 }
 
 extension Never: MetalDrawable_Shader {
-  public func setupEncoder(encoder: MTLRenderCommandEncoder) {
+  public func build(device: MTLDevice, library: MetalShaderLibrary, descriptor: MTLVertexDescriptor?) {
     fatalError()
   }
 
-  public func build(device: MTLDevice, library: MetalShaderLibrary) {
+  public func setupEncoder(encoder: MTLRenderCommandEncoder) {
     fatalError()
   }
 }

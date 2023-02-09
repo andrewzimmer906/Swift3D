@@ -44,7 +44,9 @@ public class MetalView: UIView {
     super.init(frame: frame)
     
     setupLayer()
-    timelineLoop.start(callback: render)
+    timelineLoop.start { [weak self] frameTime in
+      self?.render(time: frameTime)
+    }
   }
   
   private func setupLayer() {
@@ -82,7 +84,7 @@ public class MetalView: UIView {
   private func render(time: CFTimeInterval) {
     guard let drawable = metalLayer?.nextDrawable(),
           let depth = metalDepthTexture else {
-      fatalError()
+      return
     }
     
     let curTime = CACurrentMediaTime()

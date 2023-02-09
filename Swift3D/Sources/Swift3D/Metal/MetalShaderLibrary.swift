@@ -51,8 +51,8 @@ public class MetalShaderLibrary {
     self.library = lib
   }
   
-  func pipeline(for vertex: String, fragment: String, needsDescriptor: Bool) -> MTLRenderPipelineState {
-    let key = "\(vertex).\(fragment).\(needsDescriptor ? "default" : "none")"
+  func pipeline(for vertex: String, fragment: String, vertexDescriptor: MTLVertexDescriptor? = nil) -> MTLRenderPipelineState {
+    let key = "\(vertex).\(fragment).\(String(describing:vertexDescriptor))"
     if let pipe = pipelines[key] {
       return pipe
     }
@@ -63,10 +63,7 @@ public class MetalShaderLibrary {
     let pipelineStateDescriptor = MTLRenderPipelineDescriptor()
     pipelineStateDescriptor.vertexFunction = vertexProgram
     pipelineStateDescriptor.fragmentFunction = fragmentProgram
-
-    if needsDescriptor {
-      pipelineStateDescriptor.vertexDescriptor = defaultVertexDescriptor
-    }
+    pipelineStateDescriptor.vertexDescriptor = vertexDescriptor
 
     pipelineStateDescriptor.colorAttachments[0].pixelFormat = .bgra8Unorm
     pipelineStateDescriptor.depthAttachmentPixelFormat = .depth32Float_stencil8

@@ -6,34 +6,43 @@
 //
 
 import Foundation
+import ModelIO
+import MetalKit
+import Metal
 import simd
 
-/*
-struct Octahedron<Geometry: MetalDrawable_Geometry> {
-  static func get(divisions: Int) -> Geometry {
-    fatalError()
+struct Octahedron: MetalDrawable_Geometry {
+  var cacheKey: String { "Octahedron" }
+  let divisions: Int
+
+  func get(device: MTLDevice, allocator: MTKMeshBufferAllocator) throws -> MTKMesh {
+    let data = Self.create(for: divisions)
+    let normalizedPos = data.0.map { normalize($0) }
+
+    let normals = Self.normals(for: normalizedPos)
+    let uvs = Self.uvs(for: normalizedPos)
+
+    let vertices: [Vertex] = zip(zip(normalizedPos, normals), uvs).map { data in
+      .init(position: data.0.0 * 0.5, normal: data.0.1, uv: data.1)
+    }
+    let indices = data.1
+
+    let vertexBuffer = allocator.newBuffer(with: vertices.data,
+                                           type: .vertex)
+    let indexBuffer = allocator.newBuffer(with: indices.data,
+                                          type: .index)
+
+    let asset = MDLMesh(vertexBuffer: vertexBuffer, vertexCount: vertices.count,
+                        descriptor: Vertex.descriptor,
+                        submeshes: [.init(indexBuffer: indexBuffer, indexCount: indices.count, indexType: .uInt16, geometryType: MDLGeometryType.triangles, material: nil)])
+
+    return try MTKMesh(mesh: asset, device: device)
   }
 }
 
 // Grabbed Math from :
 // https://web.archive.org/web/20171218054621/http://www.binpress.com/tutorial/creating-an-octahedron-sphere/162
-extension Octahedron where Geometry == StandardGeometry {
-
-  // TODO: Add some caching for this LARGE object.
-  static func get(divisions: Int) -> Geometry {
-    let data = create(for: divisions)
-    let normalizedPos = data.0.map { normalize($0) }
-    
-    let normals = Self.normals(for: normalizedPos)
-    let uvs = Self.uvs(for: normalizedPos)
-    
-    let vertices: [StandardGeometry.Vertex] = zip(zip(normalizedPos, normals), uvs).map { data in
-        .init(position: data.0.0 * 0.5, uv: data.1, normal: data.0.1)
-    }
-    
-    return StandardGeometry(vertices: vertices, indices: data.1)
-  }
-  
+extension Octahedron {
   private static func normals(for positions: [simd_float3]) -> [simd_float3] {
     positions.map {
       normalize($0)
@@ -199,4 +208,3 @@ extension Octahedron where Geometry == StandardGeometry {
     return t
   }
 }
-*/

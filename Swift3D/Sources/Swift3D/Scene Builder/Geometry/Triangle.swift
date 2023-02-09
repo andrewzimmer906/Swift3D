@@ -13,7 +13,6 @@ import simd
 
 struct Triangle: MetalDrawable_Geometry {
   var cacheKey: String { "Triangle" }
-
   func get(device: MTLDevice, allocator: MTKMeshBufferAllocator) throws -> MTKMesh {
     let vertices: [Vertex] = [
       .init(position: .init(x: 0, y: 0.5, z: 0), normal: .back, uv: simd_float2(0.5, 1)),

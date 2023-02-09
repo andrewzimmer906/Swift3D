@@ -13,6 +13,9 @@
 		ECAD987C2993138300B20F52 /* Textures.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ECAD987B2993138300B20F52 /* Textures.xcassets */; };
 		ECAD987F2993138D00B20F52 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECAD987D2993138D00B20F52 /* ContentView.swift */; };
 		ECAD98802993138D00B20F52 /* TouchCamera.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECAD987E2993138D00B20F52 /* TouchCamera.swift */; };
+		ECFB0DE629959D2500687251 /* castle.mtl in Resources */ = {isa = PBXBuildFile; fileRef = ECFB0DE529959D2500687251 /* castle.mtl */; };
+		ECFB0DF92995A4A700687251 /* Worn_Baseball_Ball.usdz in Resources */ = {isa = PBXBuildFile; fileRef = ECFB0DF82995A4A700687251 /* Worn_Baseball_Ball.usdz */; };
+		ECFB0DFD2995A78B00687251 /* title.obj in Resources */ = {isa = PBXBuildFile; fileRef = ECFB0DFC2995A78B00687251 /* title.obj */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +27,9 @@
 		ECAD987B2993138300B20F52 /* Textures.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Textures.xcassets; sourceTree = "<group>"; };
 		ECAD987D2993138D00B20F52 /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		ECAD987E2993138D00B20F52 /* TouchCamera.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TouchCamera.swift; sourceTree = "<group>"; };
+		ECFB0DE529959D2500687251 /* castle.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = castle.mtl; sourceTree = "<group>"; };
+		ECFB0DF82995A4A700687251 /* Worn_Baseball_Ball.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = Worn_Baseball_Ball.usdz; sourceTree = "<group>"; };
+		ECFB0DFC2995A78B00687251 /* title.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = title.obj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -95,6 +101,9 @@
 		ECAD98812993139D00B20F52 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				ECFB0DFC2995A78B00687251 /* title.obj */,
+				ECFB0DF82995A4A700687251 /* Worn_Baseball_Ball.usdz */,
+				ECFB0DE529959D2500687251 /* castle.mtl */,
 				ECAD98792993136A00B20F52 /* castle.obj */,
 			);
 			path = Models;
@@ -161,8 +170,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ECFB0DF92995A4A700687251 /* Worn_Baseball_Ball.usdz in Resources */,
+				ECFB0DE629959D2500687251 /* castle.mtl in Resources */,
 				ECAD987C2993138300B20F52 /* Textures.xcassets in Resources */,
 				ECAD987A2993136A00B20F52 /* castle.obj in Resources */,
+				ECFB0DFD2995A78B00687251 /* title.obj in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

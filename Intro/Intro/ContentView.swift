@@ -2,79 +2,97 @@ import SwiftUI
 import Swift3D
 import simd
 
+class Swift3DData {
+  var rotation: Float = 0
+}
+
 struct ContentView: View {
   @State var tester: Bool = true
-  @State var isRotated: Bool = true
+  @State var is3D: Bool = false
 
+  let data = Swift3DData()
   let cameraController = TouchCameraController()
   
   var body: some View {
     ZStack {
-      Swift3DView(updateLoop: { delta in
-        cameraController.update(delta: delta)
-      }) {
-        TouchCamera(controller: cameraController, skybox: .skybox(.cube("environment")))
-        lights
+      if is3D {
+        Swift3DView(updateLoop: { delta in
+          data.rotation += .pi * Float(delta)
+          cameraController.update(delta: delta)
+        }) {
+          TouchCamera(controller: cameraController, skybox: .skybox(low: .white, mid: .white, high: .white))
+          lights
+          ModelNode(id: "title", url: .model("title.obj"))
+            .shaded(.standard(albedo: Color.blue))
+            .translated(.down * 0.25)
 
-        OctaNode(id: "1", divisions: 2)
-          .shaded(.standard(albedo: UIImage(named: "orangeChecker"), specPow: 2))
-          .transform(.translated(.right * 1))
-        OctaNode(id: "2", divisions: 2)
-          .shaded(.standard(albedo: UIImage(named: "orangeChecker"), specPow: 2))
-          .transform(.translated(.left * 1))
-        OctaNode(id: "3", divisions: 2)
-          .shaded(.standard(albedo: UIImage(named: "redChecker"), specPow: 2))
-          .transform(.translated(.forward * 1))
-        OctaNode(id: "4", divisions: 2)
-          .shaded(.standard(albedo: UIImage(named: "redChecker"), specPow: 2))
-          .transform(.translated(.back * 1))
-        OctaNode(id: "5", divisions: 2)
-          .shaded(.standard(albedo: UIImage(named: "purpleChecker"), specPow: 2))
-          .transform(.translated(.down * 1))
-        OctaNode(id: "6", divisions: 2)
-          .shaded(.standard(albedo: UIImage(named: "purpleChecker"), specPow: 2))
-          .transform(.translated(.up * 1))
-        OctaNode(id: "newid", divisions: 2)
-          .shaded(.standard(albedo: UIImage(named: "purpleChecker"), specPow: 2))
-          .transform(.translated(.right * 2))
-
-         TriangleNode(id: "tri")
-          //.shaded(.standard(albedo: Color.yellow))
-          //.transform(.translated(.left * 2))
-
-
-        /*CubeNode(id: "cube1")
-          .shaded(.standard(albedo: UIImage(named: "orangeChecker")))
-          .transform(.translated(.left * 0.5))*/
+          OctaNode(id: "gem", divisions: 0)
+            .shaded(.standard(albedo: Color.red))
+            .transform(.rotated(angle: data.rotation, axis: .up))
+            .transform(.translated(.down * 3))
+        }
+        .frame(height: 500)
+        .padding()
+      } else {
+        Text("SwiftUI")
+          .font(Font.system(size: 60).weight(.black))
+          .kerning(0)
+          .foregroundColor(.blue)
       }
+
+      VStack {
+        Text("Growing tired of your everyday Swift UI? 🥱")
+        Text("Let's go further. 🚀🚀🚀")
+        Spacer()
+        Button {
+          is3D.toggle()
+        } label: {
+          if is3D {
+            Text("Back to 2D").foregroundColor(.white)
+              .padding(.vertical, 4)
+              .padding(.horizontal, 8)
+              .background(RoundedRectangle(cornerSize: CGSize(width: 8, height: 8)).fill(Color.gray))
+          }
+          else {
+            Text("Enter the 3rd Dimension!")
+              .font(.title3.bold())
+              .foregroundColor(.white)
+              .padding(.vertical, 4)
+              .padding(.horizontal, 8)
+              .background(RoundedRectangle(cornerSize: CGSize(width: 8, height: 8)).fill(Color.blue))
+          }
+        }
+      }
+      .padding()
     }
     .onTapGesture {
-      cameraController.touchTapped()
-      isRotated.toggle()
+      if is3D {
+        cameraController.touchTapped()
+      }
     }
     .gesture(DragGesture(minimumDistance: 0)
       .onChanged { gesture in
-        cameraController.touchMoved(startLocation: gesture.startLocation,
-                                    curLocation: gesture.location)
+        if is3D {
+          cameraController.touchMoved(startLocation: gesture.startLocation,
+                                      curLocation: gesture.location)
+        }
       }
       .onEnded({ gesture in
-        cameraController.touchEnded(predictedEndLocation: gesture.predictedEndLocation)
+        if is3D {
+          cameraController.touchEnded(predictedEndLocation: gesture.predictedEndLocation)
+        }
       })
     )
-    .onAppear {
-      let url = Bundle.main.url(forResource: "castle", withExtension: "obj")
-      print("url: \(url)")
-    }
   }
   
   private var lights: some Node {
     GroupNode(id: "lights_container") {
       AmbientLightNode(id: "Ambient")
-        .colored(color: .init(hue: 0, saturation: 0, brightness: 0.45))
+        .colored(color: .init(hue: 0, saturation: 0, brightness: 0.6))
       
       DirectionalLightNode(id: "Directional")
-        .colored(color: .init(hue: 0, saturation: 0, brightness: 0.55))
-        .transform(.lookAt(eye: .zero, look: simd_float3(x: 0, y: 0.5, z: -0.5), up: .up))      
+        .colored(color: .init(hue: 0, saturation: 0, brightness: 0.45))
+        .transform(.lookAt(eye: .zero, look: simd_float3(x: 0, y: 0.5, z: -0.5), up: .up))
     }
   }
   
@@ -94,5 +112,22 @@ struct ContentView: View {
         .transform(.translated(.forward))
         .transform(.scaled(simd_float3(x: 0.15, y: 0.15, z: 2)))
     }
+  }
+
+  struct preview: PreviewProvider {
+    static var previews: some View {
+      ContentView()
+    }
+  }
+}
+
+extension URL {
+  static func model(_ path: String) -> URL {
+    let components = path.components(separatedBy: ".")
+    guard components.count == 2,
+          let url = Bundle.main.url(forResource: components[0], withExtension: components[1]) else {
+      fatalError()
+    }
+    return url
   }
 }

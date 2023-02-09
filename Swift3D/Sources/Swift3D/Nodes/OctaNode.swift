@@ -20,7 +20,7 @@ public struct OctaNode: Node, AcceptsShader {
   public var drawCommands: [any MetalDrawable] {
     [RenderGeometry(id: id, 
                     transform: float4x4.identity, 
-                    geometry: Sphere(), //Octahedron.get(divisions: divisions) as StandardGeometry,
+                    geometry: Octahedron(divisions: divisions),
                     shaderPipeline: UnlitShader(.red),
                     renderType: .triangles,
                     animations: nil,

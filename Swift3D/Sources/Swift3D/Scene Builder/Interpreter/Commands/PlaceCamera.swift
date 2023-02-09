@@ -132,7 +132,7 @@ extension PlaceCamera.Storage {
     self.surfaceAspect = surfaceAspect
 
     // Build the Pipeline
-    command.shaderPipeline?.build(device: device, library: shaderLibrary)
+    command.shaderPipeline?.build(device: device, library: shaderLibrary, descriptor: nil)
     
     // Re-use previous buffers if they are the right size / data.
     if let prevStorage = previous?.storage as? PlaceCamera.Storage {
