@@ -11,7 +11,7 @@ struct ContentView: View {
   @State var is3D: Bool = false
 
   let data = Swift3DData()
-  let cameraController = TouchCameraController()
+  let cameraController = TouchCameraController(minDistance: 8, maxDistance: 24)
   
   var body: some View {
     ZStack {
@@ -20,7 +20,8 @@ struct ContentView: View {
           data.rotation += .pi * Float(delta)
           cameraController.update(delta: delta)
         }) {
-          TouchCamera(controller: cameraController, skybox: .skybox(low: .white, mid: .white, high: .white))
+          TouchCamera(controller: cameraController,
+                      skybox: .skybox(low: .white, mid: .white, high: .white))
           lights
           ModelNode(id: "title", url: .model("title.obj"))
             .shaded(.standard(albedo: Color.blue))
@@ -31,7 +32,6 @@ struct ContentView: View {
             .transform(.rotated(angle: data.rotation, axis: .up))
             .transform(.translated(.down * 3))
         }
-        .frame(height: 500)
         .padding()
       } else {
         Text("SwiftUI")
@@ -42,24 +42,24 @@ struct ContentView: View {
 
       VStack {
         Text("Growing tired of your everyday Swift UI? 🥱")
-        Text("Let's go further. 🚀🚀🚀")
+        Text("What if we went.. ✨**3D**✨ 🚀🚀🚀")
         Spacer()
         Button {
           is3D.toggle()
         } label: {
           if is3D {
             Text("Back to 2D").foregroundColor(.white)
-              .padding(.vertical, 4)
-              .padding(.horizontal, 8)
-              .background(RoundedRectangle(cornerSize: CGSize(width: 8, height: 8)).fill(Color.gray))
+              .padding(.vertical, 12)
+              .padding(.horizontal, 16)
+              .background(RoundedRectangle(cornerSize: CGSize(width: 12, height: 12)).fill(Color.gray))
           }
           else {
             Text("Enter the 3rd Dimension!")
               .font(.title3.bold())
               .foregroundColor(.white)
-              .padding(.vertical, 4)
-              .padding(.horizontal, 8)
-              .background(RoundedRectangle(cornerSize: CGSize(width: 8, height: 8)).fill(Color.blue))
+              .padding(.vertical, 12)
+              .padding(.horizontal, 16)
+              .background(RoundedRectangle(cornerSize: CGSize(width: 12, height: 12)).fill(Color.blue))
           }
         }
       }
