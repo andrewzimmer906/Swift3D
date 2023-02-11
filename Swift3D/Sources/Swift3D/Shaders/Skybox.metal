@@ -1,8 +1,7 @@
 #include <metal_stdlib>
 using namespace metal;
 
-#include "SharedData.h"
-#include "Lighting.h"
+#include "Common.h"
 
 struct VertexOut {
   float4 position [[position]];  //1
@@ -13,8 +12,6 @@ struct VertexOut {
 
 vertex VertexOut skybox_vertex(const device Uniforms& uniforms [[ buffer(1) ]],
                            const device ViewProjectionUniform& vpUniforms [[ buffer(2) ]],
-                           const device Lights& lights [[ buffer(3) ]],
-                           // const device SkyboxProperties& material [[ buffer(4) ]],
                            unsigned int vid [[ vertex_id ]]) {
   // Viewport covering triangle.
   float2 positions[] = {

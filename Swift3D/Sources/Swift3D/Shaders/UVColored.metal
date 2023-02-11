@@ -3,17 +3,44 @@ using namespace metal;
 
 #include "Common.h"
 
+
+// ---------- Color Generation
+
+inline float3 bump3 (float3 x)
+{
+    float3 y = 1 - x * x;
+    y = max(y, 0);
+    return y;
+}
+
+float3 spectral_gems (float x)
+{
+       // w: [400, 700]
+    // x: [0,   1]
+    // fixed x = saturate((w - 400.0)/300.0);
+
+    return bump3
+    (    float3
+        (
+            4 * (x - 0.75),    // Red
+            4 * (x - 0.5),    // Green
+            4 * (x - 0.25)    // Blue
+        )
+    );
+}
+
+
 struct VertexOut {
   float4 position [[position]];  //1
-  float2 uv;
   float3 worldPos;
   float3 viewPos;
   float3 worldNormal;
+  float3 uvColor;
 };
 
 // --
 
-vertex VertexOut standard_vertex(VertexIn in [[stage_in]],
+vertex VertexOut uv_color_vertex(VertexIn in [[stage_in]],
                            const device Uniforms& uniforms [[ buffer(1) ]],
                            const device ViewProjectionUniform& vpUniforms [[ buffer(2) ]]) {
   float4x4 m_matrix =   uniforms.modelMatrix;
@@ -25,19 +52,17 @@ vertex VertexOut standard_vertex(VertexIn in [[stage_in]],
     .worldPos = (m_matrix * float4(in.position, 1.0)).xyz,
     .viewPos = (mv_matrix * float4(in.position, 1.0)).xyz,
     .worldNormal = normalize((m_matrix * float4(in.normal, 0.0))).xyz,
-    .uv = in.uv
+    .uvColor = spectral_gems((in.uv.x + in.uv.y) * 0.5)
   };
 
   return out;
 }
 
-fragment float4 standard_fragment(VertexOut in [[stage_in]],
-                                  texture2d<float> albedo [[ texture(0) ]],
+fragment float4 uv_color_fragment(VertexOut in [[stage_in]],
                                   constant FragmentUniforms &uniforms [[ buffer(0) ]],
                                   constant MaterialProperties &material [[ buffer(1) ]],
                                   constant Light *lights [[ buffer(2) ]]) {
 
-  float3 albedoColor = albedo.sample(textureSampler, in.uv * material.albedoTextureScaling.xy).xyz;
   float3 finalColor = float3(0);
 
   float3 viewDirection = normalize(in.worldPos - uniforms.cameraPos.xyz);
@@ -46,5 +71,5 @@ fragment float4 standard_fragment(VertexOut in [[stage_in]],
     finalColor += calculateLightingSpecular(lights[i], material, in.worldNormal, viewDirection);
   }
 
-  return float4(finalColor * albedoColor, 1);
+  return float4((finalColor + in.uvColor) * 0.5, 1);
 }

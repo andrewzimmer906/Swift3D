@@ -31,14 +31,23 @@ extension float4x4: Lerpable  {
     let toT = to.translation
     let toR = to.rotation
     let toS = to.scale
-    
-    
-    
+
     let T = simd_float3.lerp(fromT, toT, percent)
     let R = simd_slerp(fromR, toR, percent)
     let S = simd_float3.lerp(fromS, toS, percent)
     
     return float4x4.TRS(trans: T, rot: R, scale: S)    
+  }
+
+  static func straightLerp(_ from: Self, _ to: Self, _ percent: Float) -> Self {
+    var mat = float4x4()
+
+    mat[0] = SIMD4<Float>.lerp(from[0], to[0], percent)
+    mat[1] = SIMD4<Float>.lerp(from[1], to[1], percent)
+    mat[2] = SIMD4<Float>.lerp(from[2], to[2], percent)
+    mat[3] = SIMD4<Float>.lerp(from[3], to[3], percent)
+
+    return mat
   }
 }
 

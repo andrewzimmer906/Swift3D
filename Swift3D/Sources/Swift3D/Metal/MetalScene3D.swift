@@ -24,6 +24,7 @@ class MetalScene3D {
                   shaderLibrary: MetalShaderLibrary,
                   geometryLibrary: MetalGeometryLibrary,
                   surfaceAspect: Float) {
+    print("Update content!!")
     self.content = content
     
     // Generate some draw commands    

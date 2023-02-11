@@ -9,18 +9,12 @@ public class MetalRenderer: ObservableObject {
   private let commandQueue: MTLCommandQueue
   let metalDevice: MTLDevice
   let depthStencilState: MTLDepthStencilState?
-  
-  private lazy var defaultLighting: MTLBuffer? = {
-    let buff = metalDevice.makeBuffer(length: MemoryLayout<Lights>.size)
-    guard let buff = buff else {
-      fatalError()
-    }
-    
-    let lightsUniform = Lights(light1: simd_float4(x:0, y: 0, z: 0, w: 1), light1Col: .one * 0.35, 
-                                      light2: simd_float4(x:0, y: 0, z: 0, w: 0), light2Col: .zero)
-    buff.contents().storeBytes(of: lightsUniform, as: Lights.self)
-    return buff
-  }()
+  let standardFragmentUniformBuffer: MTLBuffer
+
+  // Low Ambient Lighting
+  private var defaultLighting: [Light] {
+    [Light(position: simd_float4(.zero, 1), color: .one * 0.35)]
+  }
   
   private lazy var defaultProjViewBuffer: MTLBuffer? = {
     let buff = metalDevice.makeBuffer(length: MemoryLayout<ViewProjectionUniform>.size)
@@ -48,6 +42,12 @@ public class MetalRenderer: ObservableObject {
     descriptor.isDepthWriteEnabled = true
     
     self.depthStencilState = device.makeDepthStencilState(descriptor: descriptor)
+
+    guard let buff = device.makeBuffer(length: MemoryLayout<StandardFragmentUniform>.size) else {
+      fatalError()
+    }
+
+    self.standardFragmentUniformBuffer = buff
   }
   
   func render(_ time: CFTimeInterval, 
@@ -82,26 +82,22 @@ public class MetalRenderer: ObservableObject {
     renderPassDescriptor.depthAttachment.texture = depthTexture
     renderPassDescriptor.depthAttachment.loadAction = .load
     renderPassDescriptor.depthAttachment.storeAction = .store
-    
+
+    // Light Setup
+    var lightsData: [Light] = defaultLighting
+
+    let lightCommands = commands.compactMap { $0.0 as? PlaceLight }
+    lightsData = lightCommands.map { $0.uniformValues }
+
+    // Camera and Fragment uniforms setup
     var viewProjBuffer: MTLBuffer? = nil
     if let cameraCommand = commands.first(where: { $0.0 is PlaceCamera })?.0 as? PlaceCamera {
       viewProjBuffer = cameraCommand.storage.viewProjBuffer
+      let uniform = StandardFragmentUniform(camPos: simd_float4(cameraCommand.transform.translation, 1),
+                                            lightCount: simd_float4(x: Float(lightsData.count), y: 0, z: 0, w: 0))
+      standardFragmentUniformBuffer.contents().storeBytes(of: uniform, as: StandardFragmentUniform.self)
     }
-    
-    var lightsBuffer: MTLBuffer?
-    let lightCommands = commands.filter({ $0.0 is PlaceLight })
-    if !lightCommands.isEmpty {
-      let storage = lightCommands.first?.0.storage as? PlaceLight.Storage
-      let presentedCommands = lightCommands.map { (cur, prev) in
-        cur.presentedDrawCommand(time: time, previous: prev)
-      }
-      storage?.set(presentedCommands)
-      lightsBuffer = storage?.lightsUniform
-    }
-    else {
-      lightsBuffer = defaultLighting
-    }
-    
+
     commands.forEach { command in
       command.0.update(time: time, previous: command.1)
       
@@ -119,8 +115,10 @@ public class MetalRenderer: ObservableObject {
       } else {
         encoder.setVertexBuffer(defaultProjViewBuffer, offset: 0, index: 2)
       }
-        
-      encoder.setFragmentBuffer(lightsBuffer, offset: 0, index: 1)
+
+      encoder.setFragmentBuffer(standardFragmentUniformBuffer, offset: 0, index: FragmentBufferIndex.uniform.rawValue)
+      encoder.setFragmentBytes(lightsData, length: MemoryLayout<Light>.stride * lightsData.count, index: FragmentBufferIndex.lights.rawValue)
+
       command.0.render(encoder: encoder, depthStencil: depthStencilState)
     }
 

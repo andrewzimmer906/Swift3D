@@ -30,28 +30,33 @@ struct PlaceCamera: MetalDrawable, HasShaderPipeline {
   
   
   func withUpdated(transform: float4x4) -> Self {
-    withUpdated(id: nil, animations: nil, transform: transform, shaderPipeline: nil)
+    withUpdated(id: nil, animations: nil, transform: transform, shaderPipeline: nil, cameraProjectionSettings: nil)
   }
   
   func withUpdated(id: String) -> Self {
-    withUpdated(id: id, animations: nil, transform: nil, shaderPipeline: nil)
+    withUpdated(id: id, animations: nil, transform: nil, shaderPipeline: nil, cameraProjectionSettings: nil)
   }
   
   func withUpdated(animations: [NodeTransition]) -> Self {
-    withUpdated(id: nil, animations: animations, transform: nil, shaderPipeline: nil)
+    withUpdated(id: nil, animations: animations, transform: nil, shaderPipeline: nil, cameraProjectionSettings: nil)
+  }
+
+  func withUpdated(cameraProjectionSettings: CameraProjectionSettings) -> Self {
+    withUpdated(id: nil, animations: animations, transform: nil, shaderPipeline: nil, cameraProjectionSettings: cameraProjectionSettings)
   }
 
   func withUpdated<Shader: MetalDrawable_Shader>(shaderPipeline: Shader) -> any MetalDrawable {
-    withUpdated(id: nil, animations: nil, transform: nil, shaderPipeline: shaderPipeline)
+    withUpdated(id: nil, animations: nil, transform: nil, shaderPipeline: shaderPipeline, cameraProjectionSettings: nil)
   }
   
   private func withUpdated(id: String?,
                            animations: [NodeTransition]?,
                            transform: float4x4?,
-                           shaderPipeline: (any MetalDrawable_Shader)?) -> Self {
+                           shaderPipeline: (any MetalDrawable_Shader)?,
+                           cameraProjectionSettings: CameraProjectionSettings?) -> Self {
     .init(id: id ?? self.id,
           transform: transform ?? self.transform,
-          cameraProjectionSettings: self.cameraProjectionSettings,
+          cameraProjectionSettings: cameraProjectionSettings ?? self.cameraProjectionSettings,
           shaderPipeline: shaderPipeline ?? self.shaderPipeline,
           animations: animations ?? self.animations,
           storage: storage)
@@ -64,7 +69,16 @@ extension PlaceCamera {
   /// Updates the values in the command with any animations that are running.  
   func update(time: CFTimeInterval, previous: (any MetalDrawable)?) {
     if let dirtyTransform = attribute(at: time, cur: self.transform, prev: previous?.transform) {
-      storage.set((dirtyTransform, self.cameraProjectionSettings))
+      if let animation = animations?.first,
+         let prev = previous as? PlaceCamera {
+        let percent = animation.interpolate(time: time)
+        let projMatrix = CameraProjectionSettings.projectionLerp(prev.cameraProjectionSettings, cameraProjectionSettings, percent, aspect: storage.surfaceAspect ?? 1)
+
+        storage.set((dirtyTransform, projMatrix))
+      }
+      else {
+        storage.set((dirtyTransform, self.cameraProjectionSettings))
+      }
     }
   }
   
@@ -105,6 +119,17 @@ extension PlaceCamera.Storage {
       let camSettings = tuple.1
 
       let projM = camSettings.matrix(aspect: self.surfaceAspect ?? 1)
+      let vpUniform = ViewProjectionUniform(projectionMatrix: projM, viewMatrix: viewM)
+      self.viewProjBuffer?.contents().storeBytes(of: vpUniform, as: ViewProjectionUniform.self)
+
+      var viewDirectionMatrix = viewM
+      viewDirectionMatrix.columns.3 = SIMD4<Float>(0, 0, 0, 1)
+      let clipToViewDirectionTransform = (projM * viewDirectionMatrix).inverse
+
+      self.skyboxInverseView = clipToViewDirectionTransform
+    } else if let tuple = value as? (float4x4, float4x4) {
+      let viewM = tuple.0.inverse
+      let projM = tuple.1
       let vpUniform = ViewProjectionUniform(projectionMatrix: projM, viewMatrix: viewM)
       self.viewProjBuffer?.contents().storeBytes(of: vpUniform, as: ViewProjectionUniform.self)
 

@@ -1,8 +1,7 @@
 #include <metal_stdlib>
 using namespace metal;
 
-#include "SharedData.h"
-#include "Lighting.h"
+#include "Common.h"
 
 struct VertexOut {
   float4 position [[position]];  //1
@@ -16,8 +15,7 @@ struct CustomShaderUniform {
 
 vertex VertexOut unlit_vertex(VertexIn in [[stage_in]],
                            const device Uniforms& uniforms [[ buffer(1) ]],
-                           const device ViewProjectionUniform& vpUniforms [[ buffer(2) ]],
-                           const device Lights& lights [[ buffer(3) ]]) {
+                           const device ViewProjectionUniform& vpUniforms [[ buffer(2) ]]) {
   VertexOut out;
   
   float4x4 mvp_matrix = vpUniforms.projectionMatrix * vpUniforms.viewMatrix * uniforms.modelMatrix;

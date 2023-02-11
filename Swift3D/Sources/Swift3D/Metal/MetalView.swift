@@ -93,12 +93,14 @@ public class MetalView: UIView {
       updateLoop?(delta)
       lastUpdateTime = curTime
 
+      /*
       if let content = self.content {
         scene.setContent(content(),
                          shaderLibrary: shaderLibrary,
                          geometryLibrary: geometryLibrary,
                          surfaceAspect: Float(layer.frame.size.width / layer.frame.size.height))
       }
+       */
     }
 
     renderer.render(time, layerDrawable: drawable, depthTexture: depth, commands: scene.commands)

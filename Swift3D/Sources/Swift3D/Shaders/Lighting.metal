@@ -8,7 +8,7 @@
 #include <metal_stdlib>
 using namespace metal;
 
-#include "Lighting.h"
+#include "Common.h"
 
 // Helpers
 float3 calculateLight(float type, float3 light, float3 col, float3 normal, float3 normalV, float4 vPos, MaterialProperties material) {
@@ -36,9 +36,23 @@ float3 calculateLight(float type, float3 light, float3 col, float3 normal, float
   return float3(0, 0, 0); // none
 }
 
-// We'll eventually want position for point lights, but whatevers
-float3 calculateLighting(Lights lights, MaterialProperties material, float3 normal, float3 normalV, float4 vPos) {
-  float3 light1 = calculateLight(lights.light1.w, lights.light1.xyz, lights.light1Col.xyz, normal, normalV, vPos, material);
-  float3 light2 = calculateLight(lights.light2.w, lights.light2.xyz, lights.light2Col.xyz, normal, normalV, vPos, material);
-  return light1 + light2;
+float3 calculateLightingSpecular(Light light, MaterialProperties material, float3 normal, float3 viewDirection) {
+  float atten = light.color.w;
+  float3 color = light.color.xyz;
+
+  if (light.position.w == LightTypeAmbient) {
+    return color * atten;
+  } else if(light.position.w == LightTypeDirectional) {
+    float3 lightDir = normalize(light.position.xyz);
+    float diffuseFactor = saturate(-dot(lightDir, normal));
+
+    float3 reflection = reflect(lightDir, normal);
+
+    float specFactor = pow(saturate(-dot(reflection, viewDirection)), material.properties.x) * diffuseFactor;
+    float rimFactor = pow(saturate(1.0 - dot(lightDir, normal)), material.properties.y);
+
+    return (specFactor + diffuseFactor + rimFactor) * color * atten;
+  }
+
+  return float3(0);
 }

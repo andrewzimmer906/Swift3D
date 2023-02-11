@@ -1,8 +1,7 @@
 #include <metal_stdlib>
 using namespace metal;
 
-#include "SharedData.h"
-#include "Lighting.h"
+#include "Common.h"
 #include "SimplexNoise.h"
 
 // -- Helpers
@@ -39,7 +38,6 @@ struct VertexOut {
 
 vertex VertexOut procedural_skybox_vertex(const device Uniforms& uniforms [[ buffer(1) ]],
                            const device ViewProjectionUniform& vpUniforms [[ buffer(2) ]],
-                           const device Lights& lights [[ buffer(3) ]],
                            // const device SkyboxProperties& material [[ buffer(4) ]],
                            unsigned int vid [[ vertex_id ]]) {
   // Viewport covering triangle.

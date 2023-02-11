@@ -10,7 +10,6 @@ import simd
 
 public struct TransformModifier: NodeModifier {
   let transform: float4x4
-  // let reverseApplication: Bool
   
   public func printedTree(content: any Node) -> [String] {
     content.printedTree
@@ -18,7 +17,6 @@ public struct TransformModifier: NodeModifier {
   
   public func drawCommands(content: any Node) -> [any MetalDrawable] {    
     return content.drawCommands.map { command in
-      //let updatedTransform = reverseApplication ? transform * command.transform : command.transform * transform
       let updatedTransform = transform * command.transform
       return command.withUpdated(transform: updatedTransform)
     }
@@ -44,15 +42,3 @@ extension Node {
     self.modifier(TransformModifier(transform: .scaled(scale)))
   }
 }
-
-/*
-extension GroupNode {
-  public func transform(_ transform: float4x4) -> ModifiedNodeContent<Self, TransformModifier> {
-    self.modifier(TransformModifier(transform: transform, reverseApplication: true))      
-  }
-
-  public func translated(_ translation: simd_float3) -> ModifiedNodeContent<Self, TransformModifier> {
-    self.modifier(TransformModifier(transform: .translated(translation), reverseApplication: true))
-  }
-}
-*/

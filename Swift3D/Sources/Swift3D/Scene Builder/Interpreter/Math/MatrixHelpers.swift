@@ -131,8 +131,30 @@ extension float4x4 {
     return unsafeBitCast(GLKMatrix4MakeFrustum(left, right, bottom, top, nearZ, farZ), to: float4x4.self)
   }
 
-  public static func makeOrtho(left: Float, _ right: Float, _ bottom: Float, _ top: Float, _ nearZ: Float, _ farZ: Float) -> float4x4 {
-    return unsafeBitCast(GLKMatrix4MakeOrtho(left, right, bottom, top, nearZ, farZ), to: float4x4.self)
+  public static func makeOrthographic(left: Float, right: Float, bottom: Float, top: Float, nearZ: Float, farZ: Float) -> float4x4 {
+
+    // Left Hand
+    /*float4x4(rows: [
+      .init(x: 2 / (right - left), y: 0, z: 0, w: (left + right) / (left - right)),
+      .init(x: 0, y: 2 / (top - bottom), z: 0, w: (top + bottom) / (bottom - top)),
+      .init(x: 0, y: 0, z: 1 / (farZ - nearZ), w: nearZ / (nearZ - farZ)),
+      .init(x: 0, y: 0, z: 0, w: 1)
+    ])*/
+
+    // Right Hand
+    float4x4(rows: [
+      .init(x: 2 / (right - left), y: 0, z: 0, w: (left + right) / (left - right)),
+      .init(x: 0, y: 2 / (top - bottom), z: 0, w: (top + bottom) / (bottom - top)),
+      .init(x: 0, y: 0, z: -1 / (farZ - nearZ), w: nearZ / (nearZ - farZ)),
+      .init(x: 0, y: 0, z: 0, w: 1)
+    ])
+
+      /*return float4x4(
+          [ 2 / (right - left), 0, 0, 0],
+          [0, 2 / (top - bottom), 0, 0],
+          [0, 0, 1 / (far - near), 0],
+          [(left + right) / (left - right), (top + bottom) / (bottom - top), near / (near - far), 1]
+      )*/
   }
 
   // MARK: - Instance

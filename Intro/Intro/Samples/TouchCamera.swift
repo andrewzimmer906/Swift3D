@@ -82,7 +82,7 @@ class TouchCameraController {
     }
     angularVelocity = .zero
 
-    let dragSpeed: Float = 0.5
+    let dragSpeed: Float = 1
     let offset = curLocation - lastDragLocation
     let xDrag = Float(offset.x / UIScreen.main.bounds.width) * dragSpeed
     let yDrag = Float(offset.y / UIScreen.main.bounds.height) * dragSpeed
@@ -137,5 +137,34 @@ struct TouchCamera<Skybox: MetalDrawable_Shader>: Node {
       .skybox(skybox)
       .transform(controller.transform)
       .transition(.easeInOut(0.3))
+  }
+}
+
+// MARK: View Extensions for touch controls
+
+extension View {
+  func withCameraControls(controller: TouchCameraController) -> some View {
+    return self.modifier(TouchCameraGestureModifier(controller: controller))
+  }
+}
+
+struct TouchCameraGestureModifier: ViewModifier {
+  let controller: TouchCameraController
+  func body(content: Content) -> some View {
+    content
+    .highPriorityGesture(DragGesture(minimumDistance: 0)
+      .onChanged { gesture in
+        controller.touchMoved(startLocation: gesture.startLocation,
+                                    curLocation: gesture.location)
+
+      }
+      .onEnded({ gesture in
+        if (abs(gesture.predictedEndTranslation.width) + abs(gesture.predictedEndTranslation.height)) < 0.25 {
+          controller.touchTapped()
+        }
+
+        controller.touchEnded(predictedEndLocation: gesture.predictedEndLocation)
+      })
+    )
   }
 }

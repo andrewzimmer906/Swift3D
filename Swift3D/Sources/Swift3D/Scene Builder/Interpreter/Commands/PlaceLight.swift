@@ -10,16 +10,6 @@ import UIKit
 import Metal
 import simd
 
-// MARK: - Uniforms
-
-struct Lights {
-  let light1: simd_float4
-  let light1Col: simd_float4
-  
-  let light2: simd_float4
-  let light2Col: simd_float4
-}
-
 // MARK: - Command
 
 struct PlaceLight: MetalDrawable {
@@ -74,13 +64,15 @@ extension PlaceLight {
     fatalError()
   }
   
-  var uniformValues: (simd_float4, simd_float4) {
+  var uniformValues: Light {
     let direction = transform.rotation.act(.back)
-    return (simd_float4(direction, Float(type.rawValue)), color)
+    return Light(position: simd_float4(direction, Float(type.rawValue)),
+                 color: color)
   }
 }
 
 // MARK: Storage
+
 extension PlaceLight {
   class Storage: MetalDrawable_Storage {
     private(set) var device: MTLDevice?
@@ -89,8 +81,14 @@ extension PlaceLight {
 }
 
 extension PlaceLight.Storage {
+
   func set<Value>(_ value: Value) {
+    /*
     if let lights = value as? [PlaceLight] {
+      let uniformValues = lights.map { $0.uniformValues }
+
+
+
       var values0 = (simd_float4.zero, simd_float4.zero)
       var values1 = (simd_float4.zero, simd_float4.zero)
       if lights.count > 0 {
@@ -103,6 +101,7 @@ extension PlaceLight.Storage {
       let uniform = Lights(light1: values0.0, light1Col: values0.1, light2: values1.0, light2Col: values1.1)
       self.lightsUniform?.contents().storeBytes(of: uniform, as: Lights.self)
     }
+     */
   }
   
   func build(_ command: (any MetalDrawable),
@@ -111,10 +110,7 @@ extension PlaceLight.Storage {
                shaderLibrary: MetalShaderLibrary,
                geometryLibrary: MetalGeometryLibrary,
                surfaceAspect: Float) {
-    self.device = device    
-    if lightsUniform == nil {
-      self.lightsUniform = device.makeBuffer(length: MemoryLayout<Lights>.size)
-    }
+    self.device = device
   }
 }
 

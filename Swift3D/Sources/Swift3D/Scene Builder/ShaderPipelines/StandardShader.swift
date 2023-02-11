@@ -25,13 +25,6 @@ extension MetalDrawable_Shader where Self == StandardShader {
   }
 }
 
-// MARK: - Uniforms
-
-fileprivate struct MaterialSettings {
-  let lightingSettings: simd_float4
-  let albedoTextureScaling: simd_float4;
-}
-
 // MARK: - Shader
 
 public struct StandardShader: MetalDrawable_Shader {
@@ -56,7 +49,7 @@ public struct StandardShader: MetalDrawable_Shader {
 
     // Albedo
     encoder.setFragmentTexture(albedo.mtlTexture(library), index: 0)
-    encoder.setFragmentBytes(&storage.material, length: MemoryLayout<MaterialSettings>.size, index: 0)
+    encoder.setFragmentBytes(&storage.material, length: MemoryLayout<MaterialSettings>.size, index: FragmentBufferIndex.material.rawValue)
 
     if let ps = storage.pipeline {
       encoder.setRenderPipelineState(ps)
