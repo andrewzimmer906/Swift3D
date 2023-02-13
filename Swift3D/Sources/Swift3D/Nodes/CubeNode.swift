@@ -16,7 +16,7 @@ public struct CubeNode: Node, AcceptsShader {
   
   public var drawCommands: [any MetalDrawable] {
     [RenderGeometry(id: id, 
-                    transform: float4x4.identity, 
+                    transform: .identity, 
                     geometry: Cube(),
                     shaderPipeline: UnlitShader(.white),
                     renderType: .triangles,

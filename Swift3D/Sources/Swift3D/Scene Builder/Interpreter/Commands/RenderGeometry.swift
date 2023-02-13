@@ -19,7 +19,7 @@ protocol HasShaderPipeline {
 
 struct RenderGeometry: MetalDrawable, HasShaderPipeline {
   let id: String
-  let transform: float4x4
+  let transform: MetalDrawableData.Transform
   let geometry: any MetalDrawable_Geometry
   let shaderPipeline: any MetalDrawable_Shader
   let renderType: MetalDrawableData.RenderType?  
@@ -31,7 +31,7 @@ struct RenderGeometry: MetalDrawable, HasShaderPipeline {
     withUpdated(id: id, animations: nil, transform: nil, shaderPipeline: nil)
   }
   
-  func withUpdated(transform: float4x4) -> Self {
+  func withUpdated(transform: MetalDrawableData.Transform) -> Self {
     withUpdated(id: nil, animations: nil, transform: transform, shaderPipeline: nil)
   }
   
@@ -45,7 +45,7 @@ struct RenderGeometry: MetalDrawable, HasShaderPipeline {
   
   private func withUpdated(id: String?,
                            animations: [NodeTransition]?,
-                           transform: float4x4?, 
+                           transform: MetalDrawableData.Transform?,
                            shaderPipeline: (any MetalDrawable_Shader)?) -> Self {
       RenderGeometry.init(id: id ?? self.id, 
                           transform: transform ?? self.transform, 
@@ -70,10 +70,6 @@ extension RenderGeometry {
     encoder.setCullMode(cullBackfaces ? .back : .none)    
     
     // Vertices
-    if let vb = storage.vertexBuffer {
-      encoder.setVertexBuffer(vb, offset: 0, index: 0)
-    }
-    
     if let modelM = storage.modelMatBuffer {
       encoder.setVertexBuffer(modelM, offset: 0, index: 1)
     }
@@ -104,24 +100,36 @@ extension RenderGeometry {
 // MARK: - Storage
 
 extension RenderGeometry {
-  class Storage: MetalDrawable_Storage {    
+  class Storage: MetalDrawable_Storage {
     private(set) var device: MTLDevice?
     private(set) var mesh: MTKMesh?
-    private(set) var vertexBuffer: MTLBuffer?
-    private(set) var indexBuffer: MTLBuffer?
+
     private(set) var modelMatBuffer: MTLBuffer?
+    private(set) var transform: MetalDrawableData.Transform = .identity
   }
 }
 
 extension RenderGeometry.Storage {
   func set<Value>(_ value: Value) {
-    if let t = value as? float4x4 {
-      self.modelMatBuffer?.contents().storeBytes(of: t, as: float4x4.self)
+    if let t = value as? MetalDrawableData.Transform {
+      self.transform = t
+      self.modelMatBuffer?.contents().storeBytes(of: t.value, as: float4x4.self)
     }
+  }
+
+  func update(time: CFTimeInterval,
+              command: (any MetalDrawable),
+              previous: (any MetalDrawable_Storage)?) {
+    let previous = previous as? RenderGeometry.Storage
+    let transform = attribute(at: time,
+                              cur: command.transform,
+                              prev: previous?.transform,
+                              animation: command.animations?.with([.all]))
+    set(transform)
   }
   
   func build(_ command: (any MetalDrawable),
-             previous: (any MetalDrawable)?,
+             previous: (any MetalDrawable_Storage)?,
              device: MTLDevice,
              shaderLibrary: MetalShaderLibrary,
              geometryLibrary: MetalGeometryLibrary,
@@ -130,17 +138,21 @@ extension RenderGeometry.Storage {
       fatalError()
     }
     
-    let previous = previous as? RenderGeometry    
+    let previous = previous as? RenderGeometry.Storage
     self.device = device
-    
-    // Re-use previous buffers if they are the right size / data.
-    if let prevStorage = previous?.storage as? RenderGeometry.Storage {
-      self.modelMatBuffer = prevStorage.modelMatBuffer
+
+
+    if let previous = previous {
+      copy(from: previous)
+    }
+    else {
+      var transform = command.transform.value
+      self.transform = command.transform
+      self.modelMatBuffer = device.makeBuffer(bytes: &transform, length: float4x4.length)
+      self.mesh = geometryLibrary.cachedMesh(command.geometry)
     }
     
     // set up our shader pipeline
-    self.mesh = geometryLibrary.cachedMesh(command.geometry)
-
     var vertexDescriptor: MTLVertexDescriptor?
     if let modelDescriptor = self.mesh?.vertexDescriptor {
       vertexDescriptor = MTKMetalVertexDescriptorFromModelIO(modelDescriptor)
@@ -149,15 +161,12 @@ extension RenderGeometry.Storage {
     command.shaderPipeline.build(device: device,
                                  library: shaderLibrary,
                                  descriptor: vertexDescriptor)
+  }
 
-    // Save Model Transform
-    if self.modelMatBuffer == nil {
-      self.modelMatBuffer = device.makeBuffer(length: float4x4.length)
-    }
-
-    // Use the latest transform according to what our transitions will calculate
-    self.set(command.transform)
-    command.update(time: CACurrentMediaTime(), previous: previous)
+  func copy(from previous: RenderGeometry.Storage) {
+    self.transform = previous.transform
+    self.modelMatBuffer = previous.modelMatBuffer
+    self.mesh = previous.mesh
   }
 }
 

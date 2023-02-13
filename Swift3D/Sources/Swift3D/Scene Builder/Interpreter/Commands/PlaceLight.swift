@@ -14,21 +14,16 @@ import simd
 
 struct PlaceLight: MetalDrawable {
   let id: String
-  let transform: float4x4
+  let transform: MetalDrawableData.Transform
   
   let type: LightType
   let color: simd_float4
   
   let animations: [NodeTransition]?
+
+  let storage: PlaceLight.Storage
   
-  // Use a static here as we are passing one uniform for 
-  // all of our lights!
-  var storage: PlaceLight.Storage {
-    Self._storage
-  }
-  private static let _storage: PlaceLight.Storage = PlaceLight.Storage()
-  
-  func withUpdated(transform: float4x4) -> Self {
+  func withUpdated(transform: MetalDrawableData.Transform) -> Self {
     withUpdated(id: nil, animations: nil, transform: transform, color: nil)
   }
   
@@ -46,13 +41,14 @@ struct PlaceLight: MetalDrawable {
   
   private func withUpdated(id: String?, 
                            animations: [NodeTransition]?,
-                           transform: float4x4?,
+                           transform: MetalDrawableData.Transform?,
                            color: simd_float4?) -> Self {
     .init(id: id ?? self.id,
           transform: transform ?? self.transform,
           type: type,
           color: color ?? self.color,
-          animations: animations ?? self.animations)
+          animations: animations ?? self.animations,
+          storage: self.storage)
   }
 }
 
@@ -65,7 +61,7 @@ extension PlaceLight {
   }
   
   var uniformValues: Light {
-    let direction = transform.rotation.act(.back)
+    let direction = transform.value.rotation.act(.back)
     return Light(position: simd_float4(direction, Float(type.rawValue)),
                  color: color)
   }
@@ -76,41 +72,45 @@ extension PlaceLight {
 extension PlaceLight {
   class Storage: MetalDrawable_Storage {
     private(set) var device: MTLDevice?
-    private(set) var lightsUniform: MTLBuffer?
+    private(set) var uniformValues: Light?
   }
 }
 
 extension PlaceLight.Storage {
-
   func set<Value>(_ value: Value) {
-    /*
-    if let lights = value as? [PlaceLight] {
-      let uniformValues = lights.map { $0.uniformValues }
-
-
-
-      var values0 = (simd_float4.zero, simd_float4.zero)
-      var values1 = (simd_float4.zero, simd_float4.zero)
-      if lights.count > 0 {
-        values0 = lights[0].uniformValues        
-      }
-      if lights.count > 1 {
-        values1 = lights[1].uniformValues        
-      }
-      
-      let uniform = Lights(light1: values0.0, light1Col: values0.1, light2: values1.0, light2Col: values1.1)
-      self.lightsUniform?.contents().storeBytes(of: uniform, as: Lights.self)
+    if let light = value as? Light {
+      self.uniformValues = light
     }
-     */
   }
-  
+
+  func update(time: CFTimeInterval, command: (any MetalDrawable), previous: (any MetalDrawable_Storage)?) {
+    let previous = previous as? Self
+    guard let command = command as? PlaceLight else {
+      fatalError()
+    }
+
+    let uniformValues = attribute(at: time,
+                                  cur: command.uniformValues,
+                                  prev: previous?.uniformValues,
+                                  animation: command.animations?.with([.all]))
+    set(uniformValues)
+  }
+
   func build(_ command: (any MetalDrawable),
-               previous: (any MetalDrawable)?,
+               previous: (any MetalDrawable_Storage)?,
                device: MTLDevice, 
                shaderLibrary: MetalShaderLibrary,
                geometryLibrary: MetalGeometryLibrary,
                surfaceAspect: Float) {
     self.device = device
+
+    if let previous = previous as? PlaceLight.Storage {
+      self.copy(from: previous)
+    }
+  }
+
+  func copy(from previous: PlaceLight.Storage) {
+    self.uniformValues = previous.uniformValues
   }
 }
 

@@ -7,8 +7,7 @@ class Intro3DData {
 }
 
 struct IntroSample: View {
-  @State var is3D: Bool = true
-  @State var cameraProj: Bool = true
+  @State var is3D: Bool = false
 
   let data = Intro3DData()
   let cameraController = TouchCameraController(minDistance: 8, maxDistance: 16)
@@ -17,26 +16,17 @@ struct IntroSample: View {
     VStack {
       Text("Growing tired of your everyday Swift UI? 🥱")
       Text("What if we went.. ✨**3D**✨ 🚀🚀🚀")
-
       ZStack {
         if is3D {
           VStack {
-            Swift3DView(/*updateLoop: { delta in
+            Swift3DView(updateLoop: { delta in
               data.rotation += .pi * Float(delta)
               cameraController.update(delta: delta)
-            }*/) {
+            }) {
+              TouchCamera(controller: cameraController,
+                          skybox: .skybox(low: .white, mid: .white, high: .white))
 
-              CameraNode(id: "cam")
-                .testProjection(isOrtho: !cameraProj)
-                .translated(.back * 10)
-                .transition(.easeInOut(2))
-
-
-              //TouchCamera(controller: cameraController,
-//                          skybox: .skybox(low: .white, mid: .white, high: .white))
               StandardLighting(id: "lights")
-
-//              TriangleNode(id: "tri")
 
               ModelNode(id: "title", url: .model("title.obj"))
                 .shaded(.standard(albedo: Color.blue))
@@ -81,12 +71,6 @@ struct IntroSample: View {
             .padding(.horizontal, 16)
             .background(RoundedRectangle(cornerSize: CGSize(width: 12, height: 12)).fill(Color.blue))
         }
-      }
-
-      Button {
-        cameraProj.toggle()
-      } label: {
-        Text("Test").foregroundColor(.blue)
       }
       Text("Swipe for more ➡️").font(.callout).padding(.top)
     }

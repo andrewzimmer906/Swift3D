@@ -22,24 +22,8 @@ extension Float: Lerpable {
   }
 }
 
-extension float4x4: Lerpable  {  
+extension float4x4: Lerpable  {
   static func lerp(_ from: Self, _ to: Self, _ percent: Float) -> Self {
-    let fromT = from.translation
-    let fromR = from.rotation
-    let fromS = from.scale
-    
-    let toT = to.translation
-    let toR = to.rotation
-    let toS = to.scale
-
-    let T = simd_float3.lerp(fromT, toT, percent)
-    let R = simd_slerp(fromR, toR, percent)
-    let S = simd_float3.lerp(fromS, toS, percent)
-    
-    return float4x4.TRS(trans: T, rot: R, scale: S)    
-  }
-
-  static func straightLerp(_ from: Self, _ to: Self, _ percent: Float) -> Self {
     var mat = float4x4()
 
     mat[0] = SIMD4<Float>.lerp(from[0], to[0], percent)
@@ -60,5 +44,23 @@ extension simd_float3: Lerpable  {
 extension SIMD4<Float>: Lerpable  {
   static func lerp(_ from: Self, _ to: Self, _ percent: Float) -> Self {
     return from + (to - from) * percent
+  }
+}
+
+extension MetalDrawableData.Transform: Lerpable {
+  static func lerp(_ from: Self, _ to: Self, _ percent: Float) -> Self {
+    let fromT = from.value.translation
+    let fromR = from.value.rotation
+    let fromS = from.value.scale
+
+    let toT = to.value.translation
+    let toR = to.value.rotation
+    let toS = to.value.scale
+
+    let T = simd_float3.lerp(fromT, toT, percent)
+    let R = simd_slerp(fromR, toR, percent)
+    let S = simd_float3.lerp(fromS, toS, percent)
+
+    return .init(value: float4x4.TRS(trans: T, rot: R, scale: S))
   }
 }

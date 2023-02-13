@@ -17,7 +17,7 @@ public struct TriangleNode: Node, AcceptsShader {
 
   public var drawCommands: [any MetalDrawable] {
     [RenderGeometry(id: id, 
-                    transform: float4x4.identity, 
+                    transform: .identity, 
                     geometry: Triangle(),
                     shaderPipeline: UnlitShader(.red),
                     renderType: .triangles,

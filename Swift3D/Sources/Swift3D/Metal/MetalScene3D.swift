@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 import Metal
 
-typealias CommandAndPrevious = (any MetalDrawable, (any MetalDrawable)?)
+typealias CommandAndPrevious = (any MetalDrawable, (any MetalDrawable_Storage)?)
 
 class MetalScene3D {
   private let device: MTLDevice
@@ -24,26 +24,24 @@ class MetalScene3D {
                   shaderLibrary: MetalShaderLibrary,
                   geometryLibrary: MetalGeometryLibrary,
                   surfaceAspect: Float) {
-    print("Update content!!")
     self.content = content
     
-    // Generate some draw commands    
-    let nextCommands = content.drawCommands.map({ command in
+    // Generate some draw commands
+    let nextCommands = content.drawCommands.map { command in
       let prevCommands = commands.filter { $0.0.id == command.id }
       assert(prevCommands.count <= 1, "Ids must be unique. Please check your Ids.")
-      let prevTuple = prevCommands.first
-      let prevCommand = prevTuple?.0.presentedDrawCommand(time: CACurrentMediaTime(), previous: prevTuple?.1)
-      
+      let prevStorage = prevCommands.first?.0.storage
+
       command.storage
         .build(command,
-               previous: prevCommand,
+               previous: prevStorage,
                device: device,
                shaderLibrary: shaderLibrary,
                geometryLibrary: geometryLibrary,
                surfaceAspect: surfaceAspect)
       
-      return (command, prevCommand)
-    })
+      return (command, prevStorage)
+    }
     
     commands = nextCommands
   }

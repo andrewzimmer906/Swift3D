@@ -108,31 +108,17 @@ extension float4x4 {
     return m
   }
   
-  public static func makePerspective(fovyRadians: Float, _ aspect: Float, _ nearZ: Float, _ farZ: Float) -> float4x4 {
-    let ys = 1 / tanf(fovyRadians * 0.5)
+  public static func makePerspective(fovYRadians: Float, aspect: Float, nearZ: Float, farZ: Float) -> float4x4 {
+    let ys = 1 / tanf(fovYRadians * 0.5)
     let xs = ys / aspect
     let zs = farZ / (nearZ - farZ)
     return float4x4(columns: (.init(x:xs, y:0, z:0, w:0),
                               .init(x:0, y:ys, z:0, w:0),
                               .init(x:0, y:0, z:zs, w:-1),
                               .init(x:0, y:0, z:zs * nearZ, w:0)))
-    /*return Mat4([
-      Vec4(xs,  0, 0,   0),
-      Vec4( 0, ys, 0,   0),
-      Vec4( 0,  0, zs, -1),
-      Vec4( 0,  0, zs * nearZ, 0)
-    ])
-    */
-    
-    // return unsafeBitCast(GLKMatrix4MakePerspective(fovyRadians, aspect, nearZ, farZ), to: float4x4.self)
-  }
-
-  public static func makeFrustum(left: Float, _ right: Float, _ bottom: Float, _ top: Float, _ nearZ: Float, _ farZ: Float) -> float4x4 {
-    return unsafeBitCast(GLKMatrix4MakeFrustum(left, right, bottom, top, nearZ, farZ), to: float4x4.self)
   }
 
   public static func makeOrthographic(left: Float, right: Float, bottom: Float, top: Float, nearZ: Float, farZ: Float) -> float4x4 {
-
     // Left Hand
     /*float4x4(rows: [
       .init(x: 2 / (right - left), y: 0, z: 0, w: (left + right) / (left - right)),
@@ -148,13 +134,10 @@ extension float4x4 {
       .init(x: 0, y: 0, z: -1 / (farZ - nearZ), w: nearZ / (nearZ - farZ)),
       .init(x: 0, y: 0, z: 0, w: 1)
     ])
+  }
 
-      /*return float4x4(
-          [ 2 / (right - left), 0, 0, 0],
-          [0, 2 / (top - bottom), 0, 0],
-          [0, 0, 1 / (far - near), 0],
-          [(left + right) / (left - right), (top + bottom) / (bottom - top), near / (near - far), 1]
-      )*/
+  public static func makeFrustum(left: Float, _ right: Float, _ bottom: Float, _ top: Float, _ nearZ: Float, _ farZ: Float) -> float4x4 {
+    return unsafeBitCast(GLKMatrix4MakeFrustum(left, right, bottom, top, nearZ, farZ), to: float4x4.self)
   }
 
   // MARK: - Instance

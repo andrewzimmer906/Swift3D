@@ -21,42 +21,42 @@ struct ViewProjectionUniform {
 
 struct PlaceCamera: MetalDrawable, HasShaderPipeline {
   let id: String
-  let transform: float4x4
-  let cameraProjectionSettings: CameraProjectionSettings
+  let transform: MetalDrawableData.Transform
+  let projection: CameraProjection
   let shaderPipeline: (any MetalDrawable_Shader)?
   let animations: [NodeTransition]?
 
   let storage: PlaceCamera.Storage
   
   
-  func withUpdated(transform: float4x4) -> Self {
-    withUpdated(id: nil, animations: nil, transform: transform, shaderPipeline: nil, cameraProjectionSettings: nil)
+  func withUpdated(transform: MetalDrawableData.Transform) -> Self {
+    withUpdated(id: nil, animations: nil, transform: transform, shaderPipeline: nil, projection: nil)
   }
   
   func withUpdated(id: String) -> Self {
-    withUpdated(id: id, animations: nil, transform: nil, shaderPipeline: nil, cameraProjectionSettings: nil)
+    withUpdated(id: id, animations: nil, transform: nil, shaderPipeline: nil, projection: nil)
   }
   
   func withUpdated(animations: [NodeTransition]) -> Self {
-    withUpdated(id: nil, animations: animations, transform: nil, shaderPipeline: nil, cameraProjectionSettings: nil)
+    withUpdated(id: nil, animations: animations, transform: nil, shaderPipeline: nil, projection: nil)
   }
 
-  func withUpdated(cameraProjectionSettings: CameraProjectionSettings) -> Self {
-    withUpdated(id: nil, animations: animations, transform: nil, shaderPipeline: nil, cameraProjectionSettings: cameraProjectionSettings)
+  func withUpdated(projection: CameraProjection) -> Self {
+    withUpdated(id: nil, animations: animations, transform: nil, shaderPipeline: nil, projection: projection)
   }
 
   func withUpdated<Shader: MetalDrawable_Shader>(shaderPipeline: Shader) -> any MetalDrawable {
-    withUpdated(id: nil, animations: nil, transform: nil, shaderPipeline: shaderPipeline, cameraProjectionSettings: nil)
+    withUpdated(id: nil, animations: nil, transform: nil, shaderPipeline: shaderPipeline, projection: nil)
   }
   
   private func withUpdated(id: String?,
                            animations: [NodeTransition]?,
-                           transform: float4x4?,
+                           transform: MetalDrawableData.Transform?,
                            shaderPipeline: (any MetalDrawable_Shader)?,
-                           cameraProjectionSettings: CameraProjectionSettings?) -> Self {
+                           projection: CameraProjection?) -> Self {
     .init(id: id ?? self.id,
           transform: transform ?? self.transform,
-          cameraProjectionSettings: cameraProjectionSettings ?? self.cameraProjectionSettings,
+          projection: projection ?? self.projection,
           shaderPipeline: shaderPipeline ?? self.shaderPipeline,
           animations: animations ?? self.animations,
           storage: storage)
@@ -66,22 +66,6 @@ struct PlaceCamera: MetalDrawable, HasShaderPipeline {
 // MARK: - Updates
 
 extension PlaceCamera {
-  /// Updates the values in the command with any animations that are running.  
-  func update(time: CFTimeInterval, previous: (any MetalDrawable)?) {
-    if let dirtyTransform = attribute(at: time, cur: self.transform, prev: previous?.transform) {
-      if let animation = animations?.first,
-         let prev = previous as? PlaceCamera {
-        let percent = animation.interpolate(time: time)
-        let projMatrix = CameraProjectionSettings.projectionLerp(prev.cameraProjectionSettings, cameraProjectionSettings, percent, aspect: storage.surfaceAspect ?? 1)
-
-        storage.set((dirtyTransform, projMatrix))
-      }
-      else {
-        storage.set((dirtyTransform, self.cameraProjectionSettings))
-      }
-    }
-  }
-  
   var needsRender: Bool { shaderPipeline != nil }
 
   // Render our skybox.
@@ -106,52 +90,67 @@ extension PlaceCamera {
 extension PlaceCamera {
   class Storage: MetalDrawable_Storage {
     private(set) var device: MTLDevice?
-    private(set) var surfaceAspect: Float?
+    private(set) var surfaceAspect: Float = 1
     private(set) var viewProjBuffer: MTLBuffer?
+
+    private(set) var view: MetalDrawableData.Transform = .identity
+    private(set) var projection: float4x4?
     var skyboxInverseView: float4x4 = .identity
   }
 }
 
 extension PlaceCamera.Storage {
   func set<Value>(_ value: Value) {
-    if let tuple = value as? (float4x4, CameraProjectionSettings) {
-      let viewM = tuple.0.inverse
-      let camSettings = tuple.1
 
-      let projM = camSettings.matrix(aspect: self.surfaceAspect ?? 1)
-      let vpUniform = ViewProjectionUniform(projectionMatrix: projM, viewMatrix: viewM)
+    if let tuple = value as? (MetalDrawableData.Transform, float4x4) {
+      // Update matrices
+      self.view = .init(value: tuple.0.value)
+      let view = self.view.value.inverse
+      let proj = tuple.1
+      self.projection = proj
+
+      // Update uniform
+      let vpUniform = ViewProjectionUniform(projectionMatrix: proj, viewMatrix: view)
       self.viewProjBuffer?.contents().storeBytes(of: vpUniform, as: ViewProjectionUniform.self)
 
-      var viewDirectionMatrix = viewM
+      // Skybox inverse view matrix.
+      var viewDirectionMatrix = view
       viewDirectionMatrix.columns.3 = SIMD4<Float>(0, 0, 0, 1)
-      let clipToViewDirectionTransform = (projM * viewDirectionMatrix).inverse
-
-      self.skyboxInverseView = clipToViewDirectionTransform
-    } else if let tuple = value as? (float4x4, float4x4) {
-      let viewM = tuple.0.inverse
-      let projM = tuple.1
-      let vpUniform = ViewProjectionUniform(projectionMatrix: projM, viewMatrix: viewM)
-      self.viewProjBuffer?.contents().storeBytes(of: vpUniform, as: ViewProjectionUniform.self)
-
-      var viewDirectionMatrix = viewM
-      viewDirectionMatrix.columns.3 = SIMD4<Float>(0, 0, 0, 1)
-      let clipToViewDirectionTransform = (projM * viewDirectionMatrix).inverse
-
+      let clipToViewDirectionTransform = (proj * viewDirectionMatrix).inverse
       self.skyboxInverseView = clipToViewDirectionTransform
     }
   }
-  
-  func build(_ command: (any MetalDrawable),
-               previous: (any MetalDrawable)?,
-               device: MTLDevice, 
-               shaderLibrary: MetalShaderLibrary,
-               geometryLibrary: MetalGeometryLibrary,
-               surfaceAspect: Float) {
+
+  func update(time: CFTimeInterval, command: (any MetalDrawable), previous: (any MetalDrawable_Storage)?) {
+    let previous = previous as? Self
     guard let command = command as? PlaceCamera else {
       fatalError()
     }
 
-    let previous = previous as? PlaceCamera
+    let view = attribute(at: time,
+                         cur: command.transform,
+                         prev: previous?.view,
+                         animation: command.animations?.with([.all]))
+
+    let targetProj = command.projection.matrix(aspect: self.surfaceAspect)
+    let projection = attribute(at: time,
+                               cur: targetProj,
+                               prev: previous?.projection,
+                               animation: command.animations?.with([.all]))
+
+    self.set((view, projection))
+  }
+  
+  func build(_ command: (any MetalDrawable),
+               previous: (any MetalDrawable_Storage)?,
+               device: MTLDevice, 
+               shaderLibrary: MetalShaderLibrary,
+               geometryLibrary: MetalGeometryLibrary,
+               surfaceAspect: Float) {
+    let previous = previous as? Self
+    guard let command = command as? PlaceCamera else {
+      fatalError()
+    }
 
     self.device = device
     self.surfaceAspect = surfaceAspect
@@ -159,17 +158,22 @@ extension PlaceCamera.Storage {
     // Build the Pipeline
     command.shaderPipeline?.build(device: device, library: shaderLibrary, descriptor: nil)
     
-    // Re-use previous buffers if they are the right size / data.
-    if let prevStorage = previous?.storage as? PlaceCamera.Storage {
-      self.viewProjBuffer = prevStorage.viewProjBuffer
-    }
-    
-    if self.viewProjBuffer == nil {
+    // Re-use previous buffers if they are the right size / data and
+    // copy data from previous storage for animations.
+    if let previous = previous {
+      self.copy(from: previous)
+    } else {
+      // Make the buffers / data from scratch!
       self.viewProjBuffer = device.makeBuffer(length: MemoryLayout<ViewProjectionUniform>.size)
+      self.set((command.transform, command.projection.matrix(aspect: self.surfaceAspect)))
     }
-    
-    // Use the latest transform according to what our transitions will calculate
-    let updatedTransform = command.attribute(at: CACurrentMediaTime(), cur: command.transform, prev: previous?.transform)
-    self.set((updatedTransform ?? command.transform, command.cameraProjectionSettings))
+  }
+
+  // Attempt to reuse any generated data or buffers from the existing storage from previous.
+  func copy(from previous: PlaceCamera.Storage) {
+    self.viewProjBuffer = previous.viewProjBuffer
+    self.view = previous.view
+    self.projection = previous.projection
+    self.skyboxInverseView = previous.skyboxInverseView
   }
 }

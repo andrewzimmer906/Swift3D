@@ -30,3 +30,12 @@ struct Light {
   let position: simd_float4
   let color: simd_float4
 }
+
+extension Light: Lerpable {
+  // Don't uh.. lerp between two different TYPES of lights please.. :)  It's
+  // stored in position.w and may act strangely..
+  static func lerp(_ from: Light, _ to: Light, _ percent: Float) -> Light {
+    Light(position: simd_float4.lerp(from.position, to.position, percent),
+          color: simd_float4.lerp(from.color, to.color, percent))
+  }
+}

@@ -86,21 +86,25 @@ public class MetalView: UIView {
           let depth = metalDepthTexture else {
       return
     }
-    
-    let curTime = CACurrentMediaTime()
-    let delta = curTime - lastUpdateTime
+
+    let delta = time - lastUpdateTime
     if delta >= preferredTimeBetweenUpdates {
       updateLoop?(delta)
-      lastUpdateTime = curTime
+      lastUpdateTime = time
 
-      /*
       if let content = self.content {
         scene.setContent(content(),
                          shaderLibrary: shaderLibrary,
                          geometryLibrary: geometryLibrary,
                          surfaceAspect: Float(layer.frame.size.width / layer.frame.size.height))
       }
-       */
+    }
+
+    // Update command values for GPU & Time (primarily used for transitions)
+    scene.commands.forEach { (command, previousStorage) in
+      command.storage.update(time: time,
+                             command: command,
+                             previous: previousStorage)
     }
 
     renderer.render(time, layerDrawable: drawable, depthTexture: depth, commands: scene.commands)

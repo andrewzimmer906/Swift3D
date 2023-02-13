@@ -16,7 +16,12 @@ public struct AmbientLightNode: Node, AcceptsColored {
   
   public var drawCommands: [any MetalDrawable] {
     [
-      PlaceLight(id: id, transform: .identity, type: .ambient, color: .one, animations: nil)
+      PlaceLight(id: id,
+                 transform: .identity,
+                 type: .ambient,
+                 color: .one,
+                 animations: nil,
+                 storage: .init())
     ]
   }
 }
@@ -29,7 +34,12 @@ public struct DirectionalLightNode: Node, AcceptsColored {
   
   public var drawCommands: [any MetalDrawable] {
     [
-      PlaceLight(id: id, transform: .identity, type: .directional, color: .one, animations: nil)
+      PlaceLight(id: id,
+                 transform: .identity,
+                 type: .directional,
+                 color: .one,
+                 animations: nil,
+                 storage: .init())
     ]
   }
 }
