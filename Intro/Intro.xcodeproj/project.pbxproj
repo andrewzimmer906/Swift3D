@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		EC1907ED299C25FA0011A21F /* IsometricSample.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC1907EC299C25FA0011A21F /* IsometricSample.swift */; };
 		EC2D46282996D13F004C9BC0 /* PageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC2D46272996D13F004C9BC0 /* PageView.swift */; };
 		EC2D462A2996D16D004C9BC0 /* IntroSample.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC2D46292996D16D004C9BC0 /* IntroSample.swift */; };
 		EC2D462E2996D27B004C9BC0 /* URL+IO.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC2D462D2996D27B004C9BC0 /* URL+IO.swift */; };
@@ -23,6 +24,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		EC1907EC299C25FA0011A21F /* IsometricSample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IsometricSample.swift; sourceTree = "<group>"; };
 		EC2D46272996D13F004C9BC0 /* PageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageView.swift; sourceTree = "<group>"; };
 		EC2D46292996D16D004C9BC0 /* IntroSample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntroSample.swift; sourceTree = "<group>"; };
 		EC2D462D2996D27B004C9BC0 /* URL+IO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+IO.swift"; sourceTree = "<group>"; };
@@ -58,6 +60,7 @@
 				EC2D462C2996D270004C9BC0 /* Extensions */,
 				ECAD98812993139D00B20F52 /* Models */,
 				ECAD987E2993138D00B20F52 /* TouchCamera.swift */,
+				EC1907EC299C25FA0011A21F /* IsometricSample.swift */,
 				EC2D46292996D16D004C9BC0 /* IntroSample.swift */,
 				EC2D462F2996FB15004C9BC0 /* StandardLighting.swift */,
 			);
@@ -214,6 +217,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				ECAD987F2993138D00B20F52 /* ContentView.swift in Sources */,
+				EC1907ED299C25FA0011A21F /* IsometricSample.swift in Sources */,
 				EC2D462A2996D16D004C9BC0 /* IntroSample.swift in Sources */,
 				EC2D46282996D13F004C9BC0 /* PageView.swift in Sources */,
 				ECAD98802993138D00B20F52 /* TouchCamera.swift in Sources */,

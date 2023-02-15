@@ -50,16 +50,6 @@ enum CameraProjection {
     }
   }
 }
-/*
-extension CameraProjectionSettings {
-  static func projectionLerp(_ from: Self, _ to: Self, _ percent: Float, aspect: Float) -> float4x4 {
-    let fromMat = from.matrix(aspect: aspect)
-    let toMat = to.matrix(aspect: aspect)
-    print("lerp perc: \(percent)")
-    return float4x4.straightLerp(fromMat, toMat, percent)
-  }
-}
-*/
 
 public struct CameraNode: Node {
   public let id: String
@@ -75,8 +65,34 @@ public struct CameraNode: Node {
                  animations: nil,
                  storage: PlaceCamera.Storage())]
   }
+}
 
+// MARK: -  Camera Modifier Support
+
+public protocol CameraNodeModifiable: Node {
+  func skybox(_ shader: any MetalDrawable_Shader) -> ModifiedNodeContent<Self, ShaderModifier>
+  func perspective(fov: Float, zNear: Float, zFar: Float) -> ModifiedNodeContent<Self, ProjectionModifier>
+  func orthographic(viewSpace: CGRect, zNear: Float, zFar: Float) -> ModifiedNodeContent<Self, ProjectionModifier>
+}
+
+extension CameraNodeModifiable {
   public func skybox(_ shader: any MetalDrawable_Shader) -> ModifiedNodeContent<Self, ShaderModifier> {
     return self.modifier(ShaderModifier(shader: shader))
   }
+
+  public func perspective(fov: Float = 1.0472, zNear: Float = 0.1, zFar: Float = 100) -> ModifiedNodeContent<Self, ProjectionModifier> {
+    self.modifier(ProjectionModifier(value: .perspective(.init(fov: fov, zNear: zNear, zFar: zFar))))
+  }
+
+  public func orthographic(viewSpace: CGRect, zNear: Float = 0.1, zFar: Float = 100) -> ModifiedNodeContent<Self, ProjectionModifier> {
+    self.modifier(ProjectionModifier(value: .orthographic(.init(left: Float(viewSpace.minX),
+                                                                right: Float(viewSpace.maxX),
+                                                                top: Float(viewSpace.maxY),
+                                                                bottom: Float(viewSpace.minY),
+                                                                nearZ: zNear,
+                                                                farZ: zFar))))
+  }
 }
+
+extension CameraNode: CameraNodeModifiable { }
+extension ModifiedNodeContent: CameraNodeModifiable where Content: CameraNodeModifiable, Modifier: NodeModifier { }

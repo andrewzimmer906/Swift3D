@@ -13,22 +13,30 @@ func makeCode(@SceneBuilder _ content: () -> any Node) -> any Node {
   content()
 }
 
-func testBuilder() {
-  // let yes = true
-  // let no = false
+public struct SceneBuilderTest {
+  public static func testBuilder() {
+    // let yes = true
+    // let no = false
 
-  let tree = makeCode {
-    GroupNode(id: "one") {
-      TriangleNode(id: "tri1")
+    let tree = makeCode {
+
+      ForEach3D(data: ["one", "two", "three"]) { element in
+        TriangleNode(id: element)
+      }
+
+      GroupNode(id: "one") {
+        TriangleNode(id: "tri1")
+      }
+      TriangleNode(id: "tris")
     }
-    TriangleNode(id: "tris")
+
+    print("\n")
+    print(tree)
+    print("\n")
+    print(tree.printedTree.reduce("", { partialResult, str in
+      partialResult + "\n" + str
+    }))
   }
-  
-  print("\n")
-  print(tree)
-  print("\n")
-  print(tree.printedTree.reduce("", { partialResult, str in
-    partialResult + "\n" + str
-  }))
 }
+
 

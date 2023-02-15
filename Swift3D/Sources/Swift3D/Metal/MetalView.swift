@@ -20,6 +20,10 @@ public class MetalView: UIView {
   private var lastUpdateTime: CFTimeInterval = 0
   private var preferredTimeBetweenUpdates: CFTimeInterval = 0
 
+  private var screenScale: CGFloat {
+    self.window?.screen.scale ?? 1
+  }
+
   private var content: (() -> any Node)?
   
   // MARK: Setup / Teardown
@@ -48,11 +52,12 @@ public class MetalView: UIView {
       self?.render(time: frameTime)
     }
   }
-  
+
   private func setupLayer() {
     let ml = CAMetalLayer()
-    
+
     ml.device = device
+    ml.contentsScale = screenScale
     ml.pixelFormat = .bgra8Unorm
     ml.framebufferOnly = true
     ml.frame = layer.frame
@@ -119,7 +124,11 @@ public class MetalView: UIView {
 
     for l in layers {
       l.frame = layer.frame
-    }      
+      if let metalLayer = l as? CAMetalLayer {
+        metalLayer.drawableSize = CGSize(width: layer.bounds.size.width * screenScale,
+                                         height: layer.bounds.height * screenScale)
+      }
+    }
     
     // Reset content to reset the aspect ration on the projection matrix.
     scene.setContent(scene.content,
@@ -131,7 +140,8 @@ public class MetalView: UIView {
     // Remake our depth texture to size.
     let desc = MTLTextureDescriptor.texture2DDescriptor(
         pixelFormat: .depth32Float_stencil8,
-        width: Int(layer.frame.size.width), height: Int(layer.frame.size.height), 
+        width: Int(layer.frame.size.width * screenScale),
+        height: Int(layer.frame.size.height * screenScale),
         mipmapped: false)
     desc.storageMode = .private
     desc.usage = .renderTarget    

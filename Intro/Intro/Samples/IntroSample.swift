@@ -8,10 +8,10 @@ class Intro3DData {
 
 struct IntroSample: View {
   @State var is3D: Bool = false
-
+  
   let data = Intro3DData()
   let cameraController = TouchCameraController(minDistance: 8, maxDistance: 16)
-
+  
   var body: some View {
     VStack {
       Text("Growing tired of your everyday Swift UI? 🥱")
@@ -25,13 +25,13 @@ struct IntroSample: View {
             }) {
               TouchCamera(controller: cameraController,
                           skybox: .skybox(low: .white, mid: .white, high: .white))
-
+              
               StandardLighting(id: "lights")
-
+              
               ModelNode(id: "title", url: .model("title.obj"))
                 .shaded(.standard(albedo: Color.blue))
                 .translated(.down * 0.25)
-
+              
               CubeNode(id: "cube")
                 .shaded(.uvColored())
                 .transform(.rotated(angle: data.rotation, axis: .up))
@@ -49,11 +49,11 @@ struct IntroSample: View {
               .font(Font.system(size: 60).weight(.black))
               .kerning(0)
               .foregroundColor(.blue)
-            Rectangle().fill(.red).frame(width: 30, height: 30)
+            Rectangle().fill(.blue).frame(width: 30, height: 30)
           }
         }
       }.frame(maxHeight: .infinity)
-
+      
       Button {
         is3D.toggle()
       } label: {
@@ -72,32 +72,13 @@ struct IntroSample: View {
             .background(RoundedRectangle(cornerSize: CGSize(width: 12, height: 12)).fill(Color.blue))
         }
       }
-      Text("Swipe for more ➡️").font(.callout).padding(.top)
     }
     .padding()
   }
-}
-
-private func axis(id: String) -> some Node {
-  GroupNode(id: id) {
-    CubeNode(id: "X")
-
-      .transform(.translated(.right))
-      .transform(.scaled(simd_float3(x: 2, y: 0.15, z: 0.15)))
-
-    CubeNode(id: "Y")
-
-      .transform(.translated(.up))
-      .transform(.scaled(simd_float3(x: 0.15, y: 2, z: 0.15)))
-
-    CubeNode(id: "Z")
-      .transform(.translated(.forward))
-      .transform(.scaled(simd_float3(x: 0.15, y: 0.15, z: 2)))
-  }
-}
-
-struct preview: PreviewProvider {
-  static var previews: some View {
-    ContentView()
+  
+  struct preview: PreviewProvider {
+    static var previews: some View {
+      IntroSample()
+    }
   }
 }
