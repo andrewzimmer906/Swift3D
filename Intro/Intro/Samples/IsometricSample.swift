@@ -10,7 +10,7 @@ struct Point: Identifiable {
 class PointCloud {
   let points: [Point]
 
-  init(radius: Float = 2, numPoints: Int = 120) {
+  init(radius: Float = 2, numPoints: Int = 50) {
     var pointsMut: [Point] = []
 
     while pointsMut.count < numPoints {

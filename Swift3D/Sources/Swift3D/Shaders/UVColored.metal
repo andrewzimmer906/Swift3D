@@ -6,29 +6,30 @@ using namespace metal;
 
 // ---------- Color Generation
 
-inline float3 bump3 (float3 x)
+// Based on GPU Gems
+// Optimised by Alan Zucconi
+inline float3 bump3y (float3 x, float3 yoffset)
 {
     float3 y = 1 - x * x;
-    y = max(y, 0);
+    y = saturate(y-yoffset);
     return y;
 }
 
-float3 spectral_gems (float x)
+float3 spectral_zucconi (float x)
 {
-       // w: [400, 700]
+    // w: [400, 700]
     // x: [0,   1]
-    // fixed x = saturate((w - 400.0)/300.0);
 
-    return bump3
-    (    float3
-        (
-            4 * (x - 0.75),    // Red
-            4 * (x - 0.5),    // Green
-            4 * (x - 0.25)    // Blue
-        )
-    );
+    const float3 cs = float3(3.54541723, 2.86670055, 2.29421995);
+    const float3 xs = float3(0.69548916, 0.49416934, 0.28269708);
+    const float3 ys = float3(0.02320775, 0.15936245, 0.53520021);
+
+  return bump3y (cs * (x - xs), ys);//* sin(x * 3.14159);
 }
 
+float3 uvColor(float2 uv) {
+  return saturate(spectral_zucconi(uv.x) + spectral_zucconi(uv.y));
+}
 
 struct VertexOut {
   float4 position [[position]];  //1
@@ -52,7 +53,7 @@ vertex VertexOut uv_color_vertex(VertexIn in [[stage_in]],
     .worldPos = (m_matrix * float4(in.position, 1.0)).xyz,
     .viewPos = (mv_matrix * float4(in.position, 1.0)).xyz,
     .worldNormal = normalize((m_matrix * float4(in.normal, 0.0))).xyz,
-    .uvColor = spectral_gems((in.uv.x + in.uv.y) * 0.5)
+    .uvColor = uvColor(in.uv)
   };
 
   return out;

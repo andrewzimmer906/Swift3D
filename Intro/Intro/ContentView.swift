@@ -9,12 +9,14 @@ struct ContentView: View {
     VStack {
       PageView(
         pages: pages.map({ page in
-          page
+          VStack {
+            page
+            Text("Swipe for more ➡️").font(.callout).padding(.top)
+          }
         }), currentPage: $curPage)
-      Text("Swipe for more ➡️").font(.callout).padding(.top)
     }
     .onAppear {
-      SceneBuilderTest.testBuilder()
+      // SceneBuilderTest.testBuilder()
     }
   }
 
@@ -27,12 +29,18 @@ struct ContentView: View {
 
 extension ContentView {
   enum Content: View, CaseIterable {
+    case introAnimation
+    case lighting
     case intro
     case isometric
 
     @ViewBuilder
     var body: some View {
       switch(self) {
+      case .introAnimation:
+        IntroAnimationSample()
+      case .lighting:
+        ShapesSample()
       case .intro:
         IntroSample()
       case .isometric:
