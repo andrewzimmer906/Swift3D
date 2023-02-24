@@ -29,6 +29,7 @@ struct ContentView: View {
 
 extension ContentView {
   enum Content: View, CaseIterable {
+    case car
     case introAnimation
     case lighting
     case intro
@@ -37,6 +38,8 @@ extension ContentView {
     @ViewBuilder
     var body: some View {
       switch(self) {
+      case .car:
+        CarSample()
       case .introAnimation:
         IntroAnimationSample()
       case .lighting:

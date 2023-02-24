@@ -15,7 +15,7 @@ public class MetalGeometryLibrary {
   private var mdlModels: [String: MTKMesh] = [:]
 
   let device: MTLDevice
-  private lazy var allocator: MTKMeshBufferAllocator = {
+  lazy var allocator: MTKMeshBufferAllocator = {
     MTKMeshBufferAllocator(device: device)
   }()
 

@@ -17,13 +17,11 @@ public struct ModelNode: Node, AcceptsShader {
   }
 
   public var drawCommands: [any MetalDrawable] {
-    [RenderGeometry(id: id,
-                    transform: .identity,
-                    geometry: ObjModel(url: url),
-                    shaderPipeline: UnlitShader(.white),
-                    renderType: .triangles,
-                    animations: nil,
-                    storage: RenderGeometry.Storage(),
-                    cullBackfaces: true)]
+    [RenderModel(id: id,
+                 transform: .identity,
+                 model: Model(url: url),
+                 shaderPipeline: nil,
+                 animations: nil,
+                 storage: RenderModel.Storage())]
   }
 }
