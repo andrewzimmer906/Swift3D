@@ -20,6 +20,10 @@ extension Never: MetalDrawable_Geometry {
 }
 
 extension Never: MetalDrawable_Shader {
+  public func setTextures(encoder: MTLRenderCommandEncoder) {
+    fatalError()
+  }
+
   public func build(device: MTLDevice, library: MetalShaderLibrary, descriptor: MTLVertexDescriptor?) {
     fatalError()
   }

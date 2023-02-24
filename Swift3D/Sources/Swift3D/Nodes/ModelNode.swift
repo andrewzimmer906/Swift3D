@@ -6,9 +6,10 @@
 //
 
 import Foundation
+import SwiftUI
 import simd
 
-public struct ModelNode: Node, AcceptsShader {
+public struct ModelNode: Node, AcceptsShaderWithDefaultTextures {
   public let id: String
   public let url: URL
   public init(id: String, url: URL) {
@@ -20,7 +21,8 @@ public struct ModelNode: Node, AcceptsShader {
     [RenderModel(id: id,
                  transform: .identity,
                  model: Model(url: url),
-                 shaderPipeline: nil,
+                 shaderPipeline: .standard(albedo: Color.white),
+                 overrideTextures: false,
                  animations: nil,
                  storage: RenderModel.Storage())]
   }

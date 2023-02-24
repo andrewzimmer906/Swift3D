@@ -31,16 +31,21 @@ public struct SkyboxShader: MetalDrawable_Shader {
     self.storage.library = library
   }
 
-  public func setupEncoder(encoder: MTLRenderCommandEncoder) {
+  public func setTextures(encoder: MTLRenderCommandEncoder) {
     guard
       let library = storage.library else {
       return
     }
 
-    // Texture
     encoder.setFragmentTexture(texture.mtlTexture(library), index: 0)
+  }
 
-    // Shaders
+  public func setupEncoder(encoder: MTLRenderCommandEncoder) {
+    guard
+      let library = storage.library else {
+      return
+    }
+    
     encoder.setRenderPipelineState(library.pipeline(for: functions.0, fragment: functions.1))    
   }
 }

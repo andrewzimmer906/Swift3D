@@ -41,14 +41,16 @@ public struct StandardShader: MetalDrawable_Shader {
     self.storage.pipeline = library.pipeline(for: functions.0, fragment: functions.1, vertexDescriptor: descriptor)
     self.storage.material = self.material
   }
-  
-  public func setupEncoder(encoder: MTLRenderCommandEncoder) {
+
+  public func setTextures(encoder: MTLRenderCommandEncoder) {
     guard let library = storage.library else {
       return
     }
 
-    // Albedo
-    encoder.setFragmentTexture(albedo.mtlTexture(library), index: 0)
+    encoder.setFragmentTexture(albedo.mtlTexture(library), index: 0) // Albedo
+  }
+  
+  public func setupEncoder(encoder: MTLRenderCommandEncoder) {
     encoder.setFragmentBytes(&storage.material, length: MemoryLayout<MaterialSettings>.size, index: FragmentBufferIndex.material.rawValue)
 
     if let ps = storage.pipeline {

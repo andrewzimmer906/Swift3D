@@ -36,6 +36,8 @@ public struct ProceduralSkyboxShader: MetalDrawable_Shader {
     self.storage.library = library
   }
 
+  public func setTextures(encoder: MTLRenderCommandEncoder) { }
+
   public func setupEncoder(encoder: MTLRenderCommandEncoder) {
     guard
       let library = storage.library else {

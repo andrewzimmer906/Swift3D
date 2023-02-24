@@ -76,6 +76,7 @@ extension RenderGeometry {
     
     // Shaders and Uniforms
     self.shaderPipeline.setupEncoder(encoder: encoder)
+    self.shaderPipeline.setTextures(encoder: encoder)
 
     // Draw Meshes
     if let mesh = storage.mesh {

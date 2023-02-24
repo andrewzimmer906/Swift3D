@@ -17,38 +17,49 @@ struct RenderModel: MetalDrawable, HasShaderPipeline {
   let id: String
   let transform: MetalDrawableData.Transform
   let model: Model
-  let shaderPipeline: (any MetalDrawable_Shader)?
+  let shaderPipeline: any MetalDrawable_Shader
+  let overrideTextures: Bool
   let animations: [NodeTransition]?
   let storage: RenderModel.Storage
 
+
+
+
   func withUpdated(id: String) -> Self {
-    withUpdated(id: id, animations: nil, transform: nil)
+    withUpdated(id: id, animations: nil, transform: nil, overrideTextures: nil)
   }
 
   func withUpdated(transform: MetalDrawableData.Transform) -> Self {
-    withUpdated(id: nil, animations: nil, transform: transform)
+    withUpdated(id: nil, animations: nil, transform: transform, overrideTextures: nil)
   }
 
   func withUpdated(animations: [NodeTransition]) -> Self {
-    withUpdated(id: nil, animations: animations, transform: nil)
+    withUpdated(id: nil, animations: animations, transform: nil, overrideTextures: nil)
+  }
+
+  func withUpdated(overrideTextures: Bool) -> Self {
+    withUpdated(id: nil, animations: animations, transform: nil, overrideTextures: overrideTextures)
   }
 
   func withUpdated<Shader: MetalDrawable_Shader>(shaderPipeline: Shader) -> any MetalDrawable {
     RenderModel(id: id,
                 transform: transform,
-                model: self.model,
+                model: model,
                 shaderPipeline: shaderPipeline,
+                overrideTextures: overrideTextures,
                 animations: animations,
-                storage: self.storage)
+                storage: storage)
   }
 
   private func withUpdated(id: String?,
                            animations: [NodeTransition]?,
-                           transform: MetalDrawableData.Transform?) -> Self {
+                           transform: MetalDrawableData.Transform?,
+                           overrideTextures: Bool?) -> Self {
     RenderModel(id: id ?? self.id,
                 transform: transform ?? self.transform,
                 model: self.model,
                 shaderPipeline: self.shaderPipeline,
+                overrideTextures: overrideTextures ?? self.overrideTextures,
                 animations: animations ?? self.animations,
                 storage: self.storage)
   }
@@ -70,54 +81,19 @@ extension RenderModel {
       encoder.setVertexBuffer(modelM, offset: 0, index: 1)
     }
 
-    // Shaders and Uniforms
-    if let pipeline = self.shaderPipeline {
-      pipeline.setupEncoder(encoder: encoder)
-    }
-    else {
-      if let ps = storage.customPipeline {
-        encoder.setRenderPipelineState(ps)
-      }
-
-      var mat = MaterialSettings(
-       lightingSettings: simd_float4(2, 2, 0, 0),
-       albedoTextureScaling: simd_float4(x: 1, y: 1, z: 0, w: 0))
-
-      encoder.setFragmentBytes(&mat, length: MemoryLayout<MaterialSettings>.size, index: FragmentBufferIndex.material.rawValue)
+    shaderPipeline.setupEncoder(encoder: encoder)
+    if overrideTextures {
+      shaderPipeline.setTextures(encoder: encoder)
     }
 
-    // Draw Meshes
-    for mesh in storage.mesh {
-      for (i, buffer) in mesh.0.vertexBuffers.enumerated() {
-        encoder.setVertexBuffer(buffer.buffer, offset: buffer.offset, index: i)
-      }
-
-      // TODO: Gotta wrap this into another class and simplify this flow.
-      for (idx, submesh) in mesh.0.submeshes.enumerated() {
-        if let mdlSubMesh = mesh.1.submeshes?[idx] as? MDLSubmesh,
-           let material = mdlSubMesh.material {
-          if let url = material.property(with: .baseColor)?.urlValue,
-             let texture = storage.textures[url] {
-            encoder.setFragmentTexture(texture, index: 0)
-          }
-        }
-
-        let indexBuffer = submesh.indexBuffer
-        encoder.drawIndexedPrimitives(type: submesh.primitiveType,
-                                      indexCount: submesh.indexCount,
-                                      indexType: submesh.indexType,
-                                      indexBuffer: indexBuffer.buffer,
-                                      indexBufferOffset: indexBuffer.offset)
-      }
-    }
+    storage.meshAndTextures?.draw(encoder: encoder,
+                                  useModelTextures: !overrideTextures)
 
     encoder.endEncoding()
   }
 }
 
 // MARK: - Storage
-
-typealias StorageMesh = (MTKMesh, MDLMesh)
 
 extension RenderModel {
   class Storage: MetalDrawable_Storage {
@@ -126,9 +102,7 @@ extension RenderModel {
     private(set) var transform: MetalDrawableData.Transform = .identity
     private(set) var modelMatBuffer: MTLBuffer?
 
-    private(set) var textures: [URL: MTLTexture] = [:]
-    private(set) var mesh: [StorageMesh] = []
-    private(set) var customPipeline: MTLRenderPipelineState?
+    fileprivate var meshAndTextures: MeshAndTextureStorage?
   }
 }
 
@@ -164,104 +138,122 @@ extension RenderModel.Storage {
     let previous = previous as? RenderModel.Storage
     self.device = device
 
-
     if let previous = previous {
       copy(from: previous)
     }
     else {
+      meshAndTextures = .init(device: device)
+      meshAndTextures?.build(model: command.model,
+                             geometryLibrary: geometryLibrary,
+                             shaderLibrary: shaderLibrary)
+
       var transform = command.transform.value
       self.transform = command.transform
       self.modelMatBuffer = device.makeBuffer(bytes: &transform, length: float4x4.length)
+    }
 
+    command.shaderPipeline.build(device: device,
+                                 library: shaderLibrary,
+                                 descriptor: meshAndTextures?.vertexDescriptor)
+  }
+
+  func copy(from previous: RenderModel.Storage) {
+    self.transform = previous.transform
+    self.modelMatBuffer = previous.modelMatBuffer
+    self.meshAndTextures = previous.meshAndTextures
+  }
+}
+
+// MARK: - Model + Texture
+
+typealias StorageMesh = (MTKMesh, MDLMesh)
+extension RenderModel {
+  fileprivate class MeshAndTextureStorage {
+    let device: MTLDevice
+
+    private lazy var textureLoader: MTKTextureLoader = {
+      MTKTextureLoader(device: device)
+    }()
+    private(set) var textures: [URL: MTLTexture] = [:]
+    private(set) var mesh: [StorageMesh] = []
+    var vertexDescriptor: MTLVertexDescriptor? {
+      if let modelDesc = mesh.first?.0.vertexDescriptor {
+        return MTKMetalVertexDescriptorFromModelIO(modelDesc)
+      }
+      return nil
+    }
+
+    init(device: MTLDevice) {
+      self.device = device
+    }
+
+    func set<Value>(_ value: Value) {
+      if let texValue = value as? (URL, MTLTexture) {
+        textures[texValue.0] = texValue.1
+      } else if let meshValue = value as? StorageMesh {
+        mesh.append(meshValue)
+      }
+    }
+
+    func build(model: Model, geometryLibrary: MetalGeometryLibrary, shaderLibrary: MetalShaderLibrary) {
       do {
-        let asset = try command.model.asset(device: device, allocator: geometryLibrary.allocator)
+        let asset = try model.asset(device: device, allocator: geometryLibrary.allocator)
         asset.loadTextures()
 
         guard let mdlMeshes = asset.childObjects(of: MDLMesh.self) as? [MDLMesh] else {
           fatalError()
         }
 
-        // Meshes
+        // Load Meshes
         let mtkMeshes = try mdlMeshes.map { mdlMesh in
           return try MTKMesh(mesh: mdlMesh, device: device)
         }
         self.mesh = zip(mdlMeshes, mtkMeshes).map { ($1, $0) }
 
-        // Textures
+        // Load Textures
         let materials = mdlMeshes.flatMap {
-          if let subs = $0.submeshes as? [MDLSubmesh] {
-            return subs.compactMap { $0.material }
-          }
-          return []
+          ($0.submeshes as? [MDLSubmesh] ?? []).compactMap { $0.material }
         }
-        self.textures = textures(for: materials, device: device)
+
+        materials.forEach { material in
+          set((material.url(for: .baseColor),
+               material.texture(for: .baseColor, library: shaderLibrary, loader: textureLoader)))
+        }
       } catch {
         fatalError("RenderModel Model Failure")
       }
     }
 
-    // Set up our shader pipelines
-    var vertexDescriptor: MTLVertexDescriptor?
-    if let modelDescriptor = self.mesh.first?.0.vertexDescriptor {
-      vertexDescriptor = MTKMetalVertexDescriptorFromModelIO(modelDescriptor)
-    }
+    func draw(encoder: MTLRenderCommandEncoder, useModelTextures: Bool) {
+      for storageMesh in mesh {
+        for (i, buffer) in storageMesh.0.vertexBuffers.enumerated() {
+          encoder.setVertexBuffer(buffer.buffer, offset: buffer.offset, index: i)
+        }
 
-    if let shader = command.shaderPipeline {
-      shader.build(device: device,
-                   library: shaderLibrary,
-                   descriptor: vertexDescriptor)
-    } else {
-      customPipeline = shaderLibrary.pipeline(for: "standard_vertex",
-                                        fragment: "standard_fragment",
-                                        vertexDescriptor: vertexDescriptor)
-    }
-  }
+        for (idx, submesh) in storageMesh.0.submeshes.enumerated() {
+          if useModelTextures {
+            if let sub = storageMesh.1.submeshes?[idx] as? MDLSubmesh,
+               let mat = sub.material {
+              setTextures(with: mat, encoder: encoder)
+            }
+          }
 
-  func copy(from previous: RenderModel.Storage) {
-    self.transform = previous.transform
-    self.modelMatBuffer = previous.modelMatBuffer
-    self.mesh = previous.mesh
-    self.textures = previous.textures
-  }
-
-  private func textures(for materials: [MDLMaterial], device: MTLDevice) -> [URL: MTLTexture] {
-    var mutTex: [URL: MTLTexture] = [:]
-    let textureLoader = MTKTextureLoader(device: device)
-
-
-    for material in materials {
-      if let baseCol = texture(for: .baseColor, in: material, loader: textureLoader) {
-        mutTex[baseCol.0] = baseCol.1
+          // Draw
+          let indexBuffer = submesh.indexBuffer
+          encoder.drawIndexedPrimitives(type: submesh.primitiveType,
+                                        indexCount: submesh.indexCount,
+                                        indexType: submesh.indexType,
+                                        indexBuffer: indexBuffer.buffer,
+                                        indexBufferOffset: indexBuffer.offset)
+        }
       }
     }
 
-    return mutTex
-  }
-
-  private func texture(for semantic: MDLMaterialSemantic, in material: MDLMaterial, loader: MTKTextureLoader) -> (URL, MTLTexture)? {
-    let options: [MTKTextureLoader.Option : Any] = [
-        .textureUsage : MTLTextureUsage.shaderRead.rawValue,
-        .textureStorageMode : MTLStorageMode.private.rawValue,
-        .origin : MTKTextureLoader.Origin.bottomLeft.rawValue
-    ]
-
-    for i in 0..<material.count {
-      if let property = material[i] {
-        let type = property.type
-        print("Property (\(i): \(property) - \(type)")
+    func setTextures(with material: MDLMaterial, encoder: MTLRenderCommandEncoder) {
+      if let url = material.url(for: .baseColor),
+         let albedo = textures[url] {
+        encoder.setFragmentTexture(albedo, index: 0)
       }
     }
-
-    if let prop = material.property(with: semantic) {
-      let type = prop.type
-      if type == .texture,
-        let url = prop.urlValue,
-         let tex = try? loader.newTexture(URL: url, options: options) {
-        return (url, tex)
-      }
-    }
-
-    return nil
   }
 }
-

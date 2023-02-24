@@ -40,6 +40,7 @@ struct IntroAnimationSample: View {
 
             ModelNode(id: "title", url: .model("title.obj"))
               .shaded(.standard(albedo: Color.blue))
+              .overrideDefaultTextures()
               .rotated(angle: slowSpring.value.x, axis: .up)
               .translated(.up * fastSpring.value.y)
 

@@ -26,12 +26,49 @@ public struct ShaderModifier: NodeModifier {
   }
 }
 
-// MARK: - Node Extension
+public struct OverrideTexturesModifier: NodeModifier {
+  let override: Bool
 
-public protocol AcceptsShader { }
+  public func printedTree(content: any Node) -> [String] {
+    content.printedTree
+  }
 
-extension Node where Self: AcceptsShader {
-  public func shaded(_ shader: any MetalDrawable_Shader) -> ModifiedNodeContent<Self, ShaderModifier> {
-    self.modifier(ShaderModifier(shader: shader))
+  public func drawCommands(content: any Node) -> [any MetalDrawable] {
+    return content.drawCommands.map {
+      if let cmd = $0 as? RenderModel {
+        return cmd.withUpdated(overrideTextures: override)
+      }
+      return $0
+    }
   }
 }
+
+// MARK: - Node Extension
+
+public protocol AcceptsShader: Node {
+  func shaded(_ shader: any MetalDrawable_Shader) -> ModifiedNodeContent<Self, ShaderModifier>
+}
+
+extension AcceptsShader {
+  public func shaded(_ shader: any MetalDrawable_Shader) -> ModifiedNodeContent<Self, ShaderModifier> {
+    return self.modifier(ShaderModifier(shader: shader))
+  }
+}
+
+public protocol AcceptsShaderWithDefaultTextures: Node {
+  func shaded(_ shader: any MetalDrawable_Shader) -> ModifiedNodeContent<Self, ShaderModifier>
+  func overrideDefaultTextures() -> ModifiedNodeContent<Self, OverrideTexturesModifier>
+}
+
+extension AcceptsShaderWithDefaultTextures {
+  public func shaded(_ shader: any MetalDrawable_Shader) -> ModifiedNodeContent<Self, ShaderModifier> {
+    return self.modifier(ShaderModifier(shader: shader))
+  }
+  
+  public func overrideDefaultTextures() -> ModifiedNodeContent<Self, OverrideTexturesModifier> {
+    self.modifier(OverrideTexturesModifier(override: true))
+  }
+}
+
+extension ModifiedNodeContent: AcceptsShader where Content: AcceptsShader, Modifier: NodeModifier { }
+extension ModifiedNodeContent: AcceptsShaderWithDefaultTextures where Content: AcceptsShaderWithDefaultTextures, Modifier: NodeModifier { }

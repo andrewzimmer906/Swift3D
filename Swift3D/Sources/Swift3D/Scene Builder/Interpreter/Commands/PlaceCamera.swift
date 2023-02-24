@@ -80,6 +80,8 @@ extension PlaceCamera {
 
     // Shaders and Uniforms
     shaderPipeline.setupEncoder(encoder: encoder)
+    shaderPipeline.setTextures(encoder: encoder)
+    
     encoder.setFragmentBytes(&storage.skyboxInverseView, length: MemoryLayout<float4x4>.size, index: 0)
     encoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 3)
     encoder.endEncoding()
@@ -101,7 +103,6 @@ extension PlaceCamera {
 
 extension PlaceCamera.Storage {
   func set<Value>(_ value: Value) {
-
     if let tuple = value as? (MetalDrawableData.Transform, float4x4) {
       // Update matrices
       self.view = .init(value: tuple.0.value)

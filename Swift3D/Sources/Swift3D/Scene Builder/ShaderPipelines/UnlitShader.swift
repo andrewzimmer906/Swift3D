@@ -34,7 +34,9 @@ public struct UnlitShader: MetalDrawable_Shader {
     self.storage.color = self.color.components
     self.storage.pipeline = library.pipeline(for: functions.0, fragment: functions.1, vertexDescriptor: descriptor)
   }
-  
+
+  public func setTextures(encoder: MTLRenderCommandEncoder) { }
+
   public func setupEncoder(encoder: MTLRenderCommandEncoder) {
     if let ps = storage.pipeline { 
       encoder.setRenderPipelineState(ps)

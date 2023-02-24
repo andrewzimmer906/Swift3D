@@ -34,6 +34,8 @@ public struct UVColorShader: MetalDrawable_Shader {
     self.storage.material = self.material
   }
 
+  public func setTextures(encoder: MTLRenderCommandEncoder) { }
+
   public func setupEncoder(encoder: MTLRenderCommandEncoder) {
     encoder.setFragmentBytes(&storage.material, length: MemoryLayout<MaterialSettings>.size, index: FragmentBufferIndex.material.rawValue)
     if let ps = storage.pipeline {
