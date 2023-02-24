@@ -14,27 +14,23 @@
 		EC2D46302996FB15004C9BC0 /* StandardLighting.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC2D462F2996FB15004C9BC0 /* StandardLighting.swift */; };
 		EC6ADF852993089B0035E09A /* IntroApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC6ADF842993089B0035E09A /* IntroApp.swift */; };
 		ECAD987029930C4E00B20F52 /* Swift3D in Frameworks */ = {isa = PBXBuildFile; productRef = ECAD986F29930C4E00B20F52 /* Swift3D */; };
-		ECAD987A2993136A00B20F52 /* castle.obj in Resources */ = {isa = PBXBuildFile; fileRef = ECAD98792993136A00B20F52 /* castle.obj */; };
 		ECAD987C2993138300B20F52 /* Textures.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ECAD987B2993138300B20F52 /* Textures.xcassets */; };
 		ECAD987F2993138D00B20F52 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECAD987D2993138D00B20F52 /* ContentView.swift */; };
 		ECAD98802993138D00B20F52 /* TouchCamera.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECAD987E2993138D00B20F52 /* TouchCamera.swift */; };
 		ECB1CFBA299D9C0000EFCF44 /* ShapesSample.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECB1CFB9299D9C0000EFCF44 /* ShapesSample.swift */; };
 		ECB1CFBC299DAA6D00EFCF44 /* IntroAnimationSample.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECB1CFBB299DAA6D00EFCF44 /* IntroAnimationSample.swift */; };
 		ECB1CFBE299EE2C100EFCF44 /* Spring.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECB1CFBD299EE2C100EFCF44 /* Spring.swift */; };
-		ECB1CFC029A3D55000EFCF44 /* train.usdz in Resources */ = {isa = PBXBuildFile; fileRef = ECB1CFBF29A3D55000EFCF44 /* train.usdz */; };
 		ECB1CFC229A3D57600EFCF44 /* CowSample.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECB1CFC129A3D57600EFCF44 /* CowSample.swift */; };
-		ECB1CFC529A3D70400EFCF44 /* hatchbackSports.mtl in Resources */ = {isa = PBXBuildFile; fileRef = ECB1CFC329A3D70400EFCF44 /* hatchbackSports.mtl */; };
-		ECB1CFC629A3D70400EFCF44 /* hatchbackSports.obj in Resources */ = {isa = PBXBuildFile; fileRef = ECB1CFC429A3D70400EFCF44 /* hatchbackSports.obj */; };
-		ECED429E29A91FD50003FF6C /* spot_texture.png in Resources */ = {isa = PBXBuildFile; fileRef = ECED429629A91FD50003FF6C /* spot_texture.png */; };
-		ECED429F29A91FD50003FF6C /* spot_texture.svg in Resources */ = {isa = PBXBuildFile; fileRef = ECED429729A91FD50003FF6C /* spot_texture.svg */; };
-		ECED42A029A91FD50003FF6C /* spot_triangulated.mtl in Resources */ = {isa = PBXBuildFile; fileRef = ECED429829A91FD50003FF6C /* spot_triangulated.mtl */; };
-		ECED42A129A91FD50003FF6C /* spot_quadrangulated.obj in Resources */ = {isa = PBXBuildFile; fileRef = ECED429929A91FD50003FF6C /* spot_quadrangulated.obj */; };
-		ECED42A229A91FD50003FF6C /* spot_material.mtl in Resources */ = {isa = PBXBuildFile; fileRef = ECED429A29A91FD50003FF6C /* spot_material.mtl */; };
-		ECED42A329A91FD50003FF6C /* spot_control_mesh.obj in Resources */ = {isa = PBXBuildFile; fileRef = ECED429B29A91FD50003FF6C /* spot_control_mesh.obj */; };
-		ECED42A429A91FD50003FF6C /* spot_triangulated.obj in Resources */ = {isa = PBXBuildFile; fileRef = ECED429C29A91FD50003FF6C /* spot_triangulated.obj */; };
-		ECED42A529A91FD50003FF6C /* README.txt in Resources */ = {isa = PBXBuildFile; fileRef = ECED429D29A91FD50003FF6C /* README.txt */; };
 		ECED42A829A956520003FF6C /* Motion.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECED42A729A956520003FF6C /* Motion.swift */; };
-		ECFB0DE629959D2500687251 /* castle.mtl in Resources */ = {isa = PBXBuildFile; fileRef = ECFB0DE529959D2500687251 /* castle.mtl */; };
+		ECED42B229A963240003FF6C /* spot_texture.png in Resources */ = {isa = PBXBuildFile; fileRef = ECED42AA29A963240003FF6C /* spot_texture.png */; };
+		ECED42B329A963240003FF6C /* spot_texture.svg in Resources */ = {isa = PBXBuildFile; fileRef = ECED42AB29A963240003FF6C /* spot_texture.svg */; };
+		ECED42B429A963240003FF6C /* spot_triangulated.mtl in Resources */ = {isa = PBXBuildFile; fileRef = ECED42AC29A963240003FF6C /* spot_triangulated.mtl */; };
+		ECED42B529A963240003FF6C /* spot_quadrangulated.obj in Resources */ = {isa = PBXBuildFile; fileRef = ECED42AD29A963240003FF6C /* spot_quadrangulated.obj */; };
+		ECED42B629A963240003FF6C /* spot_material.mtl in Resources */ = {isa = PBXBuildFile; fileRef = ECED42AE29A963240003FF6C /* spot_material.mtl */; };
+		ECED42B729A963240003FF6C /* spot_control_mesh.obj in Resources */ = {isa = PBXBuildFile; fileRef = ECED42AF29A963240003FF6C /* spot_control_mesh.obj */; };
+		ECED42B829A963240003FF6C /* spot_triangulated.obj in Resources */ = {isa = PBXBuildFile; fileRef = ECED42B029A963240003FF6C /* spot_triangulated.obj */; };
+		ECED42B929A963240003FF6C /* README.txt in Resources */ = {isa = PBXBuildFile; fileRef = ECED42B129A963240003FF6C /* README.txt */; };
+		ECED42BB29A965940003FF6C /* CodeModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECED42BA29A965940003FF6C /* CodeModifier.swift */; };
 		ECFB0DF92995A4A700687251 /* Worn_Baseball_Ball.usdz in Resources */ = {isa = PBXBuildFile; fileRef = ECFB0DF82995A4A700687251 /* Worn_Baseball_Ball.usdz */; };
 		ECFB0DFD2995A78B00687251 /* title.obj in Resources */ = {isa = PBXBuildFile; fileRef = ECFB0DFC2995A78B00687251 /* title.obj */; };
 /* End PBXBuildFile section */
@@ -49,27 +45,23 @@
 		EC6ADF842993089B0035E09A /* IntroApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntroApp.swift; sourceTree = "<group>"; };
 		EC6ADF93299308D80035E09A /* Swift3D */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Swift3D; path = ../Swift3D; sourceTree = "<group>"; };
 		ECAD986D29930C4800B20F52 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		ECAD98792993136A00B20F52 /* castle.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = castle.obj; sourceTree = "<group>"; };
 		ECAD987B2993138300B20F52 /* Textures.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Textures.xcassets; sourceTree = "<group>"; };
 		ECAD987D2993138D00B20F52 /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		ECAD987E2993138D00B20F52 /* TouchCamera.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TouchCamera.swift; sourceTree = "<group>"; };
 		ECB1CFB9299D9C0000EFCF44 /* ShapesSample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShapesSample.swift; sourceTree = "<group>"; };
 		ECB1CFBB299DAA6D00EFCF44 /* IntroAnimationSample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntroAnimationSample.swift; sourceTree = "<group>"; };
 		ECB1CFBD299EE2C100EFCF44 /* Spring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Spring.swift; sourceTree = "<group>"; };
-		ECB1CFBF29A3D55000EFCF44 /* train.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = train.usdz; sourceTree = "<group>"; };
 		ECB1CFC129A3D57600EFCF44 /* CowSample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CowSample.swift; sourceTree = "<group>"; };
-		ECB1CFC329A3D70400EFCF44 /* hatchbackSports.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = hatchbackSports.mtl; sourceTree = "<group>"; };
-		ECB1CFC429A3D70400EFCF44 /* hatchbackSports.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = hatchbackSports.obj; sourceTree = "<group>"; };
-		ECED429629A91FD50003FF6C /* spot_texture.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = spot_texture.png; sourceTree = "<group>"; };
-		ECED429729A91FD50003FF6C /* spot_texture.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = spot_texture.svg; sourceTree = "<group>"; };
-		ECED429829A91FD50003FF6C /* spot_triangulated.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = spot_triangulated.mtl; sourceTree = "<group>"; };
-		ECED429929A91FD50003FF6C /* spot_quadrangulated.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = spot_quadrangulated.obj; sourceTree = "<group>"; };
-		ECED429A29A91FD50003FF6C /* spot_material.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = spot_material.mtl; sourceTree = "<group>"; };
-		ECED429B29A91FD50003FF6C /* spot_control_mesh.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = spot_control_mesh.obj; sourceTree = "<group>"; };
-		ECED429C29A91FD50003FF6C /* spot_triangulated.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = spot_triangulated.obj; sourceTree = "<group>"; };
-		ECED429D29A91FD50003FF6C /* README.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.txt; sourceTree = "<group>"; };
 		ECED42A729A956520003FF6C /* Motion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Motion.swift; sourceTree = "<group>"; };
-		ECFB0DE529959D2500687251 /* castle.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = castle.mtl; sourceTree = "<group>"; };
+		ECED42AA29A963240003FF6C /* spot_texture.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = spot_texture.png; sourceTree = "<group>"; };
+		ECED42AB29A963240003FF6C /* spot_texture.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = spot_texture.svg; sourceTree = "<group>"; };
+		ECED42AC29A963240003FF6C /* spot_triangulated.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = spot_triangulated.mtl; sourceTree = "<group>"; };
+		ECED42AD29A963240003FF6C /* spot_quadrangulated.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = spot_quadrangulated.obj; sourceTree = "<group>"; };
+		ECED42AE29A963240003FF6C /* spot_material.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = spot_material.mtl; sourceTree = "<group>"; };
+		ECED42AF29A963240003FF6C /* spot_control_mesh.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = spot_control_mesh.obj; sourceTree = "<group>"; };
+		ECED42B029A963240003FF6C /* spot_triangulated.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = spot_triangulated.obj; sourceTree = "<group>"; };
+		ECED42B129A963240003FF6C /* README.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.txt; sourceTree = "<group>"; };
+		ECED42BA29A965940003FF6C /* CodeModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeModifier.swift; sourceTree = "<group>"; };
 		ECFB0DF82995A4A700687251 /* Worn_Baseball_Ball.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = Worn_Baseball_Ball.usdz; sourceTree = "<group>"; };
 		ECFB0DFC2995A78B00687251 /* title.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = title.obj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -105,6 +97,7 @@
 			isa = PBXGroup;
 			children = (
 				EC2D462D2996D27B004C9BC0 /* URL+IO.swift */,
+				ECED42BA29A965940003FF6C /* CodeModifier.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -166,31 +159,11 @@
 		ECAD98812993139D00B20F52 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				ECED429529A91FD50003FF6C /* spot */,
-				ECB1CFC329A3D70400EFCF44 /* hatchbackSports.mtl */,
-				ECB1CFC429A3D70400EFCF44 /* hatchbackSports.obj */,
-				ECB1CFBF29A3D55000EFCF44 /* train.usdz */,
+				ECED42A929A963240003FF6C /* spot */,
 				ECFB0DFC2995A78B00687251 /* title.obj */,
 				ECFB0DF82995A4A700687251 /* Worn_Baseball_Ball.usdz */,
-				ECFB0DE529959D2500687251 /* castle.mtl */,
-				ECAD98792993136A00B20F52 /* castle.obj */,
 			);
 			path = Models;
-			sourceTree = "<group>";
-		};
-		ECED429529A91FD50003FF6C /* spot */ = {
-			isa = PBXGroup;
-			children = (
-				ECED429629A91FD50003FF6C /* spot_texture.png */,
-				ECED429729A91FD50003FF6C /* spot_texture.svg */,
-				ECED429829A91FD50003FF6C /* spot_triangulated.mtl */,
-				ECED429929A91FD50003FF6C /* spot_quadrangulated.obj */,
-				ECED429A29A91FD50003FF6C /* spot_material.mtl */,
-				ECED429B29A91FD50003FF6C /* spot_control_mesh.obj */,
-				ECED429C29A91FD50003FF6C /* spot_triangulated.obj */,
-				ECED429D29A91FD50003FF6C /* README.txt */,
-			);
-			path = spot;
 			sourceTree = "<group>";
 		};
 		ECED42A629A956180003FF6C /* Controls */ = {
@@ -202,6 +175,21 @@
 				ECED42A729A956520003FF6C /* Motion.swift */,
 			);
 			path = Controls;
+			sourceTree = "<group>";
+		};
+		ECED42A929A963240003FF6C /* spot */ = {
+			isa = PBXGroup;
+			children = (
+				ECED42AA29A963240003FF6C /* spot_texture.png */,
+				ECED42AB29A963240003FF6C /* spot_texture.svg */,
+				ECED42AC29A963240003FF6C /* spot_triangulated.mtl */,
+				ECED42AD29A963240003FF6C /* spot_quadrangulated.obj */,
+				ECED42AE29A963240003FF6C /* spot_material.mtl */,
+				ECED42AF29A963240003FF6C /* spot_control_mesh.obj */,
+				ECED42B029A963240003FF6C /* spot_triangulated.obj */,
+				ECED42B129A963240003FF6C /* README.txt */,
+			);
+			path = spot;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -265,22 +253,17 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ECB1CFC629A3D70400EFCF44 /* hatchbackSports.obj in Resources */,
 				ECFB0DF92995A4A700687251 /* Worn_Baseball_Ball.usdz in Resources */,
-				ECFB0DE629959D2500687251 /* castle.mtl in Resources */,
-				ECED42A129A91FD50003FF6C /* spot_quadrangulated.obj in Resources */,
+				ECED42B529A963240003FF6C /* spot_quadrangulated.obj in Resources */,
 				ECAD987C2993138300B20F52 /* Textures.xcassets in Resources */,
-				ECED42A029A91FD50003FF6C /* spot_triangulated.mtl in Resources */,
-				ECED42A529A91FD50003FF6C /* README.txt in Resources */,
-				ECB1CFC029A3D55000EFCF44 /* train.usdz in Resources */,
-				ECAD987A2993136A00B20F52 /* castle.obj in Resources */,
-				ECED42A329A91FD50003FF6C /* spot_control_mesh.obj in Resources */,
-				ECED429F29A91FD50003FF6C /* spot_texture.svg in Resources */,
-				ECED429E29A91FD50003FF6C /* spot_texture.png in Resources */,
+				ECED42B429A963240003FF6C /* spot_triangulated.mtl in Resources */,
+				ECED42B929A963240003FF6C /* README.txt in Resources */,
+				ECED42B729A963240003FF6C /* spot_control_mesh.obj in Resources */,
+				ECED42B329A963240003FF6C /* spot_texture.svg in Resources */,
+				ECED42B229A963240003FF6C /* spot_texture.png in Resources */,
 				ECFB0DFD2995A78B00687251 /* title.obj in Resources */,
-				ECB1CFC529A3D70400EFCF44 /* hatchbackSports.mtl in Resources */,
-				ECED42A429A91FD50003FF6C /* spot_triangulated.obj in Resources */,
-				ECED42A229A91FD50003FF6C /* spot_material.mtl in Resources */,
+				ECED42B829A963240003FF6C /* spot_triangulated.obj in Resources */,
+				ECED42B629A963240003FF6C /* spot_material.mtl in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -292,6 +275,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				ECAD987F2993138D00B20F52 /* ContentView.swift in Sources */,
+				ECED42BB29A965940003FF6C /* CodeModifier.swift in Sources */,
 				ECB1CFBE299EE2C100EFCF44 /* Spring.swift in Sources */,
 				ECB1CFBC299DAA6D00EFCF44 /* IntroAnimationSample.swift in Sources */,
 				EC1907ED299C25FA0011A21F /* IsometricSample.swift in Sources */,
