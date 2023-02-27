@@ -33,7 +33,7 @@ struct IntroSample: View {
                 .translated(.down * 0.25)
               
               CubeNode(id: "cube")
-                .shaded(.uvColored())
+                .shaded(.uvColored)
                 .transform(.rotated(angle: data.rotation, axis: .up))
                 .transform(.rotated(angle: data.rotation/2, axis: .right))
                 .transform(.translated(.down * 3))

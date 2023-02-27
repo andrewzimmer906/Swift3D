@@ -29,6 +29,7 @@ struct ContentView: View {
 
 extension ContentView {
   enum Content: View, CaseIterable {
+    case pbr
     case cow
     case introAnimation
     case lighting
@@ -48,6 +49,8 @@ extension ContentView {
         IntroSample()
       case .isometric:
         IsometricSample()
+      case .pbr:
+        PBRSample()
       }
     }
   }

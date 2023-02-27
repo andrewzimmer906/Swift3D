@@ -174,7 +174,7 @@ extension RenderModel {
     private lazy var textureLoader: MTKTextureLoader = {
       MTKTextureLoader(device: device)
     }()
-    private(set) var textures: [URL: MTLTexture] = [:]
+    private(set) var textures: [String: MTLTexture] = [:]
     private(set) var mesh: [StorageMesh] = []
     var vertexDescriptor: MTLVertexDescriptor? {
       if let modelDesc = mesh.first?.0.vertexDescriptor {
@@ -188,7 +188,7 @@ extension RenderModel {
     }
 
     func set<Value>(_ value: Value) {
-      if let texValue = value as? (URL, MTLTexture) {
+      if let texValue = value as? (String, MTLTexture) {
         textures[texValue.0] = texValue.1
       } else if let meshValue = value as? StorageMesh {
         mesh.append(meshValue)
@@ -216,8 +216,23 @@ extension RenderModel {
         }
 
         materials.forEach { material in
-          set((material.url(for: .baseColor),
+          set((material.key(for: .baseColor),
                material.texture(for: .baseColor, library: shaderLibrary, loader: textureLoader)))
+
+          set((material.key(for: .emission),
+              material.texture(for: .emission, library: shaderLibrary, loader: textureLoader)))
+
+          set((material.key(for: .tangentSpaceNormal),
+              material.texture(for: .tangentSpaceNormal, library: shaderLibrary, loader: textureLoader)))
+
+          set((material.key(for: .roughness),
+              material.texture(for: .roughness, library: shaderLibrary, loader: textureLoader)))
+
+          set((material.key(for: .metallic),
+              material.texture(for: .metallic, library: shaderLibrary, loader: textureLoader)))
+
+          set((material.key(for: .ambientOcclusion),
+              material.texture(for: .ambientOcclusion, library: shaderLibrary, loader: textureLoader)))
         }
       } catch {
         fatalError("RenderModel Model Failure")
@@ -250,9 +265,34 @@ extension RenderModel {
     }
 
     func setTextures(with material: MDLMaterial, encoder: MTLRenderCommandEncoder) {
-      if let url = material.url(for: .baseColor),
-         let albedo = textures[url] {
-        encoder.setFragmentTexture(albedo, index: 0)
+      if let key = material.key(for: .baseColor),
+         let tex = textures[key] {
+        encoder.setFragmentTexture(tex, index: FragmentTextureIndex.baseColor.rawValue)
+      }
+
+      if let key = material.key(for: .emission),
+         let tex = textures[key] {
+        encoder.setFragmentTexture(tex, index: FragmentTextureIndex.emission.rawValue)
+      }
+
+      if let key = material.key(for: .tangentSpaceNormal),
+         let tex = textures[key] {
+        encoder.setFragmentTexture(tex, index: FragmentTextureIndex.normal.rawValue)
+      }
+
+      if let key = material.key(for: .roughness),
+         let tex = textures[key] {
+        encoder.setFragmentTexture(tex, index: FragmentTextureIndex.roughness.rawValue)
+      }
+
+      if let key = material.key(for: .metallic),
+         let tex = textures[key] {
+        encoder.setFragmentTexture(tex, index: FragmentTextureIndex.metalness.rawValue)
+      }
+
+      if let key = material.key(for: .ambientOcclusion),
+         let tex = textures[key] {
+        encoder.setFragmentTexture(tex, index: FragmentTextureIndex.occlusion.rawValue)
       }
     }
   }

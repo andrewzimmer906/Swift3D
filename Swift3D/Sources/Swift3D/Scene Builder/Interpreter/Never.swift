@@ -32,3 +32,11 @@ extension Never: MetalDrawable_Shader {
     fatalError()
   }
 }
+
+extension Never: MetalDrawable_Texture {
+  public func mtlTexture(_ library: MetalShaderLibrary) -> MTLTexture? {
+    fatalError("Please specify a texture or use a model that has one premade.")
+  }
+
+
+}

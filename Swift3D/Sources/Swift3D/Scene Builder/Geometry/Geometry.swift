@@ -14,6 +14,19 @@ public protocol MetalDrawable_Geometry {
   func get(device: MTLDevice, allocator: MTKMeshBufferAllocator) throws -> MTKMesh
 }
 
+extension MetalDrawable_Geometry {
+  func addOrthoTan(to mesh: MDLMesh) {
+    let hasTexCoords = mesh.vertexAttributeData(forAttributeNamed: MDLVertexAttributeTextureCoordinate) != nil
+    let hasNormals = mesh.vertexAttributeData(forAttributeNamed: MDLVertexAttributeNormal) != nil
+
+    if (hasTexCoords && hasNormals) {
+        mesh.addOrthTanBasis(forTextureCoordinateAttributeNamed: MDLVertexAttributeTextureCoordinate,
+                             normalAttributeNamed: MDLVertexAttributeNormal,
+                             tangentAttributeNamed: MDLVertexAttributeTangent)
+    }
+  }
+}
+
 // MARK: - Standard Vertex
 
 struct Vertex {
@@ -26,19 +39,23 @@ struct Vertex {
     mdlVertexDescriptor.attributes = [
       MDLVertexAttribute(name: MDLVertexAttributePosition, format: .float3, offset: 0, bufferIndex: 0),
       MDLVertexAttribute(name: MDLVertexAttributeNormal, format: .float3, offset: 12, bufferIndex: 0),
-      MDLVertexAttribute(name: MDLVertexAttributeTextureCoordinate, format: .float2, offset: 24, bufferIndex: 0)
+      MDLVertexAttribute(name: MDLVertexAttributeTextureCoordinate, format: .float2, offset: 24, bufferIndex: 0),
+      MDLVertexAttribute(name: MDLVertexAttributeTangent, format: .float4, offset: 32, bufferIndex: 0)
     ]
-    mdlVertexDescriptor.layouts = [MDLVertexBufferLayout(stride: 32)]
 
+    mdlVertexDescriptor.layouts = [MDLVertexBufferLayout(stride: 48)]
     return mdlVertexDescriptor
   }
 }
 
 extension Array where Element == Vertex {
   var data: Data {
-    let vertexSize = MemoryLayout<Float>.size * (3 + 3 + 2)
+    let vertexSize = MemoryLayout<Float>.size * (3 + 3 + 2 + 4)
     let concat = self.flatMap({ v in
-      [v.position.x, v.position.y, v.position.z, v.normal.x, v.normal.y, v.normal.z, v.uv.x, v.uv.y]
+      [v.position.x, v.position.y, v.position.z,  // pos
+       v.normal.x, v.normal.y, v.normal.z,  // normal
+       v.uv.x, v.uv.y,  // uv
+       Float(0), Float(0), Float(0), Float(0)]  // tangent placeholder.
     })
     return Data(bytes: concat, count: vertexSize * self.count)
   }

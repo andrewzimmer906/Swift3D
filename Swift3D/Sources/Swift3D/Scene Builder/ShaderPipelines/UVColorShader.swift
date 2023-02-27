@@ -12,7 +12,7 @@ import simd
 // MARK: - Init Helper
 
 extension MetalDrawable_Shader where Self == UVColorShader {
-  public static func uvColored() -> UVColorShader {
+  public static var uvColored: UVColorShader {
     .init(material: .init(lightingSettings: simd_float4(x: 4, y: 4, z: 0, w: 0),
                           albedoTextureScaling: .zero),
           storage: .init())

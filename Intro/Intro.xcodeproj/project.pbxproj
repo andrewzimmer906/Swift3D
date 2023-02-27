@@ -13,6 +13,12 @@
 		EC2D462E2996D27B004C9BC0 /* URL+IO.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC2D462D2996D27B004C9BC0 /* URL+IO.swift */; };
 		EC2D46302996FB15004C9BC0 /* StandardLighting.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC2D462F2996FB15004C9BC0 /* StandardLighting.swift */; };
 		EC6ADF852993089B0035E09A /* IntroApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC6ADF842993089B0035E09A /* IntroApp.swift */; };
+		EC8F3CFA29AD443000566BC1 /* PBRSample.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC8F3CF929AD443000566BC1 /* PBRSample.swift */; };
+		EC8F3D0129AD460D00566BC1 /* RedPlastic.usdz in Resources */ = {isa = PBXBuildFile; fileRef = EC8F3CFC29AD460D00566BC1 /* RedPlastic.usdz */; };
+		EC8F3D0229AD460D00566BC1 /* Concrete.usdz in Resources */ = {isa = PBXBuildFile; fileRef = EC8F3CFD29AD460D00566BC1 /* Concrete.usdz */; };
+		EC8F3D0329AD460D00566BC1 /* RoughMetal.usdz in Resources */ = {isa = PBXBuildFile; fileRef = EC8F3CFE29AD460D00566BC1 /* RoughMetal.usdz */; };
+		EC8F3D0429AD460D00566BC1 /* BlueTile.usdz in Resources */ = {isa = PBXBuildFile; fileRef = EC8F3CFF29AD460D00566BC1 /* BlueTile.usdz */; };
+		EC8F3D0629AD4A8A00566BC1 /* MetalTiles.usdz in Resources */ = {isa = PBXBuildFile; fileRef = EC8F3D0529AD4A8A00566BC1 /* MetalTiles.usdz */; };
 		ECAD987029930C4E00B20F52 /* Swift3D in Frameworks */ = {isa = PBXBuildFile; productRef = ECAD986F29930C4E00B20F52 /* Swift3D */; };
 		ECAD987C2993138300B20F52 /* Textures.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ECAD987B2993138300B20F52 /* Textures.xcassets */; };
 		ECAD987F2993138D00B20F52 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECAD987D2993138D00B20F52 /* ContentView.swift */; };
@@ -44,6 +50,12 @@
 		EC6ADF812993089B0035E09A /* Intro.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Intro.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EC6ADF842993089B0035E09A /* IntroApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntroApp.swift; sourceTree = "<group>"; };
 		EC6ADF93299308D80035E09A /* Swift3D */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Swift3D; path = ../Swift3D; sourceTree = "<group>"; };
+		EC8F3CF929AD443000566BC1 /* PBRSample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PBRSample.swift; sourceTree = "<group>"; };
+		EC8F3CFC29AD460D00566BC1 /* RedPlastic.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = RedPlastic.usdz; sourceTree = "<group>"; };
+		EC8F3CFD29AD460D00566BC1 /* Concrete.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = Concrete.usdz; sourceTree = "<group>"; };
+		EC8F3CFE29AD460D00566BC1 /* RoughMetal.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = RoughMetal.usdz; sourceTree = "<group>"; };
+		EC8F3CFF29AD460D00566BC1 /* BlueTile.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = BlueTile.usdz; sourceTree = "<group>"; };
+		EC8F3D0529AD4A8A00566BC1 /* MetalTiles.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = MetalTiles.usdz; sourceTree = "<group>"; };
 		ECAD986D29930C4800B20F52 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		ECAD987B2993138300B20F52 /* Textures.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Textures.xcassets; sourceTree = "<group>"; };
 		ECAD987D2993138D00B20F52 /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -89,6 +101,7 @@
 				ECB1CFB9299D9C0000EFCF44 /* ShapesSample.swift */,
 				ECB1CFBB299DAA6D00EFCF44 /* IntroAnimationSample.swift */,
 				ECB1CFC129A3D57600EFCF44 /* CowSample.swift */,
+				EC8F3CF929AD443000566BC1 /* PBRSample.swift */,
 			);
 			path = Samples;
 			sourceTree = "<group>";
@@ -159,6 +172,11 @@
 		ECAD98812993139D00B20F52 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				EC8F3CFF29AD460D00566BC1 /* BlueTile.usdz */,
+				EC8F3CFD29AD460D00566BC1 /* Concrete.usdz */,
+				EC8F3D0529AD4A8A00566BC1 /* MetalTiles.usdz */,
+				EC8F3CFC29AD460D00566BC1 /* RedPlastic.usdz */,
+				EC8F3CFE29AD460D00566BC1 /* RoughMetal.usdz */,
 				ECED42A929A963240003FF6C /* spot */,
 				ECFB0DFC2995A78B00687251 /* title.obj */,
 				ECFB0DF82995A4A700687251 /* Worn_Baseball_Ball.usdz */,
@@ -259,11 +277,16 @@
 				ECED42B429A963240003FF6C /* spot_triangulated.mtl in Resources */,
 				ECED42B929A963240003FF6C /* README.txt in Resources */,
 				ECED42B729A963240003FF6C /* spot_control_mesh.obj in Resources */,
+				EC8F3D0429AD460D00566BC1 /* BlueTile.usdz in Resources */,
+				EC8F3D0629AD4A8A00566BC1 /* MetalTiles.usdz in Resources */,
 				ECED42B329A963240003FF6C /* spot_texture.svg in Resources */,
 				ECED42B229A963240003FF6C /* spot_texture.png in Resources */,
 				ECFB0DFD2995A78B00687251 /* title.obj in Resources */,
 				ECED42B829A963240003FF6C /* spot_triangulated.obj in Resources */,
 				ECED42B629A963240003FF6C /* spot_material.mtl in Resources */,
+				EC8F3D0229AD460D00566BC1 /* Concrete.usdz in Resources */,
+				EC8F3D0329AD460D00566BC1 /* RoughMetal.usdz in Resources */,
+				EC8F3D0129AD460D00566BC1 /* RedPlastic.usdz in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -280,6 +303,7 @@
 				ECB1CFBC299DAA6D00EFCF44 /* IntroAnimationSample.swift in Sources */,
 				EC1907ED299C25FA0011A21F /* IsometricSample.swift in Sources */,
 				ECED42A829A956520003FF6C /* Motion.swift in Sources */,
+				EC8F3CFA29AD443000566BC1 /* PBRSample.swift in Sources */,
 				EC2D462A2996D16D004C9BC0 /* IntroSample.swift in Sources */,
 				EC2D46282996D13F004C9BC0 /* PageView.swift in Sources */,
 				ECAD98802993138D00B20F52 /* TouchCamera.swift in Sources */,

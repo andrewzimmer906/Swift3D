@@ -22,6 +22,15 @@ typedef enum {
   LightTypeDirectional = 2
 } LightType;
 
+typedef enum {
+  FragmentTextureBaseColor = 0,
+  FragmentTextureNormal = 1,
+  FragmentTextureEmissive = 2,
+  FragmentTextureMetallic = 3,
+  FragmentTextureRoughness = 4,
+  FragmentTextureAmbientOcclusion = 5
+} FragmentTexture;
+
 // ------------ Structs
 
 // ---- Vertex --
@@ -39,6 +48,7 @@ struct VertexIn {
   float3 position [[attribute(0)]];
   float3 normal [[attribute(1)]];
   float2 uv [[attribute(2)]];
+  float4 tangent [[attribute(3)]];
 };
 
 // ---- Fragment --

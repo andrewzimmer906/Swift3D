@@ -61,10 +61,10 @@ struct CowSample: View {
       data.rotation += Float(delta) * .pi/4
     }) {
       CameraNode(id: "mainCam")
-        .translated(.up * 0.5 + .back * 3)
+        .translated(.back * 3)
       FunLights(id: "funLights")
       CubeNode(id: "cube")
-        .shaded(.uvColored())
+        .shaded(.uvColored)
         .transform(.rotated(angle: data.rotation, axis: .up))
         .transform(.rotated(angle: data.rotation/2, axis: .right))
     }
@@ -74,7 +74,7 @@ struct CowSample: View {
 
   @ViewBuilder
   var midAmble: some View {
-    Text("What's cool is I'm rendered in **FULL 🔶 3D** using **Metal!** 🤘🔥🎸")
+    Text("What's cool is I'm rendered inside of **SwiftUI** in **FULL 🔶 3D** backed by **Metal!** 🤘🔥🎸")
       .font(.title2).padding(4)
     Text("Right from SwiftUI like this:")
       .font(.title2)
@@ -95,6 +95,10 @@ Swift3DView {
       .padding()
 
     Text("You need another example? Sure.")
+    Text("...")
+      .font(.title2)
+      .padding()
+      .padding(.vertical, 24)
     Text("Oh Hey, look down there it's a cube! 🎲 😮")
       .font(.title2)
       .padding()
@@ -106,7 +110,7 @@ Swift3DView {
   var exitAmble: some View {
     Text("""
 Swift3DView(updateLoop: { delta in
-  data.rotation += Float(delta) * .pi/4
+  data.rotation += Float(delta) * .pi
 }) {
   // Lights!
   // FunLights is a ✨user defined Node✨
@@ -116,7 +120,7 @@ Swift3DView(updateLoop: { delta in
 
   // Camera!
   CameraNode(id: "mainCam")
-    .translated(.up * 0.5 + .back * 3)
+    .translated(.back * 3)
 
   // Action!
   CubeNode(id: "cube")

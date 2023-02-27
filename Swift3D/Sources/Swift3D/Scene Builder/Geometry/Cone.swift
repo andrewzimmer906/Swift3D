@@ -18,7 +18,8 @@ struct Cone: MetalDrawable_Geometry {
                         cap: true,
                         geometryType: .triangles,
                         allocator: allocator)
-
+    asset.vertexDescriptor = Vertex.descriptor
+    addOrthoTan(to: asset)
     return try MTKMesh(mesh: asset, device: device)
   }
 }

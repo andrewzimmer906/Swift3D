@@ -73,6 +73,7 @@ public class MetalShaderLibrary {
       pipelines[key] = pipelineState
       return pipelineState
     } catch {
+      print("Shader Compile Error: \(error)")
       fatalError()
     }
   }

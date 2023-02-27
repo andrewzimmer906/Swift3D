@@ -18,7 +18,8 @@ struct Cylinder: MetalDrawable_Geometry {
                         topCap: true,
                         bottomCap: true,
                         geometryType: .triangles, allocator: allocator)
-
+    asset.vertexDescriptor = Vertex.descriptor
+    addOrthoTan(to: asset)
     return try MTKMesh(mesh: asset, device: device)
   }
 }

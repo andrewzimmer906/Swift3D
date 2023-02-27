@@ -17,6 +17,12 @@ extension simd_quatf {
 
 // MARK: - simd_float3
 
+extension simd_float4 {
+  var xyz: simd_float3 {
+    return simd_float3(x, y, z)
+  }
+}
+
 extension simd_packed_float4 {
   public static var up: simd_packed_float4 {
     .init(x: 0, y: 1, z: 0, w: 0)
@@ -159,5 +165,11 @@ extension float4x4 {
     return simd_float3(x: self.columns.3.x, 
                        y: self.columns.3.y, 
                        z: self.columns.3.z)
+  }
+
+  var upperLeft3x3: float3x3 {
+    return float3x3(columns.0.xyz,
+                    columns.1.xyz,
+                    columns.2.xyz)
   }
 }

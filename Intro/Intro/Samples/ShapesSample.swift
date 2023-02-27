@@ -34,33 +34,33 @@ struct ShapesSample: View {
             funLights
 
             SphereNode(id: "sphere")
-              .shaded(.uvColored())
+              .shaded(.uvColored)
               .rotated(angle: data.rotation, axis: normalize(.up + .right))
               .translated(3 * .up + 2 * .left)
 
             CylinderNode(id: "cylinder")
-              .shaded(.uvColored())
+              .shaded(.uvColored)
               .rotated(angle: data.rotation, axis: normalize(.up + .right))
               .translated(2 * .left)
 
             ConeNode(id: "cone")
-              .shaded(.uvColored())
+              .shaded(.uvColored)
               .rotated(angle: data.rotation, axis: normalize(.up + .right))
               .translated(3 * .down + 2 * .left)
 
             CapsuleNode(id: "capsule")
-              .shaded(.uvColored())
+              .shaded(.uvColored)
               .rotated(angle: data.rotation, axis: normalize(.up + .right))
               .translated(3 * .up + 2 * .right)
 
             CubeNode(id: "cube")
-              .shaded(.uvColored())
+              .shaded(.uvColored)
               .scaled(.one * 1.5)
               .rotated(angle: data.rotation, axis: normalize(.up + .right))
               .translated(2 * (.right))
 
             OctaNode(id: "octahed", divisions: 0)
-              .shaded(.uvColored())
+              .shaded(.uvColored)
               .scaled(.one * 2.5)
               .rotated(angle: data.rotation, axis: normalize(.up + .right))
               .translated(3 * .down + 2 * .right)

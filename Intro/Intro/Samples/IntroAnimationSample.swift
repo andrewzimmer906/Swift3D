@@ -45,7 +45,7 @@ struct IntroAnimationSample: View {
               .translated(.up * fastSpring.value.y)
 
             OctaNode(id: "octa", divisions: 0)
-              .shaded(.uvColored())
+              .shaded(.uvColored)
               .scaled(.one * 1.5)
               .rotated(angle: rotation, axis: .up)
               .translated(.up * slowSpring.value.z)

@@ -23,24 +23,6 @@ public class MetalGeometryLibrary {
     self.device = device
   }
 
-  //func mldModel(for url: URL) -> MDLAsset {
-/*
-    if let asset = mdlModels[url] {
-      return asset
-    }
-
-    let allocator = MTKMeshBufferAllocator(device: device)
-    let geometryDescriptor = standardVertexDescriptor
-
-    let asset = MDLAsset(url: url,
-                         vertexDescriptor: geometryDescriptor,
-                         bufferAllocator: allocator)
-    mdlModels[url] = asset
-    return asset
-*/
-    
-  //}
-
   func cachedMesh(_ geometry: MetalDrawable_Geometry) -> MTKMesh {
     if let asset = mdlModels[geometry.cacheKey] {
       return asset

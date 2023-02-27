@@ -8,6 +8,15 @@
 import Foundation
 import simd
 
+enum FragmentTextureIndex: Int {
+  case baseColor
+  case normal
+  case emission
+  case metalness
+  case roughness
+  case occlusion
+}
+
 enum FragmentBufferIndex: Int {
   case uniform
   case material

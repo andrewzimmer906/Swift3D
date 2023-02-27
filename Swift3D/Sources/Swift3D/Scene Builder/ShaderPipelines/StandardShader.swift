@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 import Metal
 import simd
 
@@ -16,11 +17,17 @@ extension MetalDrawable_Shader where Self == StandardShader {
                               albedoScaling: simd_float2 = .one,
                               specPow: Float = 2,
                               rimPow: Float = 2) -> StandardShader {
-    
     return .init(albedo: albedo,
                  material: MaterialSettings(
                   lightingSettings: simd_float4(specPow, rimPow, 0, 0),
                   albedoTextureScaling: simd_float4(x: albedoScaling.x, y: albedoScaling.y, z: 0, w: 0)),
+                 storage: StandardShader.Storage())
+  }
+
+  public static var standard: StandardShader {
+    return .init(albedo: Color.white,
+                 material: MaterialSettings(lightingSettings: simd_float4(2, 2, 0, 0),
+                                            albedoTextureScaling: .one),
                  storage: StandardShader.Storage())
   }
 }
@@ -47,7 +54,7 @@ public struct StandardShader: MetalDrawable_Shader {
       return
     }
 
-    encoder.setFragmentTexture(albedo.mtlTexture(library), index: 0) // Albedo
+    encoder.setFragmentTexture(albedo.mtlTexture(library), index: FragmentTextureIndex.baseColor.rawValue) // Albedo
   }
   
   public func setupEncoder(encoder: MTLRenderCommandEncoder) {
