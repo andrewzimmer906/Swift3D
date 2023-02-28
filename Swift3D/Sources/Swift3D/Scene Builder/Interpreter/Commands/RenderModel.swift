@@ -77,10 +77,9 @@ extension RenderModel {
     encoder.setCullMode(.back)
 
     // Vertices
-    if let modelM = storage.modelMatBuffer {
-      encoder.setVertexBuffer(modelM, offset: 0, index: 1)
-    }
-
+    var bytes = VertexUniform(modelMatrix: storage.transform.value, normalMatrix: storage.normalMatrix)
+    encoder.setVertexBytes(&bytes, length: MemoryLayout<VertexUniform>.size, index: 1)
+    
     shaderPipeline.setupEncoder(encoder: encoder)
     if overrideTextures {
       shaderPipeline.setTextures(encoder: encoder)
@@ -96,11 +95,11 @@ extension RenderModel {
 // MARK: - Storage
 
 extension RenderModel {
-  class Storage: MetalDrawable_Storage {
+  class Storage: MetalDrawable_Storage, AcceptsViewPointUpdate {
     private(set) var device: MTLDevice?
 
+    private(set) var normalMatrix: float3x3 = float3x3(1)
     private(set) var transform: MetalDrawableData.Transform = .identity
-    private(set) var modelMatBuffer: MTLBuffer?
 
     fileprivate var meshAndTextures: MeshAndTextureStorage?
   }
@@ -110,7 +109,9 @@ extension RenderModel.Storage {
   func set<Value>(_ value: Value) {
     if let t = value as? MetalDrawableData.Transform {
       self.transform = t
-      self.modelMatBuffer?.contents().storeBytes(of: t.value, as: float4x4.self)
+    } else if let t = value as? float4x4 {
+      let mvMat = t * self.transform.value
+      self.normalMatrix = mvMat.upperLeft3x3.transpose.inverse
     }
   }
 
@@ -123,6 +124,10 @@ extension RenderModel.Storage {
                               prev: previous?.transform,
                               animation: command.animations?.with([.all]))
     set(transform)
+  }
+
+  func update(viewPoint: float4x4) {
+    set(viewPoint)
   }
 
   func build(_ command: (any MetalDrawable),
@@ -147,9 +152,7 @@ extension RenderModel.Storage {
                              geometryLibrary: geometryLibrary,
                              shaderLibrary: shaderLibrary)
 
-      var transform = command.transform.value
       self.transform = command.transform
-      self.modelMatBuffer = device.makeBuffer(bytes: &transform, length: float4x4.length)
     }
 
     command.shaderPipeline.build(device: device,
@@ -159,7 +162,7 @@ extension RenderModel.Storage {
 
   func copy(from previous: RenderModel.Storage) {
     self.transform = previous.transform
-    self.modelMatBuffer = previous.modelMatBuffer
+    self.normalMatrix = previous.normalMatrix
     self.meshAndTextures = previous.meshAndTextures
   }
 }

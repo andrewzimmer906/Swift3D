@@ -43,3 +43,21 @@ public struct DirectionalLightNode: Node, AcceptsColored {
     ]
   }
 }
+
+public struct PointLightNode: Node, AcceptsColored {
+  public let id: String
+  public init(id: String) {
+    self.id = id
+  }
+
+  public var drawCommands: [any MetalDrawable] {
+    [
+      PlaceLight(id: id,
+                 transform: .identity,
+                 type: .point,
+                 color: .one,
+                 animations: nil,
+                 storage: .init())
+    ]
+  }
+}

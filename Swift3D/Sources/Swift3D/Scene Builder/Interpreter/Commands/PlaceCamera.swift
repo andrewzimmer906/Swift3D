@@ -86,6 +86,10 @@ extension PlaceCamera {
     encoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 3)
     encoder.endEncoding()
   }
+
+  var latestViewPoint: float4x4 {
+    self.storage.view.value
+  }
 }
 
 // MARK: Storage

@@ -37,7 +37,6 @@ public protocol MetalDrawable_Storage {
                geometryLibrary: MetalGeometryLibrary,
                surfaceAspect: Float)
 
-
   func set<Value>(_ value: Value)
   func copy(from previous: Self)
 }

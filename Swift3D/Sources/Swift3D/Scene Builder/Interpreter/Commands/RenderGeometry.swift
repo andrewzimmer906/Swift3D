@@ -11,6 +11,10 @@ import Metal
 import MetalKit
 import simd
 
+protocol AcceptsViewPointUpdate {
+  func update(viewPoint: float4x4)
+}
+
 protocol HasShaderPipeline {
   func withUpdated<Shader: MetalDrawable_Shader>(shaderPipeline: Shader) -> any MetalDrawable
 }
@@ -70,9 +74,8 @@ extension RenderGeometry {
     encoder.setCullMode(cullBackfaces ? .back : .none)    
     
     // Vertices
-    if let modelM = storage.modelMatBuffer {
-      encoder.setVertexBuffer(modelM, offset: 0, index: 1)
-    }
+    var bytes = VertexUniform(modelMatrix: storage.transform.value, normalMatrix: storage.normalMatrix)
+    encoder.setVertexBytes(&bytes, length: MemoryLayout<VertexUniform>.size, index: 1)
     
     // Shaders and Uniforms
     self.shaderPipeline.setupEncoder(encoder: encoder)
@@ -101,11 +104,11 @@ extension RenderGeometry {
 // MARK: - Storage
 
 extension RenderGeometry {
-  class Storage: MetalDrawable_Storage {
+  class Storage: MetalDrawable_Storage, AcceptsViewPointUpdate {
     private(set) var device: MTLDevice?
     private(set) var mesh: MTKMesh?
 
-    private(set) var modelMatBuffer: MTLBuffer?
+    private(set) var normalMatrix: float3x3 = float3x3(1)
     private(set) var transform: MetalDrawableData.Transform = .identity
   }
 }
@@ -114,7 +117,9 @@ extension RenderGeometry.Storage {
   func set<Value>(_ value: Value) {
     if let t = value as? MetalDrawableData.Transform {
       self.transform = t
-      self.modelMatBuffer?.contents().storeBytes(of: t.value, as: float4x4.self)
+    } else if let t = value as? float4x4 {
+      let mvMat = t * self.transform.value
+      self.normalMatrix = mvMat.upperLeft3x3.transpose.inverse
     }
   }
 
@@ -127,6 +132,10 @@ extension RenderGeometry.Storage {
                               prev: previous?.transform,
                               animation: command.animations?.with([.all]))
     set(transform)
+  }
+
+  func update(viewPoint: float4x4) {
+    set(viewPoint)
   }
   
   func build(_ command: (any MetalDrawable),
@@ -147,9 +156,7 @@ extension RenderGeometry.Storage {
       copy(from: previous)
     }
     else {
-      var transform = command.transform.value
       self.transform = command.transform
-      self.modelMatBuffer = device.makeBuffer(bytes: &transform, length: float4x4.length)
       self.mesh = geometryLibrary.cachedMesh(command.geometry)
     }
     
@@ -166,7 +173,7 @@ extension RenderGeometry.Storage {
 
   func copy(from previous: RenderGeometry.Storage) {
     self.transform = previous.transform
-    self.modelMatBuffer = previous.modelMatBuffer
+
     self.mesh = previous.mesh
   }
 }

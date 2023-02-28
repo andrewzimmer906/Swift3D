@@ -33,6 +33,14 @@ extension MetalDrawable_Shader where Self == PBRShader {
   }
 }
 
+fileprivate struct PBRMaterial {
+  let properties: simd_float4
+
+  static var standard: PBRMaterial {
+    .init(properties: .zero)
+  }
+}
+
 // MARK: - Shader
 
 public struct PBRShader: MetalDrawable_Shader {
@@ -75,6 +83,8 @@ public struct PBRShader: MetalDrawable_Shader {
   }
 
   public func setupEncoder(encoder: MTLRenderCommandEncoder) {
+    encoder.setFragmentBytes(&storage.pbrMaterial, length: MemoryLayout<PBRMaterial>.size, index: FragmentBufferIndex.material.rawValue)
+
     if let ps = storage.pipeline {
       encoder.setRenderPipelineState(ps)
     }
@@ -83,6 +93,7 @@ public struct PBRShader: MetalDrawable_Shader {
 
 extension PBRShader {
   class Storage {
+    fileprivate var pbrMaterial = PBRMaterial.standard
     fileprivate var pipeline: MTLRenderPipelineState?
     fileprivate var library: MetalShaderLibrary?
   }

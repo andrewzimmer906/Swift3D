@@ -105,11 +105,17 @@ public class MetalView: UIView {
       }
     }
 
-    // Update command values for GPU & Time (primarily used for transitions)
+    // Update command values for GPU & Time (primarily used for transitions & viewpoint changes)
+    let cameraCommand = scene.commands.first(where: { $0.0 is PlaceCamera })?.0 as? PlaceCamera
     scene.commands.forEach { (command, previousStorage) in
       command.storage.update(time: time,
                              command: command,
                              previous: previousStorage)
+
+      if let cameraCommand = cameraCommand,
+         let storage = command.storage as? AcceptsViewPointUpdate {
+        storage.update(viewPoint: cameraCommand.latestViewPoint)
+      }
     }
 
     renderer.render(time, layerDrawable: drawable, depthTexture: depth, commands: scene.commands)

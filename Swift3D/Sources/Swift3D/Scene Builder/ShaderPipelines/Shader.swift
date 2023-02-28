@@ -9,6 +9,7 @@ import Foundation
 import Metal
 import SwiftUI
 import UIKit
+import simd
 
 // MARK: - Shader
 
@@ -17,6 +18,13 @@ public protocol MetalDrawable_Shader {
   func setTextures(encoder: MTLRenderCommandEncoder)
 
   func build(device: MTLDevice, library: MetalShaderLibrary, descriptor: MTLVertexDescriptor?)
+}
+
+// MARK: - Vertex Uniform
+
+struct VertexUniform {
+  let modelMatrix: float4x4
+  let normalMatrix: float3x3
 }
 
 // MARK: - Textures

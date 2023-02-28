@@ -39,18 +39,6 @@ struct VertexOut {
   float3 uvColor;
 };
 
-float3x3 upperLeft3x3AndTransposed(float4x4 m) {
-  // Not Transposed
-  /*return float3x3(m[0][0], m[1][0], m[2][0],
-                  m[0][1], m[1][1], m[2][1],
-                  m[0][2], m[1][2], m[2][2])*/
-
-  // I think!?
-  return float3x3(m[0][0], m[0][1], m[0][2],
-                  m[1][0], m[1][1], m[1][2],
-                  m[2][0], m[2][1], m[2][2]);
-}
-
 // --
 
 vertex VertexOut uv_color_vertex(VertexIn in [[stage_in]],
@@ -59,18 +47,15 @@ vertex VertexOut uv_color_vertex(VertexIn in [[stage_in]],
   float4x4 m_matrix =   uniforms.modelMatrix;
   float4x4 mv_matrix =  vpUniforms.viewMatrix * uniforms.modelMatrix;
   float4x4 mvp_matrix = vpUniforms.projectionMatrix * vpUniforms.viewMatrix * uniforms.modelMatrix;
-  float3x3 normal_matrix = upperLeft3x3AndTransposed(mv_matrix);
 
   VertexOut out {
     .position = mvp_matrix * float4(in.position, 1.0),
     .worldPos = (m_matrix * float4(in.position, 1.0)).xyz,
+    
+
     .viewPos = (mv_matrix * float4(in.position, 1.0)).xyz,
     .worldNormal = normalize((m_matrix * float4(in.normal, 0.0))).xyz,
-
-    //.uvColor = in.tangent.xyz
-    //.uvColor = uvColor((mv_matrix * float4(in.uv, 1, 1)).xyz)
-    //.uvColor = uvColor(in.uv)
-    .uvColor = normalize(normal_matrix * in.tangent.xyz)
+    .uvColor = uvColor(in.uv)
   };
 
   return out;

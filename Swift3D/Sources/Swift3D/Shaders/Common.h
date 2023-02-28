@@ -8,6 +8,8 @@
 #ifndef SharedData_h
 #define SharedData_h
 
+using namespace metal;
+
 // ------------ Enums
 
 typedef enum {
@@ -37,6 +39,7 @@ typedef enum {
 
 struct Uniforms {
   float4x4 modelMatrix;
+  float3x3 normalMatrix;
 };
 
 struct ViewProjectionUniform {
@@ -69,11 +72,21 @@ struct MaterialProperties {
   float4 albedoTextureScaling;
 };
 
+// Used for PBR Properties
+struct Material {
+    float4 baseColor;
+    float metalness;
+    float roughness;
+    float ambientOcclusion;
+};
+
 // ------------ Samplers
 constexpr sampler textureSampler (address::repeat);
 
 // ------------ Methods
 
+float3x3 upperLeft3x3AndTransposed(float4x4 m);
 float3 calculateLightingSpecular(Light light, MaterialProperties material, float3 normal, float3 viewDirection);
+float3 BRDF(thread Material &material, float NdotL, float NdotV, float NdotH, float VdotH);
 
 #endif /* Header_h */

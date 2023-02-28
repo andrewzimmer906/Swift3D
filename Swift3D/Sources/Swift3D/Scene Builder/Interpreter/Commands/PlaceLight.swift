@@ -118,5 +118,6 @@ extension PlaceLight {
   enum LightType: Int {
     case ambient = 1
     case directional = 2
+    case point = 3
   }
 }
