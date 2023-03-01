@@ -43,7 +43,7 @@ fragment float4 standard_fragment(VertexOut in [[stage_in]],
   float3 viewDirection = normalize(in.worldPos - uniforms.cameraPos.xyz);
 
   for (uint i = 0; i < uniforms.lightData.x; i++) {
-    finalColor += calculateLightingSpecular(lights[i], material, in.worldNormal, viewDirection);
+    finalColor += calculateLightingSpecular(lights[i], material, in.worldNormal, viewDirection, in.worldPos);
   }
 
   return float4(finalColor * albedoColor, 1);

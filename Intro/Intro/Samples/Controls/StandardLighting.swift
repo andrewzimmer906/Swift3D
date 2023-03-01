@@ -14,11 +14,11 @@ struct StandardLighting: Node {
 
   var body: some Node {
     AmbientLightNode(id: "Ambient")
-      .colored(color: .white.opacity(0.5))
+      .colored(color: .white, intensity: 0.5)
 
     DirectionalLightNode(id: "Directional")
-      .colored(color: .white.opacity(0.25))
-      .transform(.lookAt(eye: .zero, look: simd_float3(x: 0, y: 0, z: 0.5), up: .up))
+      .colored(color: .white, intensity: 0.25)
+      .transform(.lookAt(eye: .zero, look: simd_float3(x: 0, y: 0, z: -0.5), up: .up))
   }
 }
 
@@ -26,12 +26,12 @@ struct FunLights: Node {
   let id: String
   var body: some Node {
     AmbientLightNode(id: "Ambient")
-      .colored(color: .white.opacity(0.15))
+      .colored(color: .white, intensity: 0.15)
     DirectionalLightNode(id: "Directional")
-      .colored(color: .orange.opacity(0.4))
+      .colored(color: .orange, intensity: 0.4)
       .transform(.lookAt(eye: .zero, look: simd_float3(x: 0.5, y: 0.5, z: 0.5), up: .up))
     DirectionalLightNode(id: "Directional2")
-      .colored(color: .blue.opacity(0.5))
+      .colored(color: .blue, intensity: 0.5)
       .transform(.lookAt(eye: .zero, look: simd_float3(x: -0.5, y: -0.5, z: 0.5), up: .up))
   }
 }

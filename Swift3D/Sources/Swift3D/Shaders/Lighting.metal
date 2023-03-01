@@ -9,28 +9,13 @@
 #include "Common.h"
 using namespace metal;
 
-
-// Used for generating a normal matrix.
-float3x3 upperLeft3x3AndTransposed(float4x4 m) {
-  // Not Transposed
-  /*return float3x3(m[0][0], m[1][0], m[2][0],
-                  m[0][1], m[1][1], m[2][1],
-                  m[0][2], m[1][2], m[2][2])*/
-
-  // I think!?
-  return float3x3(m[0][0], m[0][1], m[0][2],
-                  m[1][0], m[1][1], m[1][2],
-                  m[2][0], m[2][1], m[2][2]);
-}
-
-float3 calculateLightingSpecular(Light light, MaterialProperties material, float3 normal, float3 viewDirection) {
-  float atten = light.color.w;
-  float3 color = light.color.xyz;
+float3 calculateLightingSpecular(Light light, MaterialProperties material, float3 normal, float3 viewDirection, float3 worldPos) {
+  float3 color = light.evaluateIntensity(worldPos);
+  float3 lightDir = light.directionToPoint(worldPos);
 
   if (light.position.w == LightTypeAmbient) {
-    return color * atten;
-  } else if(light.position.w == LightTypeDirectional) {
-    float3 lightDir = normalize(light.position.xyz);
+    return light.color.xyz * light.color.w;
+  } else {
     float diffuseFactor = saturate(-dot(lightDir, normal));
 
     float3 reflection = reflect(lightDir, normal);
@@ -38,7 +23,7 @@ float3 calculateLightingSpecular(Light light, MaterialProperties material, float
     float specFactor = pow(saturate(-dot(reflection, viewDirection)), material.properties.x) * diffuseFactor;
     float rimFactor = pow(saturate(1.0 - dot(lightDir, normal)), material.properties.y);
 
-    return (specFactor + diffuseFactor + rimFactor) * color * atten;
+    return (specFactor + diffuseFactor + rimFactor) * color;
   }
 
   return float3(0);

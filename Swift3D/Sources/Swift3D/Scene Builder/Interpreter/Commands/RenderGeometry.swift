@@ -11,10 +11,6 @@ import Metal
 import MetalKit
 import simd
 
-protocol AcceptsViewPointUpdate {
-  func update(viewPoint: float4x4)
-}
-
 protocol HasShaderPipeline {
   func withUpdated<Shader: MetalDrawable_Shader>(shaderPipeline: Shader) -> any MetalDrawable
 }
@@ -104,7 +100,7 @@ extension RenderGeometry {
 // MARK: - Storage
 
 extension RenderGeometry {
-  class Storage: MetalDrawable_Storage, AcceptsViewPointUpdate {
+  class Storage: MetalDrawable_Storage {
     private(set) var device: MTLDevice?
     private(set) var mesh: MTKMesh?
 
@@ -117,9 +113,6 @@ extension RenderGeometry.Storage {
   func set<Value>(_ value: Value) {
     if let t = value as? MetalDrawableData.Transform {
       self.transform = t
-    } else if let t = value as? float4x4 {
-      let mvMat = t * self.transform.value
-      self.normalMatrix = mvMat.upperLeft3x3.transpose.inverse
     }
   }
 
@@ -132,10 +125,6 @@ extension RenderGeometry.Storage {
                               prev: previous?.transform,
                               animation: command.animations?.with([.all]))
     set(transform)
-  }
-
-  func update(viewPoint: float4x4) {
-    set(viewPoint)
   }
   
   func build(_ command: (any MetalDrawable),

@@ -21,7 +21,8 @@ typedef enum {
 typedef enum {
   LightTypeUnused = 0,
   LightTypeAmbient = 1,
-  LightTypeDirectional = 2
+  LightTypeDirectional = 2,
+  LightTypePoint = 3
 } LightType;
 
 typedef enum {
@@ -39,7 +40,6 @@ typedef enum {
 
 struct Uniforms {
   float4x4 modelMatrix;
-  float3x3 normalMatrix;
 };
 
 struct ViewProjectionUniform {
@@ -61,11 +61,33 @@ struct FragmentUniforms {
   float4 lightData;
 };
 
-typedef struct {
+struct Light {
   float4 position; // w is type
   float4 color;    // a is intensity
-} Light;
 
+  float3 directionToPoint(float3 p) {
+    if (position.w == LightTypeDirectional) {
+      return -position.xyz;
+    }
+    else if (position.w == LightTypePoint) {
+      return p - position.xyz;
+    }
+
+    return float3(0,0,0);
+  }
+
+  /// Evaluates the intensity of this light given a non-normalized
+  /// vector from the surface to the light.
+  float3 evaluateIntensity(float3 toLight) {
+    if (position.w == LightTypePoint) {
+      float lightDistSq = dot(toLight, toLight);
+      float attenuation = 1.0f / max(lightDistSq, 1e-4);
+      return attenuation * color.rgb * color.w;
+    }
+
+    return color.xyz * color.w;
+  }
+};
 
 struct MaterialProperties {
   float4 properties; // (specPow, rimPow, 0, 0)
@@ -85,8 +107,7 @@ constexpr sampler textureSampler (address::repeat);
 
 // ------------ Methods
 
-float3x3 upperLeft3x3AndTransposed(float4x4 m);
-float3 calculateLightingSpecular(Light light, MaterialProperties material, float3 normal, float3 viewDirection);
+float3 calculateLightingSpecular(Light light, MaterialProperties material, float3 normal, float3 viewDirection, float3 worldPos);
 float3 BRDF(thread Material &material, float NdotL, float NdotV, float NdotH, float VdotH);
 
 #endif /* Header_h */

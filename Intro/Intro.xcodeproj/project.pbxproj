@@ -37,7 +37,7 @@
 		ECED42B829A963240003FF6C /* spot_triangulated.obj in Resources */ = {isa = PBXBuildFile; fileRef = ECED42B029A963240003FF6C /* spot_triangulated.obj */; };
 		ECED42B929A963240003FF6C /* README.txt in Resources */ = {isa = PBXBuildFile; fileRef = ECED42B129A963240003FF6C /* README.txt */; };
 		ECED42BB29A965940003FF6C /* CodeModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECED42BA29A965940003FF6C /* CodeModifier.swift */; };
-		ECFB0DF92995A4A700687251 /* Worn_Baseball_Ball.usdz in Resources */ = {isa = PBXBuildFile; fileRef = ECFB0DF82995A4A700687251 /* Worn_Baseball_Ball.usdz */; };
+		ECFB0DF92995A4A700687251 /* Baseball.usdz in Resources */ = {isa = PBXBuildFile; fileRef = ECFB0DF82995A4A700687251 /* Baseball.usdz */; };
 		ECFB0DFD2995A78B00687251 /* title.obj in Resources */ = {isa = PBXBuildFile; fileRef = ECFB0DFC2995A78B00687251 /* title.obj */; };
 /* End PBXBuildFile section */
 
@@ -74,7 +74,7 @@
 		ECED42B029A963240003FF6C /* spot_triangulated.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = spot_triangulated.obj; sourceTree = "<group>"; };
 		ECED42B129A963240003FF6C /* README.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.txt; sourceTree = "<group>"; };
 		ECED42BA29A965940003FF6C /* CodeModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeModifier.swift; sourceTree = "<group>"; };
-		ECFB0DF82995A4A700687251 /* Worn_Baseball_Ball.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = Worn_Baseball_Ball.usdz; sourceTree = "<group>"; };
+		ECFB0DF82995A4A700687251 /* Baseball.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = Baseball.usdz; sourceTree = "<group>"; };
 		ECFB0DFC2995A78B00687251 /* title.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = title.obj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -179,7 +179,7 @@
 				EC8F3CFE29AD460D00566BC1 /* RoughMetal.usdz */,
 				ECED42A929A963240003FF6C /* spot */,
 				ECFB0DFC2995A78B00687251 /* title.obj */,
-				ECFB0DF82995A4A700687251 /* Worn_Baseball_Ball.usdz */,
+				ECFB0DF82995A4A700687251 /* Baseball.usdz */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -271,7 +271,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ECFB0DF92995A4A700687251 /* Worn_Baseball_Ball.usdz in Resources */,
+				ECFB0DF92995A4A700687251 /* Baseball.usdz in Resources */,
 				ECED42B529A963240003FF6C /* spot_quadrangulated.obj in Resources */,
 				ECAD987C2993138300B20F52 /* Textures.xcassets in Resources */,
 				ECED42B429A963240003FF6C /* spot_triangulated.mtl in Resources */,

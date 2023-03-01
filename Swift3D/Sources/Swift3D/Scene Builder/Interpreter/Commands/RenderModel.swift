@@ -95,7 +95,7 @@ extension RenderModel {
 // MARK: - Storage
 
 extension RenderModel {
-  class Storage: MetalDrawable_Storage, AcceptsViewPointUpdate {
+  class Storage: MetalDrawable_Storage {
     private(set) var device: MTLDevice?
 
     private(set) var normalMatrix: float3x3 = float3x3(1)
@@ -109,9 +109,6 @@ extension RenderModel.Storage {
   func set<Value>(_ value: Value) {
     if let t = value as? MetalDrawableData.Transform {
       self.transform = t
-    } else if let t = value as? float4x4 {
-      let mvMat = t * self.transform.value
-      self.normalMatrix = mvMat.upperLeft3x3.transpose.inverse
     }
   }
 
@@ -124,10 +121,6 @@ extension RenderModel.Storage {
                               prev: previous?.transform,
                               animation: command.animations?.with([.all]))
     set(transform)
-  }
-
-  func update(viewPoint: float4x4) {
-    set(viewPoint)
   }
 
   func build(_ command: (any MetalDrawable),
@@ -179,6 +172,7 @@ extension RenderModel {
     }()
     private(set) var textures: [String: MTLTexture] = [:]
     private(set) var mesh: [StorageMesh] = []
+
     var vertexDescriptor: MTLVertexDescriptor? {
       if let modelDesc = mesh.first?.0.vertexDescriptor {
         return MTKMetalVertexDescriptorFromModelIO(modelDesc)
@@ -205,6 +199,11 @@ extension RenderModel {
 
         guard let mdlMeshes = asset.childObjects(of: MDLMesh.self) as? [MDLMesh] else {
           fatalError()
+        }
+
+        // Add ortho Tan
+        mdlMeshes.forEach {
+          Model.addOrthoTan(to: $0)
         }
 
         // Load Meshes

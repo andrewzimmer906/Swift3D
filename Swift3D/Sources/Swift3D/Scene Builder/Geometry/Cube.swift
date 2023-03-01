@@ -23,7 +23,7 @@ struct Cube: MetalDrawable_Geometry {
                         descriptor: Vertex.descriptor,
                         submeshes: [.init(indexBuffer: indexBuffer, indexCount: 36, indexType: .uInt16, geometryType: MDLGeometryType.triangles, material: nil)])
 
-    addOrthoTan(to: asset)
+    Self.addOrthoTan(to: asset)
     return try MTKMesh(mesh: asset, device: device)
   }
 

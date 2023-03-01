@@ -15,7 +15,7 @@ public protocol MetalDrawable_Geometry {
 }
 
 extension MetalDrawable_Geometry {
-  func addOrthoTan(to mesh: MDLMesh) {
+  static func addOrthoTan(to mesh: MDLMesh) {
     let hasTexCoords = mesh.vertexAttributeData(forAttributeNamed: MDLVertexAttributeTextureCoordinate) != nil
     let hasNormals = mesh.vertexAttributeData(forAttributeNamed: MDLVertexAttributeNormal) != nil
 

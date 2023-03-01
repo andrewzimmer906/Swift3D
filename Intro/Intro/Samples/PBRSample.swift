@@ -12,64 +12,69 @@ import simd
 
 struct PBRSample: View {
   let cameraController = TouchCameraController(minDistance: 2, maxDistance: 6)
+  private let motion = Motion()
 
   var body: some View {
+    ScrollView {
+      Spacer(minLength: 50)
+      Text("⚡ PBR Materials! ⚡")
+        .font(.title2)
+        pbrModel(modelPath: "MetalTiles.usdz", secondModel: "BlueTile.usdz")
+        pbrModel(modelPath: "RedPlastic.usdz", secondModel: "RoughMetal.usdz")
+    }
+    .background(.white, ignoresSafeAreaEdges: .all)
+    .onAppear {
+      motion.start()
+    }
+    .onDisappear {
+      motion.end()
+    }
+  }
+
+  private func pbrModel(modelPath: String, secondModel: String) -> some View {
+    Swift3DView {
+      CameraNode(id: "mainCam")
+        .translated(.back * 1.7)
+      lights
+
+      ModelNode(id: "\(modelPath)", url: .model(modelPath))
+        .shaded(.pbr)
+        .transform(motion.curAttitude)
+        .translated(.left * 0.75)
+
+      ModelNode(id: "\(secondModel)", url: .model(secondModel))
+        .shaded(.pbr)
+        .transform(motion.curAttitude)
+        .translated(.right * 0.75)
+    }
+    .frame(height: 150)
+    //.padding()
+  }
+
+  private var test: some View {
     ZStack {
       Swift3DView(updateLoop: { delta in
         cameraController.update(delta: delta)
       }) {
         TouchCamera(controller: cameraController)
-
         lights
-
-        /*ModelNode(id: "testModelStand", url: .model("MetalTiles.usdz"))
-          .shaded(.standard)
-          .overrideDefaultTextures()
-          .translated(.up * 1.25)
-         */
-        OctaNode(id: "octa", divisions: 2)
-          .shaded(.standard)
-          .translated(.up * 1.25)
-
         ModelNode(id: "testModel", url: .model("MetalTiles.usdz"))
           .shaded(.pbr)
-
-        ModelNode(id: "testModel2", url: .model("RedPlastic.usdz"))
-          .shaded(.pbr)
-          .translated(.down * 1.25)
       }
       .withCameraControls(controller: cameraController)
       .padding()
     }
   }
 
+  private let power: Float = 600
   private var lights: some Node {
     GroupNode(id: "Lights") {
-      DirectionalLightNode(id: "Back")
-        .colored(color: .blue.opacity(0.5))
-        .transform(.lookAt(eye: .zero, look: .back, up: .up))
+      AmbientLightNode(id: "ambient")
+        .colored(color: .white, intensity: 0.1)
 
-
-      DirectionalLightNode(id: "Forward")
-        .colored(color: .yellow.opacity(0.5))
-        .transform(.lookAt(eye: .zero, look: .forward, up: .up))
-/*
-      DirectionalLightNode(id: "Down")
-        .colored(color: .mint.opacity(0.15))
-        .transform(.lookAt(eye: .zero, look: .down, up: .up))
-
-      DirectionalLightNode(id: "Up")
-        .colored(color: .orange.opacity(0.15))
-        .transform(.lookAt(eye: .zero, look: .up, up: .up))
-
-      DirectionalLightNode(id: "Left")
-        .colored(color: .yellow.opacity(0.15))
-        .transform(.lookAt(eye: .zero, look: .left, up: .up))
-
-      DirectionalLightNode(id: "Right")
-        .colored(color: .blue.opacity(0.15))
-        .transform(.lookAt(eye: .zero, look: .right, up: .up))
-      */
+      PointLightNode(id: "Back")
+        .colored(color: .white, intensity: 4)
+        .translated(.back * 1.5)
     }
   }
 }

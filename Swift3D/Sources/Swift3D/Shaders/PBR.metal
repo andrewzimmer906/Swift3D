@@ -14,11 +14,9 @@ struct PBRMaterialProperties {
 struct VertexOut {
   float4 position [[position]];  //1
   float3 worldPos;
-  float3 eyePosition;
-  float3 eyeNormal;
-  float3 eyeTangent;
   float tangentSign [[flat]];
   float3 worldNormal;
+  float3 worldTangent;
   float2 uv;
 };
 
@@ -29,21 +27,18 @@ vertex VertexOut pbr_vertex(VertexIn in [[stage_in]],
                            const device ViewProjectionUniform& vpUniforms [[ buffer(2) ]]) {
 
   float4x4 m_matrix =      uniforms.modelMatrix;
+  // float4x4 mv_matrix =      vpUniforms.viewMatrix * uniforms.modelMatrix;
   float4x4 mvp_matrix =    vpUniforms.projectionMatrix * vpUniforms.viewMatrix * uniforms.modelMatrix;
 
   float4 modelPosition = float4(in.position, 1);
   float4 worldPosition = m_matrix * modelPosition;
-  float4 eyePosition = vpUniforms.viewMatrix * worldPosition;
-  float3x3 nm = upperLeft3x3AndTransposed(vpUniforms.viewMatrix * m_matrix);
 
   VertexOut out {
     .position = mvp_matrix * modelPosition,
     .worldPos = worldPosition.xyz,
-    .eyePosition = eyePosition.xyz,
-    .eyeNormal = normalize(nm * in.normal),
-    .eyeTangent = normalize(nm * in.tangent.xyz),
-    .tangentSign = in.tangent.w,
     .worldNormal = normalize((m_matrix * float4(in.normal, 0.0))).xyz,
+    .worldTangent = normalize((m_matrix * float4(in.tangent.xyz, 0.0))).xyz,
+    .tangentSign = in.tangent.w,
     .uv = in.uv
   };
 
@@ -83,37 +78,31 @@ fragment float4 pbr_fragment(VertexOut in [[stage_in]],
     .ambientOcclusion = ambientOcclusion
   };
 
-  // float3 V = normalize(uniforms.cameraPos.xyz);
-  float3 V = normalize(-in.eyePosition);
-  float3 Ng = normalize(in.eyeNormal);
+  float3 V = normalize(uniforms.cameraPos.xyz);
   float3 N;
-  
+
   if (!is_null_texture(normalTex)) {
-    float3 T = normalize(in.eyeTangent);
-    float3 B = cross(in.eyeNormal, in.eyeTangent) * in.tangentSign;
-    float3x3 TBN = { T, B, Ng };
+    float3 Wt = normalize(in.worldTangent);
+    float3 Wn = normalize(in.worldNormal);
+    float3 Wb = cross(Wn, Wt) * in.tangentSign;
+    float3x3 TBN = { Wt, Wb, Wn };
 
     float3 Nt = normalTex.sample(repeatSampler, in.uv).xyz * 2.0f - 1.0f;
-    N = TBN * Nt;
+    N = (TBN * Nt);
   } else {
-    N = Ng;
+    N = in.worldNormal;
   }
-  N = Ng;
-  // return float4(N * 0.5 + 0.5, 1);
+
+  // Normal Test
+  //return float4(N * 0.5 + 0.5, 1);
 
   Surface surface;
   surface.emitted = is_null_texture(emissionTex) ? float3(0) : emissionTex.sample(repeatSampler, in.uv).rgb;
 
   for (uint i = 0; i < uniforms.lightData.x; i++) {
     Light light = lights[i];
-
-    // Directional Only for the moment.
-    if (light.position.w != LightTypeDirectional) {
-      continue;
-    }
-
-    float3 lightToPoint = light.position.xyz;
-    float3 intensity = light.color.xyz * light.color.w;
+    float3 lightToPoint = light.directionToPoint(in.worldPos);
+    float3 intensity = light.evaluateIntensity(lightToPoint);
 
     float3 L = normalize(-lightToPoint);
     float3 H = normalize(L + V);
@@ -123,12 +112,16 @@ fragment float4 pbr_fragment(VertexOut in [[stage_in]],
     float NdotH = dot(N, H);
     float VdotH = dot(V, H);
 
-    surface.reflected += intensity * saturate(NdotL) * BRDF(material, NdotL, NdotV, NdotH, VdotH);
-    //surface.reflected += intensity * BRDF(material, NdotL, NdotV, NdotH, VdotH);
+    if(light.position.w == LightTypeAmbient) {
+      // Opt out of PBR for an ambient light. We just assume a perfect reflection here.
+      surface.reflected += intensity * material.baseColor.xyz;
+    } else {
+      surface.reflected += intensity * saturate(NdotL) * BRDF(material, NdotL, NdotV, NdotH, VdotH);
+    }
   }
 
   float3 color = surface.emitted + surface.reflected;
   float alpha = material.baseColor.a;
 
-  return float4(color * alpha, alpha);
+  return float4(saturate(color) * alpha, alpha);
 }

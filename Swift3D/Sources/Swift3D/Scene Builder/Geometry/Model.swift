@@ -20,14 +20,7 @@ struct Model: MetalDrawable_Geometry {
   var cacheKey: String { "some_model" }
 
   func get(device: MTLDevice, allocator: MTKMeshBufferAllocator) throws -> MTKMesh {
-    let asset = try asset(device: device, allocator: allocator)
-    let meshes = asset.childObjects(of: MDLMesh.self) as? [MDLMesh]
-    guard let assetMesh = meshes?.first else {
-      throw ModelLoadError.noMeshes
-    }
-    addOrthoTan(to: assetMesh)
-
-    return try MTKMesh(mesh: assetMesh, device: device)
+    fatalError("Not used, check RenderModel for custom loading logic")
   }
 
   func asset(device: MTLDevice, allocator: MTKMeshBufferAllocator) throws -> MDLAsset {
@@ -48,7 +41,6 @@ extension MDLMaterial {
   ]
 
   func key(for semantic: MDLMaterialSemantic) -> String? {
-
     if let prop = self.property(with: semantic) {
       let type = prop.type
       switch type {

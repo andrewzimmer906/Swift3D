@@ -61,9 +61,22 @@ extension PlaceLight {
   }
   
   var uniformValues: Light {
-    let direction = transform.value.rotation.act(.back)
-    return Light(position: simd_float4(direction, Float(type.rawValue)),
-                 color: color)
+
+    switch type {
+    case .ambient:
+      return Light(position: simd_float4(.zero, Float(type.rawValue)),
+                                         color: color)
+    case .directional:
+      let direction = transform.value.rotation.act(.back)
+      return Light(position: simd_float4(direction,
+                                         Float(type.rawValue)),
+                                         color: color)
+    case .point:
+      let pos = transform.value.translation
+      return Light(position: simd_float4(pos,
+                                         Float(type.rawValue)),
+                                         color: color)
+    }
   }
 }
 

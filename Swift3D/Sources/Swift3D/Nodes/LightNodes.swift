@@ -55,7 +55,7 @@ public struct PointLightNode: Node, AcceptsColored {
       PlaceLight(id: id,
                  transform: .identity,
                  type: .point,
-                 color: .one,
+                 color: simd_float4(1,1,1,10),
                  animations: nil,
                  storage: .init())
     ]

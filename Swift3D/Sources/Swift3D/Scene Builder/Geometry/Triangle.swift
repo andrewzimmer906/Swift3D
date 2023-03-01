@@ -29,7 +29,7 @@ struct Triangle: MetalDrawable_Geometry {
     let asset = MDLMesh(vertexBuffer: vertexBuffer, vertexCount: 3,
                         descriptor: Vertex.descriptor,
                         submeshes: [.init(indexBuffer: indexBuffer, indexCount: 3, indexType: .uInt16, geometryType: MDLGeometryType.triangles, material: nil)])
-    addOrthoTan(to: asset)
+    Self.addOrthoTan(to: asset)
 
     return try MTKMesh(mesh: asset, device: device)
   }

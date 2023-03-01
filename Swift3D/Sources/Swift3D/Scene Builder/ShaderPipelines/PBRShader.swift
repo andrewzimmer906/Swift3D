@@ -14,10 +14,10 @@ import simd
 
 extension MetalDrawable_Shader where Self == PBRShader {
   public static func pbr(baseColor: MetalDrawable_Texture = Color.white,
-                         emission: MetalDrawable_Texture? = nil,
-                         normal: MetalDrawable_Texture? = nil,
                          roughness: MetalDrawable_Texture = Color(white: 0.5),
                          metalness: MetalDrawable_Texture = Color(white: 0),
+                         emission: MetalDrawable_Texture? = nil,
+                         normal: MetalDrawable_Texture? = nil,
                          occlusion: MetalDrawable_Texture? = nil) -> PBRShader {
     return .init(baseColor: baseColor,
                  emission: emission,
