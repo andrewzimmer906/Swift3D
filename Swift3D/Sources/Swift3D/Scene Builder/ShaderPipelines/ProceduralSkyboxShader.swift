@@ -22,7 +22,7 @@ extension MetalDrawable_Shader where Self == ProceduralSkyboxShader {
     return .init(storage: ProceduralSkyboxShader.Storage(properties: properties))
   }
   
-  public static func blankSkybox() -> ProceduralSkyboxShader {
+  public static func noSkybox() -> ProceduralSkyboxShader {
     let col = simd_float4(1, 1, 1, 0)
     return .init(storage: .init(properties: .init(time: .zero, colLow: col, colMid: col, colHigh: col)))
   }

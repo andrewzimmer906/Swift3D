@@ -35,7 +35,7 @@ extension Node {
   }
 
   public func rotated(angle: Float, axis: simd_float3) -> ModifiedNodeContent<Self, TransformModifier> {
-    self.transform(.rotated(angle: angle, axis: axis))
+    self.transform(.rotated(angle: angle, axis: normalize(axis)))
   }
 
   public func scaled(_ scale: simd_float3) -> ModifiedNodeContent<Self, TransformModifier> {
