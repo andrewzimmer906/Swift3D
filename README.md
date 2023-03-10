@@ -8,9 +8,9 @@ Using a custom `DSL ` or `Domain Specific Language` that looks and feels like `S
 
 Here are just a few examples of the types of things you can do.
 
-![intro video](./Documentation/PBRExample.mov)
-![intro video 2](./Documentation/3DIntro.mov)
-![intro video 2](./Documentation/seats.mp4)
+![PBR](https://youtube.com/shorts/oMiOQMqVoqw)
+![Spring Transition](https://youtu.be/u1Rp-CHMF8U)
+![2D Integration](https://youtube.com/shorts/rL8xp2Taz04)
 
 ## Installation
 
