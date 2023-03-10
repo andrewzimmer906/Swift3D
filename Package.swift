@@ -23,9 +23,7 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
             name: "Swift3D",
-            dependencies: []),
-        .testTarget(
-            name: "Swift3DTests",
-            dependencies: ["Swift3D"]),
+            dependencies: [],
+            path: "Swift3D/Sources")
     ]
 )

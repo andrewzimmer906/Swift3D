@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		EC1907ED299C25FA0011A21F /* IsometricSample.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC1907EC299C25FA0011A21F /* IsometricSample.swift */; };
+		EC2B342B29BBEB3F00168A95 /* Swift3D in Frameworks */ = {isa = PBXBuildFile; productRef = EC2B342A29BBEB3F00168A95 /* Swift3D */; };
 		EC2D46282996D13F004C9BC0 /* PageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC2D46272996D13F004C9BC0 /* PageView.swift */; };
 		EC2D462A2996D16D004C9BC0 /* IntroSample.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC2D46292996D16D004C9BC0 /* IntroSample.swift */; };
 		EC2D462E2996D27B004C9BC0 /* URL+IO.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC2D462D2996D27B004C9BC0 /* URL+IO.swift */; };
@@ -19,7 +20,6 @@
 		EC8F3D0329AD460D00566BC1 /* RoughMetal.usdz in Resources */ = {isa = PBXBuildFile; fileRef = EC8F3CFE29AD460D00566BC1 /* RoughMetal.usdz */; };
 		EC8F3D0429AD460D00566BC1 /* BlueTile.usdz in Resources */ = {isa = PBXBuildFile; fileRef = EC8F3CFF29AD460D00566BC1 /* BlueTile.usdz */; };
 		EC8F3D0629AD4A8A00566BC1 /* MetalTiles.usdz in Resources */ = {isa = PBXBuildFile; fileRef = EC8F3D0529AD4A8A00566BC1 /* MetalTiles.usdz */; };
-		ECAD987029930C4E00B20F52 /* Swift3D in Frameworks */ = {isa = PBXBuildFile; productRef = ECAD986F29930C4E00B20F52 /* Swift3D */; };
 		ECAD987C2993138300B20F52 /* Textures.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ECAD987B2993138300B20F52 /* Textures.xcassets */; };
 		ECAD987F2993138D00B20F52 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECAD987D2993138D00B20F52 /* ContentView.swift */; };
 		ECAD98802993138D00B20F52 /* TouchCamera.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECAD987E2993138D00B20F52 /* TouchCamera.swift */; };
@@ -50,7 +50,6 @@
 		EC2D462F2996FB15004C9BC0 /* StandardLighting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StandardLighting.swift; sourceTree = "<group>"; };
 		EC6ADF812993089B0035E09A /* Demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Demo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EC6ADF842993089B0035E09A /* IntroApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntroApp.swift; sourceTree = "<group>"; };
-		EC6ADF93299308D80035E09A /* Swift3D */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Swift3D; path = ../Swift3D; sourceTree = "<group>"; };
 		EC8F3CF929AD443000566BC1 /* PBRSample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PBRSample.swift; sourceTree = "<group>"; };
 		EC8F3CFC29AD460D00566BC1 /* RedPlastic.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = RedPlastic.usdz; sourceTree = "<group>"; };
 		EC8F3CFD29AD460D00566BC1 /* Concrete.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = Concrete.usdz; sourceTree = "<group>"; };
@@ -66,6 +65,7 @@
 		ECB1CFBD299EE2C100EFCF44 /* Spring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Spring.swift; sourceTree = "<group>"; };
 		ECB1CFC129A3D57600EFCF44 /* CowSample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CowSample.swift; sourceTree = "<group>"; };
 		ECB78EB929BBB97400774E33 /* SeatsSample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeatsSample.swift; sourceTree = "<group>"; };
+		ECB78EBC29BBE93700774E33 /* Swift3D */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Swift3D; path = ..; sourceTree = "<group>"; };
 		ECED42A729A956520003FF6C /* Motion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Motion.swift; sourceTree = "<group>"; };
 		ECED42AA29A963240003FF6C /* spot_texture.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = spot_texture.png; sourceTree = "<group>"; };
 		ECED42AB29A963240003FF6C /* spot_texture.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = spot_texture.svg; sourceTree = "<group>"; };
@@ -85,7 +85,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ECAD987029930C4E00B20F52 /* Swift3D in Frameworks */,
+				EC2B342B29BBEB3F00168A95 /* Swift3D in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -121,7 +121,7 @@
 		EC6ADF782993089B0035E09A = {
 			isa = PBXGroup;
 			children = (
-				EC6ADF92299308D80035E09A /* Packages */,
+				ECB78EBB29BBE93700774E33 /* Packages */,
 				EC6ADF832993089B0035E09A /* Demo */,
 				EC6ADF822993089B0035E09A /* Products */,
 				ECAD986E29930C4E00B20F52 /* Frameworks */,
@@ -157,14 +157,6 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
-		EC6ADF92299308D80035E09A /* Packages */ = {
-			isa = PBXGroup;
-			children = (
-				EC6ADF93299308D80035E09A /* Swift3D */,
-			);
-			name = Packages;
-			sourceTree = "<group>";
-		};
 		ECAD986E29930C4E00B20F52 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -185,6 +177,14 @@
 				ECFB0DF82995A4A700687251 /* Baseball.usdz */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		ECB78EBB29BBE93700774E33 /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				ECB78EBC29BBE93700774E33 /* Swift3D */,
+			);
+			name = Packages;
 			sourceTree = "<group>";
 		};
 		ECED42A629A956180003FF6C /* Controls */ = {
@@ -230,7 +230,7 @@
 			);
 			name = Demo;
 			packageProductDependencies = (
-				ECAD986F29930C4E00B20F52 /* Swift3D */,
+				EC2B342A29BBEB3F00168A95 /* Swift3D */,
 			);
 			productName = Intro;
 			productReference = EC6ADF812993089B0035E09A /* Demo.app */;
@@ -528,7 +528,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		ECAD986F29930C4E00B20F52 /* Swift3D */ = {
+		EC2B342A29BBEB3F00168A95 /* Swift3D */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Swift3D;
 		};
