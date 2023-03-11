@@ -12,7 +12,12 @@ https://user-images.githubusercontent.com/743883/224450940-29526ed6-ac6e-4426-87
 
 https://user-images.githubusercontent.com/743883/224450945-a781b5b8-1e8e-4345-a2c6-afcb6704e615.mov
 
-https://user-images.githubusercontent.com/743883/224451092-735baf81-1a0d-4adb-a2ff-040a4e48c126.mov
+<br>
+
+### [![Stadium Seat View]([](https://user-images.githubusercontent.com/743883/224451700-dac955bf-2c86-4b8a-b51b-78ba7c820e6a.png))](http://www.youtube.com/shorts/rL8xp2Taz04 "Stadium Seat View")
+
+<a href="http://www.youtube.com/shorts/rL8xp2Taz04"><img width="253" alt="Screenshot 2023-03-10 at 5 07 35 PM" src="https://user-images.githubusercontent.com/743883/224451700-dac955bf-2c86-4b8a-b51b-78ba7c820e6a.png"></a>
+
 
 ## Installation
 
