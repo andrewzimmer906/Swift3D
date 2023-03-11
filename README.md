@@ -8,9 +8,11 @@ Using a custom `DSL ` or `Domain Specific Language` that looks and feels like `S
 
 Here are just a few examples of the types of things you can do.
 
-![PBR](https://youtube.com/shorts/oMiOQMqVoqw)
-![Spring Transition](https://youtu.be/u1Rp-CHMF8U)
-![2D Integration](https://youtube.com/shorts/rL8xp2Taz04)
+https://user-images.githubusercontent.com/743883/224450940-29526ed6-ac6e-4426-87b1-485b26026dc4.mov
+
+https://user-images.githubusercontent.com/743883/224450945-a781b5b8-1e8e-4345-a2c6-afcb6704e615.mov
+
+https://user-images.githubusercontent.com/743883/224451092-735baf81-1a0d-4adb-a2ff-040a4e48c126.mov
 
 ## Installation
 
@@ -18,10 +20,12 @@ Swift 3D uses **Swift Package Manager** for installation.  Please follow [Apple'
 
 1. In Xcode, select “File” → “Add Packages...”
 
-2. Enter `https://github.com/andrewzimmer906/Swift3D.git`
-or you can add the following dependency to your Package.swift:
+2. Enter `https://github.com/andrewzimmer906/Swift3D.git`.
 
-`.package(url: "https://github.com/andrewzimmer906/Swift3D.git", from: "1.0.0")`
+
+> Or you can add the following dependency to your Package.swift:
+>
+> `.package(url: "https://github.com/andrewzimmer906/Swift3D.git", from: "1.0.0")`
 
 
 # 🚀 Usage
@@ -74,4 +78,6 @@ However, please keep in mind that this is a side project and as such, it might t
 
 If you want to say hi, I'm on Twitter at [@andrewzimmer906](https://twitter.com/andrewzimmer906) and of course Github as [andrewzimmer906](https://github.com/andrewzimmer906).
 
-######❤️ made with love in Colorado 🏔️🌄
+<br>
+
+> ❤️ made with love in Colorado 🏔️🌄
