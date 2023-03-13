@@ -1,6 +1,6 @@
-# Swift3D 🚀
+# Swift3D 📐🔷
 
-🚀 **Swift3D** is a custom 3D engine used to define and render 3D scenes inside of existing 2D UI with declarative code.
+📐🔷 **Swift3D** is a custom 3D engine used to define and render 3D scenes inside of existing 2D UI with declarative code.
 
 Using a custom `DSL ` or `Domain Specific Language` that looks and feels like `SwiftUI`, you can define complex 3D scenes with custom lighting, transitions, and shaders.
 
